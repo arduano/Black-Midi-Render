@@ -51,12 +51,17 @@ namespace Black_Midi_Render
         int rtexture;
 
         int noteShader;
+        int postShader;
+        int defaultShader;
+
+        int vertexBufferID;
+        int colorBufferID;
+        int attrib1BufferID;
 
         int quadBufferLength = 2048;
-        int quadVertexBufferID;
         double[] quadVertexbuff;
-        int quadColorBufferID;
         float[] quadColorbuff;
+        double[] quadAttribbuff;
         int quadBufferPos = 0;
 
         int indexBufferId;
@@ -67,11 +72,38 @@ namespace Black_Midi_Render
             base.OnResize(e);
         }
 
+        int makeShaderProgram(string path)
+        {
+            int _vertexObj = GL.CreateShader(ShaderType.VertexShader);
+            int _fragObj = GL.CreateShader(ShaderType.FragmentShader);
+            int statusCode;
+            string info;
+
+            GL.ShaderSource(_vertexObj, File.ReadAllText(path + ".vert"));
+            GL.CompileShader(_vertexObj);
+            info = GL.GetShaderInfoLog(_vertexObj);
+            Console.Write(string.Format("triangle.vert compile: {0}", info));
+            GL.GetShader(_vertexObj, ShaderParameter.CompileStatus, out statusCode);
+            if (statusCode != 1) throw new ApplicationException(info);
+
+            GL.ShaderSource(_fragObj, File.ReadAllText(path + ".frag"));
+            GL.CompileShader(_fragObj);
+            info = GL.GetShaderInfoLog(_fragObj);
+            Console.Write(string.Format("triangle.frag compile: {0}", info));
+            GL.GetShader(_fragObj, ShaderParameter.CompileStatus, out statusCode);
+            if (statusCode != 1) throw new ApplicationException(info);
+
+            int shader = GL.CreateProgram();
+            GL.AttachShader(shader, _fragObj);
+            GL.AttachShader(shader, _vertexObj);
+            GL.LinkProgram(shader);
+            Console.Write(string.Format("link program: {0}", GL.GetProgramInfoLog(shader)));
+            Console.Write(string.Format("use program: {0}", GL.GetProgramInfoLog(shader)));
+            return shader;
+        }
+
         public RenderWindow(int width, int height, MidiFile midi, string outFileName) : base((int)(DisplayDevice.Default.Width / 1.5), (int)(DisplayDevice.Default.Height / 1.5), new GraphicsMode(new ColorFormat(8, 8, 8, 8)), "Render", GameWindowFlags.Default, DisplayDevice.Default)
         {
-            //this.ClientRectangle = new Rectangle(DisplayDevice.Default.Bounds.Left, DisplayDevice.Default.Bounds.Top, (int)(DisplayDevice.Default.Width / 1.5), (int)(DisplayDevice.Default.Height / 1.5));
-            //this.ClientRectangle = new Rectangle(0, 0, width + (width - Width), height + (height - Height));
-
             realWidth = width;
             realHeight = height;
 
@@ -83,7 +115,7 @@ namespace Black_Midi_Render
             VSync = VSyncMode.Off;
             if (ffRender)
             {
-                string args = "-y -f rawvideo -s " + width + "x" + height + " -pix_fmt rgb32 -r " + fps + " -i - -c:v h264 -vf vflip -an -b:v 12000k " + outFileName;
+                string args = "-y -f rawvideo -s " + realWidth + "x" + realHeight + " -pix_fmt rgb32 -r " + fps + " -i - -c:v h264 -vf vflip -an -b:v 12000k " + outFileName;
                 ffmpeg.StartInfo = new ProcessStartInfo("ffmpeg", args);
                 ffmpeg.StartInfo.RedirectStandardInput = true;
                 ffmpeg.StartInfo.UseShellExecute = false;
@@ -102,58 +134,46 @@ namespace Black_Midi_Render
 
             rtexture = GL.GenTexture();
             GL.BindTexture(TextureTarget.Texture2D, rtexture);
-            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, width, height, 0, PixelFormat.Rgba, PixelType.Byte, (IntPtr)0);
+            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, realWidth, realHeight, 0, PixelFormat.Rgba, PixelType.Byte, (IntPtr)0);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
             GL.FramebufferTexture(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, rtexture, 0);
             GL.DrawBuffer(DrawBufferMode.ColorAttachment0);
             if (GL.CheckFramebufferStatus(FramebufferTarget.Framebuffer) != FramebufferErrorCode.FramebufferComplete) throw new Exception();
 
-
-            int _vertexObj = GL.CreateShader(ShaderType.VertexShader);
-            int _fragObj = GL.CreateShader(ShaderType.FragmentShader);
-            int statusCode;
-            string info;
-
-            GL.ShaderSource(_vertexObj, File.ReadAllText(@"Shaders\notes.vert"));
-            GL.CompileShader(_vertexObj);
-            info = GL.GetShaderInfoLog(_vertexObj);
-            Console.Write(string.Format("triangle.vert compile: {0}", info));
-            GL.GetShader(_vertexObj, ShaderParameter.CompileStatus, out statusCode);
-            if (statusCode != 1) throw new ApplicationException(info);
-
-            GL.ShaderSource(_fragObj, File.ReadAllText(@"Shaders\notes.frag"));
-            GL.CompileShader(_fragObj);
-            info = GL.GetShaderInfoLog(_fragObj);
-            Console.Write(string.Format("triangle.frag compile: {0}", info));
-            GL.GetShader(_fragObj, ShaderParameter.CompileStatus, out statusCode);
-            if (statusCode != 1) throw new ApplicationException(info);
-
-            int noteShader = GL.CreateProgram();
-            GL.AttachShader(noteShader, _fragObj);
-            GL.AttachShader(noteShader, _vertexObj);
-            GL.LinkProgram(noteShader);
-            Console.Write(string.Format("link program: {0}", GL.GetProgramInfoLog(noteShader)));
-            Console.Write(string.Format("use program: {0}", GL.GetProgramInfoLog(noteShader)));
-
+            defaultShader = makeShaderProgram(@"Shaders\default");
+            noteShader = makeShaderProgram(@"Shaders\notes");
+            postShader = makeShaderProgram(@"Shaders\post");
+            
             quadVertexbuff = new double[quadBufferLength * 8];
             quadColorbuff = new float[quadBufferLength * 16];
+            quadAttribbuff = new double[quadBufferLength * 8];
 
-            GL.GenBuffers(1, out quadVertexBufferID);
-            GL.BindBuffer(BufferTarget.ArrayBuffer, quadVertexBufferID);
-            GL.BufferData(
-                BufferTarget.ArrayBuffer,
-                (IntPtr)(quadVertexbuff.Length * 8),
-                quadVertexbuff,
-                BufferUsageHint.StaticDraw);
-
-            GL.GenBuffers(1, out quadColorBufferID);
-            GL.BindBuffer(BufferTarget.ArrayBuffer, quadColorBufferID);
-            GL.BufferData(
-                BufferTarget.ElementArrayBuffer,
-                (IntPtr)(quadColorbuff.Length * 4),
-                quadColorbuff,
-                BufferUsageHint.StaticDraw);
+            GL.GenBuffers(1, out vertexBufferID);
+            GL.GenBuffers(1, out colorBufferID);
+            GL.GenBuffers(1, out attrib1BufferID);
 
             for (uint i = 0; i < indexes.Length; i++) indexes[i] = i;
+            for(int i = 0; i < quadAttribbuff.Length;)
+            {
+
+                quadAttribbuff[i++] = 0.5;
+                quadAttribbuff[i++] = 0;
+                quadAttribbuff[i++] = -0.5;
+                quadAttribbuff[i++] = 0;
+                quadAttribbuff[i++] = 0.5;
+                quadAttribbuff[i++] = 0;
+                quadAttribbuff[i++] = -0.3;
+                quadAttribbuff[i++] = 0;
+            }
+
+            GL.BindBuffer(BufferTarget.ArrayBuffer, attrib1BufferID);
+            GL.BufferData(
+                BufferTarget.ArrayBuffer,
+                (IntPtr)(quadAttribbuff.Length * 8),
+                quadAttribbuff,
+                BufferUsageHint.StaticDraw);
+
             GL.GenBuffers(1, out indexBufferId);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, indexBufferId);
             GL.BufferData(
@@ -170,20 +190,29 @@ namespace Black_Midi_Render
                 SpinWait.SpinUntil(() => midi.currentSyncTime > midiTime + tempoFrameStep || midi.unendedTracks == 0);
                 if (midi.unendedTracks == 0) break;
 
+                GL.UseProgram(noteShader);
+
                 GL.Enable(EnableCap.LineSmooth);
                 GL.Enable(EnableCap.Blend);
                 GL.EnableClientState(ArrayCap.VertexArray);
                 GL.EnableClientState(ArrayCap.ColorArray);
+                GL.Enable(EnableCap.Texture2D);
+
+                GL.EnableVertexAttribArray(0);
+                GL.EnableVertexAttribArray(1);
+                GL.EnableVertexAttribArray(2);
 
                 GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
                 GL.LineWidth(1);
-                //GL.BindFramebuffer(FramebufferTarget.Framebuffer, fbuffer);
+                GL.BindFramebuffer(FramebufferTarget.Framebuffer, fbuffer);
                 GL.Viewport(0, 0, realWidth, realHeight);
                 view.ApplyTransform(1, 1);
                 GL.Clear(ClearBufferMask.ColorBufferBit);
+
                 drawNotes();
                 drawKeyboard();
                 ProcessEvents();
+
                 if (globalTempoEvents.First != null)
                     if (midiTime + tempoFrameStep > globalTempoEvents.First.pos && globalTempoEvents.First.pos >= midiTime)
                     {
@@ -191,6 +220,7 @@ namespace Black_Midi_Render
                         tempoFrameStep = ((double)midi.division / t.tempo) * (1000000 / fps);
                     }
                 midiTime += tempoFrameStep;
+                
                 if (ffRender)
                 {
                     byte[] pixels = new byte[realWidth * realHeight * 4];
@@ -218,19 +248,27 @@ namespace Black_Midi_Render
                     });
                 }
 
-                GL.UseProgram(noteShader);
+                GL.UseProgram(postShader);
                 GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
-                //GL.Color3(1.0, 0, 0);
+                GL.Clear(ClearBufferMask.ColorBufferBit);
+                GL.Viewport(0, 0, Width, Height);
+                GL.Color3(1.0, 0, 0);
                 GL.BindTexture(TextureTarget.Texture2D, rtexture);
-                //GL.Begin(PrimitiveType.Quads);
-                //GL.Vertex2(0, 0);
-                //GL.Vertex2(1, 0);
-                //GL.Vertex2(1, 1);
-                //GL.Vertex2(0, 1);
-                //GL.End();
+                GL.Begin(PrimitiveType.Quads);
+                GL.TexCoord2(0, 0);
+                GL.Vertex2(0, 0);
+
+                GL.TexCoord2(1, 0);
+                GL.Vertex2(1, 0);
+
+                GL.TexCoord2(1, 1);
+                GL.Vertex2(1, 1);
+
+                GL.TexCoord2(0, 1);
+                GL.Vertex2(0, 1);
+                GL.End();
                 GL.BindTexture(TextureTarget.Texture2D, 0);
 
-                GL.UseProgram(0);
                 SwapBuffers();
             }
             if (ffRender) ffmpeg.Close();
@@ -251,20 +289,23 @@ namespace Black_Midi_Render
 
         void FlushQuadBuffer()
         {
-            GL.BindBuffer(BufferTarget.ArrayBuffer, quadVertexBufferID);
+            if (quadBufferPos == 0) return;
+            GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBufferID);
             GL.BufferData(
                 BufferTarget.ArrayBuffer,
                 (IntPtr)(quadVertexbuff.Length * 8),
                 quadVertexbuff,
                 BufferUsageHint.StaticDraw);
-            GL.VertexPointer(2, VertexPointerType.Double, 16, 0);
-            GL.BindBuffer(BufferTarget.ArrayBuffer, quadColorBufferID);
+            GL.VertexAttribPointer(0, 2, VertexAttribPointerType.Double, false, 16, 0);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, colorBufferID);
             GL.BufferData(
                 BufferTarget.ArrayBuffer,
                 (IntPtr)(quadColorbuff.Length * 4),
                 quadColorbuff,
                 BufferUsageHint.StaticDraw);
-            GL.ColorPointer(4, ColorPointerType.Float, 16, 0);
+            GL.VertexAttribPointer(1, 4, VertexAttribPointerType.Float, false, 16, 0);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, attrib1BufferID);
+            GL.VertexAttribPointer(2, 2, VertexAttribPointerType.Double, false, 16, 0);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, indexBufferId);
             GL.DrawElements(PrimitiveType.Quads, quadBufferPos * 4, DrawElementsType.UnsignedInt, IntPtr.Zero);
             quadBufferPos = 0;
@@ -282,6 +323,8 @@ namespace Black_Midi_Render
                     else
                         keyColors[k] = Color4.White;
                 }
+                quadBufferPos = 0;
+                float r, g, b, a;
                 foreach (Note n in globalDisplayNotes)
                 {
                     double renderCutoff = midiTime - deltaTimeOnScreen;
@@ -303,7 +346,6 @@ namespace Black_Midi_Render
                                 double y2 = 1 - (midiTime - n.start) / deltaTimeOnScreen * (1 - pianoHeight);
                                 if (!n.hasEnded)
                                     y1 = 1;
-                                //else continue;
 
                                 int pos = quadBufferPos * 8;
                                 quadVertexbuff[pos++] = x1;
@@ -316,35 +358,32 @@ namespace Black_Midi_Render
                                 quadVertexbuff[pos] = y1;
 
                                 pos = quadBufferPos * 16;
-                                quadColorbuff[pos++] = col.R;
-                                quadColorbuff[pos++] = col.G;
-                                quadColorbuff[pos++] = col.B;
-                                quadColorbuff[pos++] = col.A;
-                                quadColorbuff[pos++] = col.R;
-                                quadColorbuff[pos++] = col.G;
-                                quadColorbuff[pos++] = col.B;
-                                quadColorbuff[pos++] = col.A;
-                                quadColorbuff[pos++] = col.R;
-                                quadColorbuff[pos++] = col.G;
-                                quadColorbuff[pos++] = col.B;
-                                quadColorbuff[pos++] = col.A;
-                                quadColorbuff[pos++] = col.R;
-                                quadColorbuff[pos++] = col.G;
-                                quadColorbuff[pos++] = col.B;
-                                quadColorbuff[pos++] = col.A;
+                                r = col.R;
+                                g = col.G;
+                                b = col.B;
+                                a = col.A;
+                                quadColorbuff[pos++] = r;
+                                quadColorbuff[pos++] = g;
+                                quadColorbuff[pos++] = b;
+                                quadColorbuff[pos++] = a;
+                                quadColorbuff[pos++] = r;
+                                quadColorbuff[pos++] = g;
+                                quadColorbuff[pos++] = b;
+                                quadColorbuff[pos++] = a;
+                                quadColorbuff[pos++] = r;
+                                quadColorbuff[pos++] = g;
+                                quadColorbuff[pos++] = b;
+                                quadColorbuff[pos++] = a;
+                                quadColorbuff[pos++] = r;
+                                quadColorbuff[pos++] = g;
+                                quadColorbuff[pos++] = b;
+                                quadColorbuff[pos++] = a;
 
                                 quadBufferPos++;
-                                if (quadBufferPos >= quadBufferLength) {
+                                if (quadBufferPos >= quadBufferLength)
+                                {
                                     FlushQuadBuffer();
                                 }
-
-                                //GL.Color4(col);
-                                //GL.Begin(PrimitiveType.Quads);
-                                //GL.Vertex2(x1, y2);
-                                //GL.Vertex2(x2, y2);
-                                //GL.Vertex2(x2, y1);
-                                //GL.Vertex2(x1, y1);
-                                //GL.End();
                             }
                         }
                         else break;
@@ -358,7 +397,6 @@ namespace Black_Midi_Render
                 //GL.Flush();
                 quadBufferPos = 0;
             }
-            drawKeyboard();
         }
 
         void drawKeyboard()
@@ -366,6 +404,8 @@ namespace Black_Midi_Render
             double wdth;
             double y1 = pianoHeight;
             double y2 = 0;
+            quadBufferPos = 0;
+            float r, g, b, a;
             for (byte black = 0; black < 2; black++)
             {
                 for (int n = firstNote; n < lastNote; n++)
@@ -411,37 +451,48 @@ namespace Black_Midi_Render
                         else if (_n == 11)
                             x1 -= wdth * 0.75;
                     }
+                    
+                    int pos = quadBufferPos * 8;
+                    quadVertexbuff[pos++] = x1;
+                    quadVertexbuff[pos++] = y2;
+                    quadVertexbuff[pos++] = x2;
+                    quadVertexbuff[pos++] = y2;
+                    quadVertexbuff[pos++] = x2;
+                    quadVertexbuff[pos++] = y1;
+                    quadVertexbuff[pos++] = x1;
+                    quadVertexbuff[pos] = y1;
 
-                    GL.Color4(keyColors[n]);
-                    GL.Begin(PrimitiveType.Quads);
-                    GL.Vertex2(x1, y2);
-                    GL.Vertex2(x2, y2);
-                    GL.Vertex2(x2, y1);
-                    GL.Vertex2(x1, y1);
+                    pos = quadBufferPos * 16;
+                    var col = keyColors[n];
+                    r = col.R;
+                    g = col.G;
+                    b = col.B;
+                    a = col.A;
+                    quadColorbuff[pos++] = r;
+                    quadColorbuff[pos++] = g;
+                    quadColorbuff[pos++] = b;
+                    quadColorbuff[pos++] = a;
+                    quadColorbuff[pos++] = r;
+                    quadColorbuff[pos++] = g;
+                    quadColorbuff[pos++] = b;
+                    quadColorbuff[pos++] = a;
+                    quadColorbuff[pos++] = r;
+                    quadColorbuff[pos++] = g;
+                    quadColorbuff[pos++] = b;
+                    quadColorbuff[pos++] = a;
+                    quadColorbuff[pos++] = r;
+                    quadColorbuff[pos++] = g;
+                    quadColorbuff[pos++] = b;
+                    quadColorbuff[pos++] = a;
 
-                    GL.Color4(1, 1, 1, 0.3f);
-                    GL.Vertex2(x1, y2);
-                    GL.Color4(0, 0, 0, 0.3f);
-                    GL.Vertex2(x2, y2);
-                    GL.Color4(0, 0, 0, 0.0f);
-                    GL.Vertex2(x2, y1);
-                    GL.Color4(0, 0, 0, 0.3f);
-                    GL.Vertex2(x1, y1);
-                    GL.End();
-
-                    GL.Color4(0, 0, 0, 0.1f);
-                    GL.Begin(PrimitiveType.Lines);
-                    //GL.Vertex2(x1, y1);
-                    //GL.Vertex2(x1, y2);
-                    //GL.Vertex2(x1, y2);
-                    //GL.Vertex2(x2, y2);
-                    //GL.Vertex2(x2, y2);
-                    //GL.Vertex2(x2, y1);
-                    //GL.Vertex2(x2, y1);
-                    //GL.Vertex2(x1, y1);
-                    GL.End();
+                    quadBufferPos++;
+                    if (quadBufferPos >= quadBufferLength)
+                    {
+                        FlushQuadBuffer();
+                    }
                 }
             }
+            FlushQuadBuffer();
         }
     }
 }

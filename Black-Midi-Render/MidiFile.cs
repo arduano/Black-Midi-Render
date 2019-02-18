@@ -123,7 +123,6 @@ namespace Black_Midi_Render
 
         public void ParseAll()
         {
-            int p = 0;
             Parallel.For(0, tracks.Length, (i) =>
             {
                 //Console.WriteLine("Opening track " + _p + "/" + tracks.Length);
