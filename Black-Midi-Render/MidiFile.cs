@@ -41,7 +41,8 @@ namespace Black_Midi_Render
                 byte[] trackbytes = new byte[trackLengths[i]];
                 MidiFileReader.Position = trackBeginnings[i];
                 MidiFileReader.Read(trackbytes, 0, (int)trackLengths[i]);
-                tracks[i] = new MidiTrack(i, trackbytes, globalDisplayNotes, globalTempoEvents);
+                tracks[i] = new MidiTrack(i, new MemoryByteReader(trackbytes), globalDisplayNotes, globalTempoEvents);
+                //tracks[i] = new MidiTrack(i, new BufferByteReader(MidiFileReader, 10000000, trackBeginnings[i], trackLengths[i]), globalDisplayNotes, globalTempoEvents);
             }
             Console.WriteLine("Loaded!");
             unendedTracks = trackcount;
@@ -123,6 +124,7 @@ namespace Black_Midi_Render
 
         public void ParseAll()
         {
+            int p = 0;
             Parallel.For(0, tracks.Length, (i) =>
             {
                 //Console.WriteLine("Opening track " + _p + "/" + tracks.Length);
@@ -138,7 +140,7 @@ namespace Black_Midi_Render
                         break;
                     }
                 }
-                Console.WriteLine("Scanned track " + i + "/" + tracks.Length);
+                Console.WriteLine("Scanned track " + p++ + "/" + tracks.Length);
             });
             maxTrackTime = 0;
             foreach (var t in tracks)

@@ -12,7 +12,7 @@ namespace Black_Midi_Render
         [MTAThread]
         static void Main(string[] args)
         {
-            MidiFile f = new MidiFile(@"E:\Midi\Pi.mid");
+            MidiFile f = new MidiFile(@"E:\Midi\BA.Betelgeuse.AlphaBuild.mid_.mid");
             f.ParseAll();
             RenderWindow win = null;
             bool winStarted = false;

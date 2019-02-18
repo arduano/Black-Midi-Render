@@ -24,9 +24,19 @@ namespace Black_Midi_Render
         public int tempo;
     }
 
+    interface IByteReader
+    {
+        byte Read();
+        void Reset();
+        void Skip(int count);
+        long Location
+        {
+            get;
+        }
+    }
+
     class MidiTrack
     {
-        byte[] bytes;
         public int trackID;
 
         public bool trackEnded = false;
@@ -41,25 +51,25 @@ namespace Black_Midi_Render
         FastList<Note> globalDisplayNotes;
         FastList<Tempo> globalTempoEvents;
 
-        long readpos = 0;
-
         public Color4 trkColor;
 
         bool readDelta = false;
 
+        IByteReader reader;
+
         public void Reset()
         {
-            readpos = 0;
+            reader.Reset();
             trackTime = 0;
             trackEnded = false;
             channelPrefix = 0;
         }
 
-        public MidiTrack(int id, byte[] bytes, FastList<Note> globalNotes, FastList<Tempo> globalTempos)
+        public MidiTrack(int id, IByteReader reader, FastList<Note> globalNotes, FastList<Tempo> globalTempos)
         {
             globalDisplayNotes = globalNotes;
             globalTempoEvents = globalTempos;
-            this.bytes = bytes;
+            this.reader = reader;
             trackID = id;
             for (int i = 0; i < 256 * 16; i++)
             {
@@ -74,7 +84,7 @@ namespace Black_Midi_Render
             int val = 0;
             for (int i = 0; i < 4; i++)
             {
-                c = bytes[readpos++];
+                c = reader.Read();
                 if (c > 127)
                 {
                     val = (c - 128) + val * 128;
@@ -104,7 +114,7 @@ namespace Black_Midi_Render
                         readDelta = true;
                     }
                     while (trackTime == d);
-                    }
+                }
                 else
                 {
                     if (trackEnded) return;
@@ -123,13 +133,13 @@ namespace Black_Midi_Render
                     trackTime += ReadVariableLen();
                 }
                 readDelta = false;
-                byte command = bytes[readpos++];
+                byte command = reader.Read();
                 byte comm = (byte)(command & 0b11110000);
                 if (comm == 0b10010000)
                 {
                     byte channel = (byte)(command & 0b00001111);
-                    byte note = bytes[readpos++];
-                    byte vel = bytes[readpos++];
+                    byte note = reader.Read();
+                    byte vel = reader.Read();
                     if (vel == 0)
                     {
                         if (!readOnly)
@@ -165,8 +175,8 @@ namespace Black_Midi_Render
                 else if (comm == 0b10000000)
                 {
                     int channel = command & 0b00001111;
-                    byte note = bytes[readpos++];
-                    byte vel = bytes[readpos++];
+                    byte note = reader.Read();
+                    byte vel = reader.Read();
 
                     if (!readOnly)
                         try
@@ -186,37 +196,37 @@ namespace Black_Midi_Render
                 else if (comm == 0b10100000)
                 {
                     int channel = command & 0b00001111;
-                    byte note = bytes[readpos++];
-                    byte vel = bytes[readpos++];
+                    byte note = reader.Read();
+                    byte vel = reader.Read();
                 }
                 else if (comm == 0b10100000)
                 {
                     int channel = command & 0b00001111;
-                    byte number = bytes[readpos++];
-                    byte value = bytes[readpos++];
+                    byte number = reader.Read();
+                    byte value = reader.Read();
                 }
                 else if (comm == 0b11000000)
                 {
                     int channel = command & 0b00001111;
-                    byte program = bytes[readpos++];
+                    byte program = reader.Read();
                 }
                 else if (comm == 0b11010000)
                 {
 
                     int channel = command & 0b00001111;
-                    byte pressure = bytes[readpos++];
+                    byte pressure = reader.Read();
                 }
                 else if (comm == 0b11100000)
                 {
                     int channel = command & 0b00001111;
-                    byte l = bytes[readpos++];
-                    byte m = bytes[readpos++];
+                    byte l = reader.Read();
+                    byte m = reader.Read();
                 }
                 else if (comm == 0b10110000)
                 {
                     int channel = command & 0b00001111;
-                    byte cc = bytes[readpos++];
-                    byte vv = bytes[readpos++];
+                    byte cc = reader.Read();
+                    byte vv = reader.Read();
                 }
                 else if (command == 0b11110000)
                 {
@@ -228,13 +238,13 @@ namespace Black_Midi_Render
                 else if (command == 0b11110010)
                 {
                     int channel = command & 0b00001111;
-                    byte ll = bytes[readpos++];
-                    byte mm = bytes[readpos++];
+                    byte ll = reader.Read();
+                    byte mm = reader.Read();
 
                 }
                 else if (command == 0b11110011)
                 {
-                    byte ss = bytes[readpos++];
+                    byte ss = reader.Read();
                 }
                 else if (command == 0b11110110)
                 {
@@ -256,10 +266,10 @@ namespace Black_Midi_Render
                 }
                 else if (command == 0xFF)
                 {
-                    command = bytes[readpos++];
+                    command = reader.Read();
                     if (command == 0x00)
                     {
-                        if (bytes[readpos++] != 0)
+                        if (reader.Read() != 0)
                         {
                             throw new Exception("Corrupt Track");
                         }
@@ -270,7 +280,7 @@ namespace Black_Midi_Render
                         char[] text = new char[size];
                         for (int i = 0; i < size; i++)
                         {
-                            text[i] = (char)bytes[readpos++];
+                            text[i] = (char)reader.Read();
                         }
                         string str = new string(text);
                     }
@@ -280,7 +290,7 @@ namespace Black_Midi_Render
                         char[] text = new char[size];
                         for (int i = 0; i < size; i++)
                         {
-                            text[i] = (char)bytes[readpos++];
+                            text[i] = (char)reader.Read();
                         }
                         string str = new string(text);
                     }
@@ -290,7 +300,7 @@ namespace Black_Midi_Render
                         char[] text = new char[size];
                         for (int i = 0; i < size; i++)
                         {
-                            text[i] = (char)bytes[readpos++];
+                            text[i] = (char)reader.Read();
                         }
                         string str = new string(text);
                     }
@@ -300,7 +310,7 @@ namespace Black_Midi_Render
                         char[] text = new char[size];
                         for (int i = 0; i < size; i++)
                         {
-                            text[i] = (char)bytes[readpos++];
+                            text[i] = (char)reader.Read();
                         }
                         string str = new string(text);
                     }
@@ -310,7 +320,7 @@ namespace Black_Midi_Render
                         char[] text = new char[size];
                         for (int i = 0; i < size; i++)
                         {
-                            text[i] = (char)bytes[readpos++];
+                            text[i] = (char)reader.Read();
                         }
                         string str = new string(text);
                     }
@@ -320,7 +330,7 @@ namespace Black_Midi_Render
                         char[] text = new char[size];
                         for (int i = 0; i < size; i++)
                         {
-                            text[i] = (char)bytes[readpos++];
+                            text[i] = (char)reader.Read();
                         }
                         string str = new string(text);
                     }
@@ -330,32 +340,32 @@ namespace Black_Midi_Render
                         char[] text = new char[size];
                         for (int i = 0; i < size; i++)
                         {
-                            text[i] = (char)bytes[readpos++];
+                            text[i] = (char)reader.Read();
                         }
                         string str = new string(text);
                     }
                     else if (command == 0x20)
                     {
-                        command = bytes[readpos++];
+                        command = reader.Read();
                         if (command != 1)
                         {
                             throw new Exception("Corrupt Track");
                         }
-                        channelPrefix = bytes[readpos++];
+                        channelPrefix = reader.Read();
                     }
                     else if (command == 0x21)
                     {
-                        command = bytes[readpos++];
+                        command = reader.Read();
                         if (command != 1)
                         {
                             throw new Exception("Corrupt Track");
                         }
-                        readpos += 1;
+                        reader.Skip(1);
                         //TODO:  MIDI port
                     }
                     else if (command == 0x2F)
                     {
-                        command = bytes[readpos++];
+                        command = reader.Read();
                         if (command != 0)
                         {
                             throw new Exception("Corrupt Track");
@@ -364,14 +374,14 @@ namespace Black_Midi_Render
                     }
                     else if (command == 0x51)
                     {
-                        command = bytes[readpos++];
+                        command = reader.Read();
                         if (command != 3)
                         {
                             throw new Exception("Corrupt Track");
                         }
                         int btempo = 0;
                         for (int i = 0; i != 3; i++)
-                            btempo = (int)((btempo << 8) | bytes[readpos++]);
+                            btempo = (int)((btempo << 8) | reader.Read());
                         Tempo t = new Tempo();
                         t.pos = trackTime;
                         t.tempo = btempo;
@@ -383,30 +393,30 @@ namespace Black_Midi_Render
                     }
                     else if (command == 0x54)
                     {
-                        command = bytes[readpos++];
+                        command = reader.Read();
                         if (command != 5)
                         {
                             throw new Exception("Corrupt Track");
                         }
-                        readpos += 4;
+                        reader.Skip(4);
                     }
                     else if (command == 0x58)
                     {
-                        command = bytes[readpos++];
+                        command = reader.Read();
                         if (command != 4)
                         {
                             throw new Exception("Corrupt Track");
                         }
-                        readpos += 4;
+                        reader.Skip(4);
                     }
                     else if (command == 0x59)
                     {
-                        command = bytes[readpos++];
+                        command = reader.Read();
                         if (command != 2)
                         {
                             throw new Exception("Corrupt Track");
                         }
-                        readpos += 2;
+                        reader.Skip(2);
                         //TODO: Key Signature
                     }
                     else if (command == 0x7F)
@@ -415,7 +425,7 @@ namespace Black_Midi_Render
                         byte[] data = new byte[size];
                         for (int i = 0; i < size; i++)
                         {
-                            data[i] = bytes[readpos++];
+                            data[i] = reader.Read();
                         }
                     }
                     else

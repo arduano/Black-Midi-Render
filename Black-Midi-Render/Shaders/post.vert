@@ -12,5 +12,5 @@ void main()
 {
     gl_Position = gl_ModelViewProjectionMatrix * vec4(position.x, position.y, position.z, 1.0f);
 	color = gl_Color;
-    UV = new vec2(position.x, position.y);
+    UV = vec2(position.x, position.y);
 }

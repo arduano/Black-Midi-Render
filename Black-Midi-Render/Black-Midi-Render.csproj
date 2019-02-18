@@ -60,7 +60,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BufferByteReader.cs" />
     <Compile Include="FastList.cs" />
+    <Compile Include="MemoryByteReader.cs" />
     <Compile Include="MidiFile.cs" />
     <Compile Include="MidiTrack.cs" />
     <Compile Include="Program.cs" />
