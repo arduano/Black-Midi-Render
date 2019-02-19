@@ -30,6 +30,24 @@
         {
             this.components = new System.ComponentModel.Container();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.label13 = new System.Windows.Forms.Label();
+            this.glowRad_nud = new System.Windows.Forms.NumericUpDown();
+            this.glowCheck = new System.Windows.Forms.CheckBox();
+            this.label11 = new System.Windows.Forms.Label();
+            this.maxBuffer_nud = new System.Windows.Forms.NumericUpDown();
+            this.label12 = new System.Windows.Forms.Label();
+            this.bitrate_nud = new System.Windows.Forms.NumericUpDown();
+            this.label10 = new System.Windows.Forms.Label();
+            this.imgpath = new System.Windows.Forms.TextBox();
+            this.ffpath = new System.Windows.Forms.TextBox();
+            this.browseImgButton = new System.Windows.Forms.Button();
+            this.browseFFButton = new System.Windows.Forms.Button();
+            this.noneVsync_radio = new System.Windows.Forms.RadioButton();
+            this.none_radio = new System.Windows.Forms.RadioButton();
+            this.img_radio = new System.Windows.Forms.RadioButton();
+            this.ff_radio = new System.Windows.Forms.RadioButton();
+            this.label9 = new System.Windows.Forms.Label();
+            this.label8 = new System.Windows.Forms.Label();
             this.noteDT_nud = new System.Windows.Forms.NumericUpDown();
             this.label7 = new System.Windows.Forms.Label();
             this.pianoHeight_nud = new System.Windows.Forms.NumericUpDown();
@@ -49,28 +67,13 @@
             this.width_nud = new System.Windows.Forms.NumericUpDown();
             this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
             this.browseButton = new System.Windows.Forms.Button();
-            this.label8 = new System.Windows.Forms.Label();
-            this.label9 = new System.Windows.Forms.Label();
-            this.ff_radio = new System.Windows.Forms.RadioButton();
-            this.img_radio = new System.Windows.Forms.RadioButton();
-            this.none_radio = new System.Windows.Forms.RadioButton();
-            this.noneVsync_radio = new System.Windows.Forms.RadioButton();
-            this.browseFFButton = new System.Windows.Forms.Button();
-            this.browseImgButton = new System.Windows.Forms.Button();
-            this.ffpath = new System.Windows.Forms.TextBox();
-            this.imgpath = new System.Windows.Forms.TextBox();
-            this.label10 = new System.Windows.Forms.Label();
-            this.bitrate_nud = new System.Windows.Forms.NumericUpDown();
-            this.label11 = new System.Windows.Forms.Label();
-            this.maxBuffer_nud = new System.Windows.Forms.NumericUpDown();
-            this.label12 = new System.Windows.Forms.Label();
             this.stopButton = new System.Windows.Forms.Button();
             this.startButton = new System.Windows.Forms.Button();
-            this.glowCheck = new System.Windows.Forms.CheckBox();
-            this.glowRad_nud = new System.Windows.Forms.NumericUpDown();
-            this.label13 = new System.Windows.Forms.Label();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.groupBox1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.glowRad_nud)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.maxBuffer_nud)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.bitrate_nud)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.noteDT_nud)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pianoHeight_nud)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.maxNote_nud)).BeginInit();
@@ -79,9 +82,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.height_nud)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.width_nud)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.bitrate_nud)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.maxBuffer_nud)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.glowRad_nud)).BeginInit();
             this.SuspendLayout();
             // 
             // groupBox1
@@ -131,6 +131,204 @@
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Settings";
+            // 
+            // label13
+            // 
+            this.label13.AutoSize = true;
+            this.label13.Location = new System.Drawing.Point(198, 238);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(67, 13);
+            this.label13.TabIndex = 31;
+            this.label13.Text = "Glow Radius";
+            // 
+            // glowRad_nud
+            // 
+            this.glowRad_nud.Location = new System.Drawing.Point(107, 236);
+            this.glowRad_nud.Margin = new System.Windows.Forms.Padding(3, 7, 3, 3);
+            this.glowRad_nud.Maximum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            0});
+            this.glowRad_nud.Name = "glowRad_nud";
+            this.glowRad_nud.Size = new System.Drawing.Size(84, 20);
+            this.glowRad_nud.TabIndex = 30;
+            this.glowRad_nud.ValueChanged += new System.EventHandler(this.glowRad_nud_ValueChanged);
+            // 
+            // glowCheck
+            // 
+            this.glowCheck.AutoSize = true;
+            this.glowCheck.Location = new System.Drawing.Point(9, 237);
+            this.glowCheck.Name = "glowCheck";
+            this.glowCheck.Size = new System.Drawing.Size(92, 17);
+            this.glowCheck.TabIndex = 29;
+            this.glowCheck.Text = "Glow Enabled";
+            this.glowCheck.UseVisualStyleBackColor = true;
+            this.glowCheck.CheckedChanged += new System.EventHandler(this.glowCheck_CheckedChanged);
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(230, 208);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(192, 13);
+            this.label11.TabIndex = 28;
+            this.label11.Text = "Maximum buffer size per track (in bytes)";
+            // 
+            // maxBuffer_nud
+            // 
+            this.maxBuffer_nud.Location = new System.Drawing.Point(140, 206);
+            this.maxBuffer_nud.Margin = new System.Windows.Forms.Padding(3, 7, 3, 3);
+            this.maxBuffer_nud.Maximum = new decimal(new int[] {
+            -2147483648,
+            0,
+            0,
+            0});
+            this.maxBuffer_nud.Name = "maxBuffer_nud";
+            this.maxBuffer_nud.Size = new System.Drawing.Size(84, 20);
+            this.maxBuffer_nud.TabIndex = 27;
+            this.maxBuffer_nud.ValueChanged += new System.EventHandler(this.maxBuffer_nud_ValueChanged);
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(6, 208);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(128, 13);
+            this.label12.TabIndex = 26;
+            this.label12.Text = "Max track byte buffer size";
+            // 
+            // bitrate_nud
+            // 
+            this.bitrate_nud.Enabled = false;
+            this.bitrate_nud.Location = new System.Drawing.Point(92, 297);
+            this.bitrate_nud.Margin = new System.Windows.Forms.Padding(3, 7, 3, 3);
+            this.bitrate_nud.Maximum = new decimal(new int[] {
+            100000,
+            0,
+            0,
+            0});
+            this.bitrate_nud.Name = "bitrate_nud";
+            this.bitrate_nud.Size = new System.Drawing.Size(94, 20);
+            this.bitrate_nud.TabIndex = 25;
+            this.bitrate_nud.ValueChanged += new System.EventHandler(this.bitrate_nud_ValueChanged);
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Location = new System.Drawing.Point(49, 299);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(37, 13);
+            this.label10.TabIndex = 24;
+            this.label10.Text = "Bitrate";
+            // 
+            // imgpath
+            // 
+            this.imgpath.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.imgpath.Enabled = false;
+            this.imgpath.Location = new System.Drawing.Point(192, 325);
+            this.imgpath.Name = "imgpath";
+            this.imgpath.ReadOnly = true;
+            this.imgpath.Size = new System.Drawing.Size(341, 20);
+            this.imgpath.TabIndex = 23;
+            // 
+            // ffpath
+            // 
+            this.ffpath.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.ffpath.Enabled = false;
+            this.ffpath.Location = new System.Drawing.Point(192, 273);
+            this.ffpath.Name = "ffpath";
+            this.ffpath.ReadOnly = true;
+            this.ffpath.Size = new System.Drawing.Size(341, 20);
+            this.ffpath.TabIndex = 22;
+            // 
+            // browseImgButton
+            // 
+            this.browseImgButton.Enabled = false;
+            this.browseImgButton.Location = new System.Drawing.Point(92, 323);
+            this.browseImgButton.Name = "browseImgButton";
+            this.browseImgButton.Size = new System.Drawing.Size(94, 23);
+            this.browseImgButton.TabIndex = 21;
+            this.browseImgButton.Text = "Browse Folder";
+            this.browseImgButton.UseVisualStyleBackColor = true;
+            this.browseImgButton.Click += new System.EventHandler(this.browseImgButton_Click);
+            // 
+            // browseFFButton
+            // 
+            this.browseFFButton.Enabled = false;
+            this.browseFFButton.Location = new System.Drawing.Point(92, 271);
+            this.browseFFButton.Name = "browseFFButton";
+            this.browseFFButton.Size = new System.Drawing.Size(94, 23);
+            this.browseFFButton.TabIndex = 20;
+            this.browseFFButton.Text = "Browse File";
+            this.browseFFButton.UseVisualStyleBackColor = true;
+            this.browseFFButton.Click += new System.EventHandler(this.browseFFButton_Click);
+            // 
+            // noneVsync_radio
+            // 
+            this.noneVsync_radio.AutoSize = true;
+            this.noneVsync_radio.Checked = true;
+            this.noneVsync_radio.Location = new System.Drawing.Point(6, 372);
+            this.noneVsync_radio.Name = "noneVsync_radio";
+            this.noneVsync_radio.Size = new System.Drawing.Size(105, 17);
+            this.noneVsync_radio.TabIndex = 19;
+            this.noneVsync_radio.TabStop = true;
+            this.noneVsync_radio.Text = "None with Vsync";
+            this.noneVsync_radio.UseVisualStyleBackColor = true;
+            // 
+            // none_radio
+            // 
+            this.none_radio.AutoSize = true;
+            this.none_radio.Location = new System.Drawing.Point(6, 349);
+            this.none_radio.Name = "none_radio";
+            this.none_radio.Size = new System.Drawing.Size(51, 17);
+            this.none_radio.TabIndex = 18;
+            this.none_radio.Text = "None";
+            this.none_radio.UseVisualStyleBackColor = true;
+            // 
+            // img_radio
+            // 
+            this.img_radio.AutoSize = true;
+            this.img_radio.Location = new System.Drawing.Point(6, 326);
+            this.img_radio.Name = "img_radio";
+            this.img_radio.Size = new System.Drawing.Size(76, 17);
+            this.img_radio.TabIndex = 17;
+            this.img_radio.Text = "Image strip";
+            this.img_radio.UseVisualStyleBackColor = true;
+            this.img_radio.CheckedChanged += new System.EventHandler(this.img_radio_CheckedChanged);
+            // 
+            // ff_radio
+            // 
+            this.ff_radio.AutoSize = true;
+            this.ff_radio.Location = new System.Drawing.Point(6, 274);
+            this.ff_radio.Name = "ff_radio";
+            this.ff_radio.Size = new System.Drawing.Size(80, 17);
+            this.ff_radio.TabIndex = 16;
+            this.ff_radio.Text = "ffmpeg mp4";
+            this.ff_radio.UseVisualStyleBackColor = true;
+            this.ff_radio.CheckedChanged += new System.EventHandler(this.ff_radio_CheckedChanged);
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(160, 148);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(91, 13);
+            this.label9.TabIndex = 15;
+            this.label9.Text = "% from the bottom";
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(215, 178);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(74, 13);
+            this.label8.TabIndex = 14;
+            this.label8.Text = "Lower = faster";
             // 
             // noteDT_nud
             // 
@@ -394,170 +592,6 @@
             this.browseButton.UseVisualStyleBackColor = true;
             this.browseButton.Click += new System.EventHandler(this.browseButton_Click);
             // 
-            // label8
-            // 
-            this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(215, 178);
-            this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(74, 13);
-            this.label8.TabIndex = 14;
-            this.label8.Text = "Lower = faster";
-            // 
-            // label9
-            // 
-            this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(160, 148);
-            this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(91, 13);
-            this.label9.TabIndex = 15;
-            this.label9.Text = "% from the bottom";
-            // 
-            // ff_radio
-            // 
-            this.ff_radio.AutoSize = true;
-            this.ff_radio.Location = new System.Drawing.Point(6, 274);
-            this.ff_radio.Name = "ff_radio";
-            this.ff_radio.Size = new System.Drawing.Size(80, 17);
-            this.ff_radio.TabIndex = 16;
-            this.ff_radio.Text = "ffmpeg mp4";
-            this.ff_radio.UseVisualStyleBackColor = true;
-            this.ff_radio.CheckedChanged += new System.EventHandler(this.ff_radio_CheckedChanged);
-            // 
-            // img_radio
-            // 
-            this.img_radio.AutoSize = true;
-            this.img_radio.Location = new System.Drawing.Point(6, 326);
-            this.img_radio.Name = "img_radio";
-            this.img_radio.Size = new System.Drawing.Size(76, 17);
-            this.img_radio.TabIndex = 17;
-            this.img_radio.Text = "Image strip";
-            this.img_radio.UseVisualStyleBackColor = true;
-            this.img_radio.CheckedChanged += new System.EventHandler(this.img_radio_CheckedChanged);
-            // 
-            // none_radio
-            // 
-            this.none_radio.AutoSize = true;
-            this.none_radio.Location = new System.Drawing.Point(6, 349);
-            this.none_radio.Name = "none_radio";
-            this.none_radio.Size = new System.Drawing.Size(51, 17);
-            this.none_radio.TabIndex = 18;
-            this.none_radio.Text = "None";
-            this.none_radio.UseVisualStyleBackColor = true;
-            // 
-            // noneVsync_radio
-            // 
-            this.noneVsync_radio.AutoSize = true;
-            this.noneVsync_radio.Checked = true;
-            this.noneVsync_radio.Location = new System.Drawing.Point(6, 372);
-            this.noneVsync_radio.Name = "noneVsync_radio";
-            this.noneVsync_radio.Size = new System.Drawing.Size(105, 17);
-            this.noneVsync_radio.TabIndex = 19;
-            this.noneVsync_radio.TabStop = true;
-            this.noneVsync_radio.Text = "None with Vsync";
-            this.noneVsync_radio.UseVisualStyleBackColor = true;
-            // 
-            // browseFFButton
-            // 
-            this.browseFFButton.Enabled = false;
-            this.browseFFButton.Location = new System.Drawing.Point(92, 271);
-            this.browseFFButton.Name = "browseFFButton";
-            this.browseFFButton.Size = new System.Drawing.Size(94, 23);
-            this.browseFFButton.TabIndex = 20;
-            this.browseFFButton.Text = "Browse File";
-            this.browseFFButton.UseVisualStyleBackColor = true;
-            this.browseFFButton.Click += new System.EventHandler(this.browseFFButton_Click);
-            // 
-            // browsImgButton
-            // 
-            this.browseImgButton.Enabled = false;
-            this.browseImgButton.Location = new System.Drawing.Point(92, 323);
-            this.browseImgButton.Name = "browsImgButton";
-            this.browseImgButton.Size = new System.Drawing.Size(94, 23);
-            this.browseImgButton.TabIndex = 21;
-            this.browseImgButton.Text = "Browse Folder";
-            this.browseImgButton.UseVisualStyleBackColor = true;
-            this.browseImgButton.Click += new System.EventHandler(this.browseImgButton_Click);
-            // 
-            // ffpath
-            // 
-            this.ffpath.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.ffpath.Enabled = false;
-            this.ffpath.Location = new System.Drawing.Point(192, 273);
-            this.ffpath.Name = "ffpath";
-            this.ffpath.ReadOnly = true;
-            this.ffpath.Size = new System.Drawing.Size(341, 20);
-            this.ffpath.TabIndex = 22;
-            // 
-            // imgpath
-            // 
-            this.imgpath.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.imgpath.Enabled = false;
-            this.imgpath.Location = new System.Drawing.Point(192, 325);
-            this.imgpath.Name = "imgpath";
-            this.imgpath.ReadOnly = true;
-            this.imgpath.Size = new System.Drawing.Size(341, 20);
-            this.imgpath.TabIndex = 23;
-            // 
-            // label10
-            // 
-            this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(49, 299);
-            this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(37, 13);
-            this.label10.TabIndex = 24;
-            this.label10.Text = "Bitrate";
-            // 
-            // bitrate_nud
-            // 
-            this.bitrate_nud.Enabled = false;
-            this.bitrate_nud.Location = new System.Drawing.Point(92, 297);
-            this.bitrate_nud.Margin = new System.Windows.Forms.Padding(3, 7, 3, 3);
-            this.bitrate_nud.Maximum = new decimal(new int[] {
-            100000,
-            0,
-            0,
-            0});
-            this.bitrate_nud.Name = "bitrate_nud";
-            this.bitrate_nud.Size = new System.Drawing.Size(94, 20);
-            this.bitrate_nud.TabIndex = 25;
-            this.bitrate_nud.ValueChanged += new System.EventHandler(this.bitrate_nud_ValueChanged);
-            // 
-            // label11
-            // 
-            this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(230, 208);
-            this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(192, 13);
-            this.label11.TabIndex = 28;
-            this.label11.Text = "Maximum buffer size per track (in bytes)";
-            // 
-            // maxBuffer_nud
-            // 
-            this.maxBuffer_nud.Location = new System.Drawing.Point(140, 206);
-            this.maxBuffer_nud.Margin = new System.Windows.Forms.Padding(3, 7, 3, 3);
-            this.maxBuffer_nud.Maximum = new decimal(new int[] {
-            -2147483648,
-            0,
-            0,
-            0});
-            this.maxBuffer_nud.Name = "maxBuffer_nud";
-            this.maxBuffer_nud.Size = new System.Drawing.Size(84, 20);
-            this.maxBuffer_nud.TabIndex = 27;
-            this.maxBuffer_nud.ValueChanged += new System.EventHandler(this.maxBuffer_nud_ValueChanged);
-            // 
-            // label12
-            // 
-            this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(6, 208);
-            this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(128, 13);
-            this.label12.TabIndex = 26;
-            this.label12.Text = "Max track byte buffer size";
-            // 
             // stopButton
             // 
             this.stopButton.Enabled = false;
@@ -580,40 +614,6 @@
             this.startButton.UseVisualStyleBackColor = true;
             this.startButton.Click += new System.EventHandler(this.startButton_Click);
             // 
-            // glowCheck
-            // 
-            this.glowCheck.AutoSize = true;
-            this.glowCheck.Location = new System.Drawing.Point(9, 237);
-            this.glowCheck.Name = "glowCheck";
-            this.glowCheck.Size = new System.Drawing.Size(92, 17);
-            this.glowCheck.TabIndex = 29;
-            this.glowCheck.Text = "Glow Enabled";
-            this.glowCheck.UseVisualStyleBackColor = true;
-            this.glowCheck.CheckedChanged += new System.EventHandler(this.glowCheck_CheckedChanged);
-            // 
-            // glowRad_nud
-            // 
-            this.glowRad_nud.Location = new System.Drawing.Point(107, 236);
-            this.glowRad_nud.Margin = new System.Windows.Forms.Padding(3, 7, 3, 3);
-            this.glowRad_nud.Maximum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            0});
-            this.glowRad_nud.Name = "glowRad_nud";
-            this.glowRad_nud.Size = new System.Drawing.Size(84, 20);
-            this.glowRad_nud.TabIndex = 30;
-            this.glowRad_nud.ValueChanged += new System.EventHandler(this.glowRad_nud_ValueChanged);
-            // 
-            // label13
-            // 
-            this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(198, 238);
-            this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(67, 13);
-            this.label13.TabIndex = 31;
-            this.label13.Text = "Glow Radius";
-            // 
             // timer1
             // 
             this.timer1.Enabled = true;
@@ -629,10 +629,13 @@
             this.Controls.Add(this.groupBox1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Name = "SettingsForm";
-            this.Text = "SettingsForm";
+            this.Text = "Settings";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.SettingsForm_FormClosing);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.glowRad_nud)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.maxBuffer_nud)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.bitrate_nud)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.noteDT_nud)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pianoHeight_nud)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.maxNote_nud)).EndInit();
@@ -641,9 +644,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.height_nud)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.width_nud)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.bitrate_nud)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.maxBuffer_nud)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.glowRad_nud)).EndInit();
             this.ResumeLayout(false);
 
         }

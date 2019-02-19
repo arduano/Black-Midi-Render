@@ -8,6 +8,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
@@ -34,7 +35,7 @@ namespace Black_Midi_Render
         Task lastRenderPush = null;
 
         public bool Running = true;
-        
+
         GLPostbuffer finalCompositeBuff;
         GLPostbuffer baseRenderBuff;
         GLPostbuffer glowMaskFirstPassBuff;
@@ -67,7 +68,7 @@ namespace Black_Midi_Render
         void BindUniforms()
         {
             glowTextureSize_var = GL.GetUniformLocation(glowShader, "u_textureSize");
-            glowSigma_var = GL.GetUniformLocation(glowShader, "u_sigma"); 
+            glowSigma_var = GL.GetUniformLocation(glowShader, "u_sigma");
             glowWidth_var = GL.GetUniformLocation(glowShader, "u_width");
             glowPass_var = GL.GetUniformLocation(glowShader, "u_pass");
             glowStrength_var = GL.GetUniformLocation(glowShader, "u_strength");
@@ -87,14 +88,22 @@ namespace Black_Midi_Render
             globalTempoEvents = midi.globalTempoEvents;
             this.midi = midi;
             tempoFrameStep = ((double)midi.division / 50000) * (1000000 / settings.fps);
-            if(!settings.vsync) VSync = VSyncMode.Off;
+            if (!settings.vsync) VSync = VSyncMode.Off;
             if (settings.ffRender)
             {
                 string args = "-y -f rawvideo -s " + settings.width + "x" + settings.height + " -pix_fmt rgb32 -r " + settings.fps + " -i - -c:v h264 -vf vflip -an -b:v " + settings.bitrate + "k " + settings.ffPath;
                 ffmpeg.StartInfo = new ProcessStartInfo("ffmpeg", args);
                 ffmpeg.StartInfo.RedirectStandardInput = true;
                 ffmpeg.StartInfo.UseShellExecute = false;
-                ffmpeg.Start();
+                try
+                {
+                    ffmpeg.Start();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("There was an error starting the ffmpeg process\nNo video will be written\n(Is ffmpeg.exe in the same folder as this program?)\n\n\"" + ex.Message + "\"");
+                    settings.ffRender = false;
+                }
             }
             if (settings.imgRender)
             {
@@ -279,7 +288,7 @@ namespace Black_Midi_Render
                 GLPostbuffer.UnbindBuffers();
                 GL.Clear(ClearBufferMask.ColorBufferBit);
                 GL.Viewport(0, 0, Width, Height);
-                glowMaskFirstPassBuff.BindTexture();
+                finalCompositeBuff.BindTexture();
                 //GL.ClearColor(1, 1, 1, 1);
                 DrawScreenQuad();
                 GLPostbuffer.UnbindTextures();
@@ -291,6 +300,7 @@ namespace Black_Midi_Render
             if (settings.ffRender)
             {
                 if (lastRenderPush != null) lastRenderPush.GetAwaiter().GetResult();
+                ffmpeg.StandardInput.Close();
                 ffmpeg.Close();
             }
             this.Close();

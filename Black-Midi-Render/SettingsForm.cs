@@ -61,7 +61,7 @@ namespace Black_Midi_Render
             {
                 midifile = new MidiFile(MidiBox.Text, settings);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Console.WriteLine(ex.Message + "\n" + ex.StackTrace);
                 MessageBox.Show(ex.Message + "\n" + ex.StackTrace);
@@ -142,7 +142,7 @@ namespace Black_Midi_Render
         RenderWindow win = null;
         private void startButton_Click(object sender, EventArgs e)
         {
-            if(midifile == null)
+            if (midifile == null)
             {
                 MessageBox.Show("Please open and load a midi file first");
                 return;
@@ -225,12 +225,12 @@ namespace Black_Midi_Render
         {
             if (MessageBox.Show("Are you sure you want to close?", "Close", MessageBoxButtons.YesNo) != DialogResult.Yes) return;
             running = false;
-            if(renderThread != null) renderThread.Join();
+            if (renderThread != null) renderThread.Join();
         }
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-            if(win != null && !win.Running)
+            if (win != null && !win.Running)
             {
                 startButton.Enabled = true;
                 stopButton.Enabled = false;
