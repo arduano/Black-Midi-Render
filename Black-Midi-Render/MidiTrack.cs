@@ -24,7 +24,7 @@ namespace Black_Midi_Render
         public int tempo;
     }
 
-    interface IByteReader
+    interface IByteReader : IDisposable
     {
         byte Read();
         void Reset();
@@ -35,7 +35,7 @@ namespace Black_Midi_Render
         }
     }
 
-    class MidiTrack
+    class MidiTrack : IDisposable
     {
         public int trackID;
 
@@ -145,7 +145,7 @@ namespace Black_Midi_Render
                         if (!readOnly)
                             try
                             {
-                                var q = UnendedNotes[channel * note];
+                                var q = UnendedNotes[note << 4 | channel];
                                 var iter = q.Iterate();
                                 Note n;
                                 while (iter.MoveNext(out n))
@@ -167,7 +167,7 @@ namespace Black_Midi_Render
                         n.channel = channel;
                         if (!readOnly)
                         {
-                            UnendedNotes[channel * note].Add(n);
+                            UnendedNotes[note << 4 | channel].Add(n);
                             globalDisplayNotes.Add(n);
                         }
                     }
@@ -181,7 +181,7 @@ namespace Black_Midi_Render
                     if (!readOnly)
                         try
                         {
-                            var q = UnendedNotes[channel * note];
+                            var q = UnendedNotes[note << 4 | channel];
                             var iter = q.Iterate();
                             Note n;
                             while (iter.MoveNext(out n))
@@ -442,6 +442,11 @@ namespace Black_Midi_Render
             {
                 trackEnded = true;
             }
+        }
+
+        public void Dispose()
+        {
+            reader.Dispose();
         }
     }
 }

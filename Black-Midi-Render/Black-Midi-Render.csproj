@@ -62,6 +62,7 @@
   <ItemGroup>
     <Compile Include="BufferByteReader.cs" />
     <Compile Include="FastList.cs" />
+    <Compile Include="GLPostbuffer.cs" />
     <Compile Include="GLUtils.cs" />
     <Compile Include="KeyboardRender.cs" />
     <Compile Include="MemoryByteReader.cs" />
@@ -76,7 +77,6 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="RenderSettings.cs" />
-    <Compile Include="RenderState.cs" />
     <Compile Include="RenderWindow.cs" />
     <Compile Include="View.cs" />
   </ItemGroup>
@@ -96,10 +96,11 @@
     <None Include="Shaders\default.vert">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Shaders\post.frag">
+    <None Include="Shaders\Post\glow.frag" />
+    <None Include="Shaders\Post\post.frag">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Shaders\post.vert">
+    <None Include="Shaders\Post\post.vert">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

@@ -31,7 +31,7 @@ namespace Black_Midi_Render
         public KeyboardRender(RenderSettings rendersettings)
         {
             settings = rendersettings;
-            noteShader = GLUtils.MakeShaderProgram(@"Shaders\notes");
+            noteShader = GLUtils.MakeShaderProgram("notes");
 
             quadVertexbuff = new double[quadBufferLength * 8];
             quadColorbuff = new float[quadBufferLength * 16];
@@ -93,12 +93,13 @@ namespace Black_Midi_Render
             quadBufferPos = 0;
         }
 
-        public void Render(Color4[] keyColors)
+        public void Render()
         {
             int firstNote = settings.firstNote;
             int lastNote = settings.lastNote;
             int deltaTimeOnScreen = settings.deltaTimeOnScreen;
             double pianoHeight = settings.pianoHeight;
+            Color4[] keyColors = settings.keyColors;
             double wdth;
             double y1 = pianoHeight;
             double y2 = 0;

@@ -36,14 +36,7 @@ namespace Black_Midi_Render
             tracks = new MidiTrack[trackcount];
 
             Console.WriteLine("Loading tracks into memory");
-            for (int i = 0; i < trackcount; i++)
-            {
-                byte[] trackbytes = new byte[trackLengths[i]];
-                MidiFileReader.Position = trackBeginnings[i];
-                MidiFileReader.Read(trackbytes, 0, (int)trackLengths[i]);
-                tracks[i] = new MidiTrack(i, new MemoryByteReader(trackbytes), globalDisplayNotes, globalTempoEvents);
-                //tracks[i] = new MidiTrack(i, new BufferByteReader(MidiFileReader, 10000000, trackBeginnings[i], trackLengths[i]), globalDisplayNotes, globalTempoEvents);
-            }
+            LoadAndParseAll(true);
             Console.WriteLine("Loaded!");
             unendedTracks = trackcount;
         }
@@ -122,12 +115,19 @@ namespace Black_Midi_Render
             return false;
         }
 
-        public void ParseAll()
+        public void LoadAndParseAll(bool useBufferStream = false)
         {
+            long[] tracklens = new long[tracks.Length];
             int p = 0;
             Parallel.For(0, tracks.Length, (i) =>
             {
-                //Console.WriteLine("Opening track " + _p + "/" + tracks.Length);
+                byte[] trackbytes = new byte[trackLengths[i]];
+                lock (MidiFileReader)
+                {
+                    MidiFileReader.Position = trackBeginnings[i];
+                    MidiFileReader.Read(trackbytes, 0, (int)trackLengths[i]);
+                }
+                tracks[i] = new MidiTrack(i, new MemoryByteReader(trackbytes), globalDisplayNotes, globalTempoEvents);
                 var t = tracks[i];
                 while (!t.trackEnded)
                 {
@@ -140,14 +140,16 @@ namespace Black_Midi_Render
                         break;
                     }
                 }
+                tracklens[i] = t.trackTime;
+                if (useBufferStream)
+                {
+                    t.Dispose();
+                    tracks[i] = new MidiTrack(i, new BufferByteReader(MidiFileReader, 1000, trackBeginnings[i], trackLengths[i]), globalDisplayNotes, globalTempoEvents);
+                }
+                else t.Reset();
                 Console.WriteLine("Scanned track " + p++ + "/" + tracks.Length);
             });
-            maxTrackTime = 0;
-            foreach (var t in tracks)
-            {
-                if (maxTrackTime < t.trackTime) maxTrackTime = t.trackTime;
-                t.Reset();
-            }
+            maxTrackTime = tracklens.Max();
             unendedTracks = trackcount;
         }
 

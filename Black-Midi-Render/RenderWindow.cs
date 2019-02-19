@@ -101,21 +101,13 @@ namespace Black_Midi_Render
                 }
             }
 
-            fbuffer = GL.GenFramebuffer();
-            GL.BindFramebuffer(FramebufferTarget.Framebuffer, fbuffer);
+            int a, b;
+            GLUtils.GenFrameBufferTexture(realWidth, realHeight, out fbuffer, out rtexture);
+            GLUtils.GenFrameBufferTexture(realWidth, realHeight, out a, out b);
 
-            rtexture = GL.GenTexture();
-            GL.BindTexture(TextureTarget.Texture2D, rtexture);
-            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, realWidth, realHeight, 0, PixelFormat.Rgba, PixelType.Byte, (IntPtr)0);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
-            GL.FramebufferTexture(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, rtexture, 0);
-            GL.DrawBuffer(DrawBufferMode.ColorAttachment0);
-            if (GL.CheckFramebufferStatus(FramebufferTarget.Framebuffer) != FramebufferErrorCode.FramebufferComplete) throw new Exception();
-
-            defaultShader = GLUtils.MakeShaderProgram(@"Shaders\default");
-            noteShader = GLUtils.MakeShaderProgram(@"Shaders\notes");
-            postShader = GLUtils.MakeShaderProgram(@"Shaders\post");
+            defaultShader = GLUtils.MakeShaderProgram("default");
+            noteShader = GLUtils.MakeShaderProgram("notes");
+            postShader = GLUtils.MakePostShaderProgram("post");
             
             quadVertexbuff = new double[quadBufferLength * 8];
             quadColorbuff = new float[quadBufferLength * 16];
@@ -162,10 +154,13 @@ namespace Black_Midi_Render
 
         protected override void OnRenderFrame(FrameEventArgs e)
         {
-            while (Running)
+            long nc = -1;
+            int nonoteframes = 0;
+            while (Running && (nonoteframes < fps * 5 || midi.unendedTracks != 0))
             {
+                if (nc == 0) nonoteframes++;
+                else nonoteframes = 0;
                 SpinWait.SpinUntil(() => midi.currentSyncTime > midiTime + tempoFrameStep || midi.unendedTracks == 0);
-                if (midi.unendedTracks == 0) break;
 
                 GL.UseProgram(noteShader);
 
@@ -185,9 +180,10 @@ namespace Black_Midi_Render
                 GL.Viewport(0, 0, realWidth, realHeight);
                 view.ApplyTransform(1, 1);
                 GL.Clear(ClearBufferMask.ColorBufferBit);
-
-                keyColors = noteRender.Render(globalDisplayNotes, midiTime);//drawNotes();
-                keyboardRender.Render(keyColors);
+                
+                settings.ResetVariableState();
+                nc = noteRender.Render(globalDisplayNotes, midiTime);
+                keyboardRender.Render();
                 ProcessEvents();
 
                 if (globalTempoEvents.First != null)
@@ -229,27 +225,24 @@ namespace Black_Midi_Render
                 GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
                 GL.Clear(ClearBufferMask.ColorBufferBit);
                 GL.Viewport(0, 0, Width, Height);
-                GL.Color3(1.0, 0, 0);
                 GL.BindTexture(TextureTarget.Texture2D, rtexture);
-                GL.Begin(PrimitiveType.Quads);
-                GL.TexCoord2(0, 0);
-                GL.Vertex2(0, 0);
-
-                GL.TexCoord2(1, 0);
-                GL.Vertex2(1, 0);
-
-                GL.TexCoord2(1, 1);
-                GL.Vertex2(1, 1);
-
-                GL.TexCoord2(0, 1);
-                GL.Vertex2(0, 1);
-                GL.End();
+                DrawScreenQuad();
                 GL.BindTexture(TextureTarget.Texture2D, 0);
 
                 SwapBuffers();
             }
             if (ffRender) ffmpeg.Close();
             this.Close();
+        }
+
+        void DrawScreenQuad()
+        {
+            GL.Begin(PrimitiveType.Quads);
+            GL.Vertex2(0, 0);
+            GL.Vertex2(1, 0);
+            GL.Vertex2(1, 1);
+            GL.Vertex2(0, 1);
+            GL.End();
         }
 
         bool isBlackNote(int n)

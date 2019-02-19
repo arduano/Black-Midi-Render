@@ -31,7 +31,7 @@ namespace Black_Midi_Render
         public NoteRender(RenderSettings rendersettings)
         {
             settings = rendersettings;
-            noteShader = GLUtils.MakeShaderProgram(@"Shaders\notes");
+            noteShader = GLUtils.MakeShaderProgram("notes");
 
             quadVertexbuff = new double[quadBufferLength * 8];
             quadColorbuff = new float[quadBufferLength * 16];
@@ -94,14 +94,14 @@ namespace Black_Midi_Render
             quadBufferPos = 0;
         }
         
-        public Color4[] Render(FastList<Note> notes, double midiTime)
+        public long Render(FastList<Note> notes, double midiTime)
         {
-            Color4[] keyColors = new Color4[256];
-            for (int i = 0; i < 256; i++) keyColors[i] = Color4.Transparent;
+            long nc = 0;
             int firstNote = settings.firstNote;
             int lastNote = settings.lastNote;
             int deltaTimeOnScreen = settings.deltaTimeOnScreen;
             double pianoHeight = settings.pianoHeight;
+            Color4[] keyColors = settings.keyColors;
             lock (notes)
             {
                 double wdth;
@@ -115,6 +115,7 @@ namespace Black_Midi_Render
                         {
                             if (n.note >= firstNote && n.note < lastNote)
                             {
+                                nc++;
                                 Color4 col = n.track.trkColor;
                                 int k = n.note;
                                 if (n.start < renderCutoff)
@@ -175,7 +176,7 @@ namespace Black_Midi_Render
                 FlushQuadBuffer();
                 quadBufferPos = 0;
             }
-            return keyColors;
+            return nc;
         }
 
         bool isBlackNote(int n)

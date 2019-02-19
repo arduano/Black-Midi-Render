@@ -17,6 +17,11 @@ namespace Black_Midi_Render
 
         public long Location => pos;
 
+        public void Dispose()
+        {
+            bytes = null;
+        }
+
         public byte Read() => bytes[pos++];
 
         public void Reset()

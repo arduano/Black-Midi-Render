@@ -13,7 +13,6 @@ namespace Black_Midi_Render
         static void Main(string[] args)
         {
             MidiFile f = new MidiFile(@"E:\Midi\Pi.mid");
-            f.ParseAll();
             RenderWindow win = null;
             bool winStarted = false;
             Thread wintask = new Thread(() =>
