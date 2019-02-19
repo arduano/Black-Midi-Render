@@ -90,7 +90,6 @@ namespace Black_Midi_Render
             GL.VertexAttribPointer(2, 2, VertexAttribPointerType.Double, false, 16, 0);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, indexBufferId);
             GL.DrawElements(PrimitiveType.Quads, quadBufferPos * 4, DrawElementsType.UnsignedInt, IntPtr.Zero);
-            GL.Flush();
             quadBufferPos = 0;
         }
 
