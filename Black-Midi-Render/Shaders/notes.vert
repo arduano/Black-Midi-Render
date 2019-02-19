@@ -1,4 +1,4 @@
-﻿#version 440 core
+﻿#version 330 core
 
 in vec2 position;
 in vec4 defColor;
