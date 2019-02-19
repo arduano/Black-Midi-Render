@@ -1,11 +1,11 @@
-﻿#version 330 core
+﻿#version 440 core
 
 in vec2 position;
 in vec4 defColor;
 in vec2 attrib;
 
 
-uniform mat4 mvpm;
+uniform mat4 gl_ModelViewProjectionMatrix;
 out vec4 color;
 
 
@@ -114,7 +114,7 @@ vec3 hsv2rgb(vec3 hsv)
 
 void main()
 {
-    gl_Position = mvpm * vec4(position.x, position.y, 1, 1.0f);
+    gl_Position = gl_ModelViewProjectionMatrix * vec4(position.x, position.y, 1, 1.0f);
     if(attrib.x == 0) color = defColor;
     else
     { 

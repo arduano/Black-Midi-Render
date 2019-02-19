@@ -324,7 +324,7 @@
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(225, 178);
+            this.label8.Location = new System.Drawing.Point(215, 178);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(74, 13);
             this.label8.TabIndex = 14;
@@ -332,7 +332,7 @@
             // 
             // noteDT_nud
             // 
-            this.noteDT_nud.Location = new System.Drawing.Point(135, 176);
+            this.noteDT_nud.Location = new System.Drawing.Point(125, 176);
             this.noteDT_nud.Margin = new System.Windows.Forms.Padding(3, 7, 3, 3);
             this.noteDT_nud.Maximum = new decimal(new int[] {
             10000,
@@ -359,9 +359,9 @@
             this.label7.AutoSize = true;
             this.label7.Location = new System.Drawing.Point(6, 178);
             this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(123, 13);
+            this.label7.Size = new System.Drawing.Size(113, 13);
             this.label7.TabIndex = 12;
-            this.label7.Text = "Note screen time in ticks";
+            this.label7.Text = "Note delta screen time";
             // 
             // pianoHeight_nud
             // 
@@ -430,12 +430,12 @@
             // 
             this.maxNote_nud.Location = new System.Drawing.Point(201, 116);
             this.maxNote_nud.Maximum = new decimal(new int[] {
-            255,
+            256,
             0,
             0,
             0});
             this.maxNote_nud.Minimum = new decimal(new int[] {
-            1,
+            2,
             0,
             0,
             0});
@@ -454,7 +454,12 @@
             this.minNote_nud.Location = new System.Drawing.Point(68, 116);
             this.minNote_nud.Margin = new System.Windows.Forms.Padding(3, 15, 3, 3);
             this.minNote_nud.Maximum = new decimal(new int[] {
-            254,
+            255,
+            0,
+            0,
+            0});
+            this.minNote_nud.Minimum = new decimal(new int[] {
+            1,
             0,
             0,
             0});

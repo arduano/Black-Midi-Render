@@ -25,8 +25,8 @@ namespace Black_Midi_Render
             width_nud.Value = settings.width;
             height_nud.Value = settings.height;
             fps_nud.Value = settings.fps;
-            minNote_nud.Value = settings.firstNote;
-            maxNote_nud.Value = settings.lastNote - 1;
+            minNote_nud.Value = settings.firstNote + 1;
+            maxNote_nud.Value = settings.lastNote;
             pianoHeight_nud.Value = (decimal)settings.pianoHeight * 100;
             noteDT_nud.Value = settings.deltaTimeOnScreen;
             maxBuffer_nud.Value = settings.maxTrackBufferSize;
@@ -98,12 +98,12 @@ namespace Black_Midi_Render
 
         private void minNote_nud_ValueChanged(object sender, EventArgs e)
         {
-            settings.firstNote = (int)(minNote_nud.Value);
+            settings.firstNote = (int)(minNote_nud.Value - 1);
         }
 
         private void maxNote_nud_ValueChanged(object sender, EventArgs e)
         {
-            settings.lastNote = (int)maxNote_nud.Value - 1;
+            settings.lastNote = (int)maxNote_nud.Value;
         }
 
         private void pianoHeight_nud_ValueChanged(object sender, EventArgs e)
