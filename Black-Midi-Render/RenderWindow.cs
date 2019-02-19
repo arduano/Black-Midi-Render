@@ -91,7 +91,7 @@ namespace Black_Midi_Render
             if (!settings.vsync) VSync = VSyncMode.Off;
             if (settings.ffRender)
             {
-                string args = "-y -f rawvideo -s " + settings.width + "x" + settings.height + " -pix_fmt rgb32 -r " + settings.fps + " -i - -c:v h264 -vf vflip -an -b:v " + settings.bitrate + "k " + settings.ffPath;
+                string args = "-y -f rawvideo -s " + settings.width + "x" + settings.height + " -pix_fmt rgb32 -r " + settings.fps + " -i - -c:v h264 -vf vflip -an -b:v " + settings.bitrate + "k \"" + settings.ffPath + "\"";
                 ffmpeg.StartInfo = new ProcessStartInfo("ffmpeg", args);
                 ffmpeg.StartInfo.RedirectStandardInput = true;
                 ffmpeg.StartInfo.UseShellExecute = false;
