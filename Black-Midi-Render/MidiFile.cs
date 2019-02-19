@@ -28,8 +28,11 @@ namespace Black_Midi_Render
 
         public int unendedTracks = 0;
 
-        public MidiFile(string filename)
+        RenderSettings settings;
+
+        public MidiFile(string filename, RenderSettings settings)
         {
+            this.settings = settings;
             MidiFileReader = new StreamReader(filename).BaseStream;
             ParseHeaderChunk();
             while (MidiFileReader.Position < MidiFileReader.Length) ParseTrackChunk();
@@ -144,18 +147,27 @@ namespace Black_Midi_Render
                 if (useBufferStream)
                 {
                     t.Dispose();
-                    tracks[i] = new MidiTrack(i, new BufferByteReader(MidiFileReader, 1000, trackBeginnings[i], trackLengths[i]), globalDisplayNotes, globalTempoEvents);
+                    tracks[i] = new MidiTrack(i, new BufferByteReader(MidiFileReader, settings.maxTrackBufferSize, trackBeginnings[i], trackLengths[i]), globalDisplayNotes, globalTempoEvents);
                 }
                 else t.Reset();
-                Console.WriteLine("Scanned track " + p++ + "/" + tracks.Length);
+                Console.WriteLine("Loaded track " + p++ + "/" + tracks.Length);
             });
             maxTrackTime = tracklens.Max();
             unendedTracks = trackcount;
         }
 
+        public void Reset()
+        {
+            globalDisplayNotes.Unlink();
+            globalTempoEvents.Unlink();
+            currentSyncTime = 0;
+            unendedTracks = trackcount;
+            foreach (var t in tracks) t.Reset();
+        }
+
         public void Dispose()
         {
-            throw new NotImplementedException();
+            foreach (var t in tracks) t.Dispose();
         }
     }
 }

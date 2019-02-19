@@ -30,12 +30,10 @@ namespace Black_Midi_Render
         Color4[] keyColors = new Color4[256];
 
         Process ffmpeg = new Process();
-        bool ffRender = false;
-        bool imgRender = false;
         long imgnumber = 0;
         Task lastRenderPush = null;
 
-        bool Running = true;
+        public bool Running = true;
         
         GLPostbuffer finalCompositeBuff;
         GLPostbuffer baseRenderBuff;
@@ -80,7 +78,7 @@ namespace Black_Midi_Render
             base.OnResize(e);
         }
 
-        public RenderWindow(int width, int height, MidiFile midi, RenderSettings settings) : base((int)(DisplayDevice.Default.Width / 1.5), (int)(DisplayDevice.Default.Height / 1.5), new GraphicsMode(new ColorFormat(8, 8, 8, 8)), "Render", GameWindowFlags.Default, DisplayDevice.Default)
+        public RenderWindow(MidiFile midi, RenderSettings settings) : base((int)(DisplayDevice.Default.Width / 1.5), (int)(DisplayDevice.Default.Height / 1.5), new GraphicsMode(new ColorFormat(8, 8, 8, 8)), "Render", GameWindowFlags.Default, DisplayDevice.Default)
         {
             this.settings = settings;
 
@@ -90,15 +88,15 @@ namespace Black_Midi_Render
             this.midi = midi;
             tempoFrameStep = ((double)midi.division / 50000) * (1000000 / settings.fps);
             if(!settings.vsync) VSync = VSyncMode.Off;
-            if (ffRender)
+            if (settings.ffRender)
             {
-                string args = "-y -f rawvideo -s " + width + "x" + height + " -pix_fmt rgb32 -r " + settings.fps + " -i - -c:v h264 -vf vflip -an -b:v 12000k " + settings.ffPath;
+                string args = "-y -f rawvideo -s " + settings.width + "x" + settings.height + " -pix_fmt rgb32 -r " + settings.fps + " -i - -c:v h264 -vf vflip -an -b:v " + settings.bitrate + "k " + settings.ffPath;
                 ffmpeg.StartInfo = new ProcessStartInfo("ffmpeg", args);
                 ffmpeg.StartInfo.RedirectStandardInput = true;
                 ffmpeg.StartInfo.UseShellExecute = false;
                 ffmpeg.Start();
             }
-            if (imgRender)
+            if (settings.imgRender)
             {
                 if (!Directory.Exists(settings.imgPath))
                 {
@@ -163,11 +161,8 @@ namespace Black_Midi_Render
         protected override void OnRenderFrame(FrameEventArgs e)
         {
             long nc = -1;
-            int nonoteframes = 0;
-            while (Running && (nonoteframes < settings.fps * 5 || midi.unendedTracks != 0))
+            while (Running && (midiTime < midi.maxTrackTime + settings.deltaTimeOnScreen + settings.fps * tempoFrameStep * 5 || midi.unendedTracks != 0))
             {
-                if (nc == 0) nonoteframes++;
-                else nonoteframes = 0;
                 SpinWait.SpinUntil(() => midi.currentSyncTime > midiTime + tempoFrameStep || midi.unendedTracks == 0);
 
                 GL.UseProgram(noteShader);
@@ -194,42 +189,55 @@ namespace Black_Midi_Render
                 nc = noteRender.Render(globalDisplayNotes, midiTime);
                 keyboardRender.Render();
 
-                GL.UseProgram(glowShader);
-                glowMaskFirstPassBuff.BindBuffer();
-                GL.Viewport(0, 0, settings.width, settings.height);
-                view.ApplyTransform(1, 1);
-                GL.Clear(ClearBufferMask.ColorBufferBit);
+                if (settings.glowEnabled)
+                {
+                    GL.UseProgram(glowShader);
+                    glowMaskFirstPassBuff.BindBuffer();
+                    GL.Viewport(0, 0, settings.width, settings.height);
+                    view.ApplyTransform(1, 1);
+                    GL.Clear(ClearBufferMask.ColorBufferBit);
 
-                GL.Uniform1(glowTextureSize_var, (float)settings.width);
-                GL.Uniform1(glowStrength_var, 20f);
-                GL.Uniform1(glowSigma_var, 1f);
-                GL.Uniform1(glowWidth_var, 200);
-                GL.Uniform1(glowPass_var, 0);
+                    GL.Uniform1(glowTextureSize_var, (float)settings.width);
+                    GL.Uniform1(glowStrength_var, 10f);
+                    GL.Uniform1(glowSigma_var, 1f);
+                    GL.Uniform1(glowWidth_var, settings.glowRadius);
+                    GL.Uniform1(glowPass_var, 0);
 
-                baseRenderBuff.BindTexture();
-                DrawScreenQuad();
+                    baseRenderBuff.BindTexture();
+                    DrawScreenQuad();
 
-                glowMaskSecondPassBuff.BindBuffer();
-                GL.Viewport(0, 0, settings.width, settings.height);
-                view.ApplyTransform(1, 1);
-                GL.Clear(ClearBufferMask.ColorBufferBit);
-                GL.Uniform1(glowPass_var, 1);
-                GL.Uniform1(glowTextureSize_var, (float)settings.height);
+                    glowMaskSecondPassBuff.BindBuffer();
+                    GL.Viewport(0, 0, settings.width, settings.height);
+                    view.ApplyTransform(1, 1);
+                    GL.Clear(ClearBufferMask.ColorBufferBit);
+                    GL.Uniform1(glowPass_var, 1);
+                    GL.Uniform1(glowTextureSize_var, (float)settings.height);
 
-                glowMaskFirstPassBuff.BindTexture();
-                DrawScreenQuad();
+                    glowMaskFirstPassBuff.BindTexture();
+                    DrawScreenQuad();
 
-                finalCompositeBuff.BindBuffer();
-                GL.Viewport(0, 0, settings.width, settings.height);
-                view.ApplyTransform(1, 1);
-                GL.Clear(ClearBufferMask.ColorBufferBit);
-                
-                GL.UseProgram(postShader);
-                glowMaskSecondPassBuff.BindTexture();
-                DrawScreenQuad();
-                baseRenderBuff.BindTexture();
-                DrawScreenQuad();
+                    finalCompositeBuff.BindBuffer();
+                    GL.Viewport(0, 0, settings.width, settings.height);
+                    view.ApplyTransform(1, 1);
+                    GL.Clear(ClearBufferMask.ColorBufferBit);
 
+                    GL.UseProgram(postShader);
+                    glowMaskSecondPassBuff.BindTexture();
+                    DrawScreenQuad();
+                    baseRenderBuff.BindTexture();
+                    DrawScreenQuad();
+                }
+                else
+                {
+                    finalCompositeBuff.BindBuffer();
+                    GL.Viewport(0, 0, settings.width, settings.height);
+                    view.ApplyTransform(1, 1);
+                    GL.Clear(ClearBufferMask.ColorBufferBit);
+
+                    GL.UseProgram(postShader);
+                    baseRenderBuff.BindTexture();
+                    DrawScreenQuad();
+                }
                 if (globalTempoEvents.First != null)
                     if (midiTime + tempoFrameStep > globalTempoEvents.First.pos && globalTempoEvents.First.pos >= midiTime)
                     {
@@ -240,6 +248,7 @@ namespace Black_Midi_Render
 
                 if (settings.ffRender)
                 {
+                    finalCompositeBuff.BindBuffer();
                     byte[] pixels = new byte[settings.width * settings.height * 4];
                     IntPtr unmanagedPointer = Marshal.AllocHGlobal(pixels.Length);
                     GL.ReadPixels(0, 0, settings.width, settings.height, PixelFormat.Bgra, PixelType.UnsignedByte, unmanagedPointer);
@@ -250,6 +259,7 @@ namespace Black_Midi_Render
                 }
                 if (settings.imgRender)
                 {
+                    finalCompositeBuff.BindBuffer();
                     byte[] pixels = new byte[settings.width * settings.height * 4];
                     IntPtr unmanagedPointer = Marshal.AllocHGlobal(pixels.Length);
                     GL.ReadPixels(0, 0, settings.width, settings.height, PixelFormat.Bgra, PixelType.UnsignedByte, unmanagedPointer);
@@ -269,14 +279,20 @@ namespace Black_Midi_Render
                 GLPostbuffer.UnbindBuffers();
                 GL.Clear(ClearBufferMask.ColorBufferBit);
                 GL.Viewport(0, 0, Width, Height);
-                finalCompositeBuff.BindTexture();
+                glowMaskFirstPassBuff.BindTexture();
+                //GL.ClearColor(1, 1, 1, 1);
                 DrawScreenQuad();
                 GLPostbuffer.UnbindTextures();
 
                 SwapBuffers();
                 ProcessEvents();
             }
-            if (ffRender) ffmpeg.Close();
+            Running = false;
+            if (settings.ffRender)
+            {
+                if (lastRenderPush != null) lastRenderPush.GetAwaiter().GetResult();
+                ffmpeg.Close();
+            }
             this.Close();
         }
 

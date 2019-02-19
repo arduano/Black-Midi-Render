@@ -9,7 +9,6 @@ namespace Black_Midi_Render
 {
     class RenderSettings
     {
-        public string midiFile = @"E:\Midi\Pi.mid";
 
         public int firstNote = 0;
         public int lastNote = 128;
@@ -26,6 +25,12 @@ namespace Black_Midi_Render
         public bool imgRender = false;
         public string imgPath = "imgs";
         public bool vsync = false;
+
+        public int maxTrackBufferSize = 10000;
+        public int bitrate = 12000;
+
+        public bool glowEnabled = false;
+        public int glowRadius = 200;
 
         public Color4[] keyColors;
 

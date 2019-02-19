@@ -59,9 +59,12 @@ namespace Black_Midi_Render
 
         public void Reset()
         {
+            foreach (var un in UnendedNotes) un.Unlink();
+            trkColor = Color4.FromHsv(new OpenTK.Vector4(trackID * 1.36271f % 1, 1.0f, 1.0f, 1f));
             reader.Reset();
             trackTime = 0;
             trackEnded = false;
+            readDelta = false;
             channelPrefix = 0;
         }
 
@@ -75,7 +78,7 @@ namespace Black_Midi_Render
             {
                 UnendedNotes[i] = new FastList<Note>();
             }
-            trkColor = Color4.FromHsv(new OpenTK.Vector4(id * 1.36271f % 1, 1.0f, 1.0f, 1));
+            trkColor = Color4.FromHsv(new OpenTK.Vector4(id * 1.36271f % 1, 1.0f, 1.0f, 1f));
         }
 
         long ReadVariableLen()
@@ -121,6 +124,23 @@ namespace Black_Midi_Render
                     trackTime += ReadVariableLen();
                     readDelta = true;
                 }
+            }
+        }
+
+        void EndTrack()
+        {
+            trackEnded = true;
+
+            foreach (var un in UnendedNotes)
+            {
+                var iter = un.Iterate();
+                Note n;
+                while (iter.MoveNext(out n))
+                {
+                    n.end = trackTime;
+                    n.hasEnded = true;
+                }
+                un.Unlink();
             }
         }
 
@@ -370,7 +390,7 @@ namespace Black_Midi_Render
                         {
                             throw new Exception("Corrupt Track");
                         }
-                        trackEnded = true;
+                        EndTrack();
                     }
                     else if (command == 0x51)
                     {
@@ -440,7 +460,7 @@ namespace Black_Midi_Render
             }
             catch
             {
-                trackEnded = true;
+                EndTrack();
             }
         }
 
