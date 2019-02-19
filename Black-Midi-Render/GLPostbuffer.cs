@@ -34,5 +34,10 @@ namespace Black_Midi_Render
         {
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
         }
+
+        public static void UnbindTextures()
+        {
+            GL.BindTexture(TextureTarget.Texture2D, 0);
+        }
     }
 }

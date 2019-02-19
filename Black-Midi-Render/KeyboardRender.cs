@@ -128,7 +128,7 @@ namespace Black_Midi_Render
                     {
                         if (black == 0)
                             continue;
-                        y2 = pianoHeight / 2;
+                        y2 = pianoHeight / 5*2;
                     }
                     else
                     {

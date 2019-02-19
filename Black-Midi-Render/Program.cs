@@ -12,12 +12,13 @@ namespace Black_Midi_Render
         [MTAThread]
         static void Main(string[] args)
         {
-            MidiFile f = new MidiFile(@"E:\Midi\Pi.mid");
+            RenderSettings settings = new RenderSettings();
+            MidiFile f = new MidiFile(settings.midiFile);
             RenderWindow win = null;
             bool winStarted = false;
             Thread wintask = new Thread(() =>
             {
-                win = new RenderWindow(1920, 1080, f, "out.mp4");
+                win = new RenderWindow(1920, 1080, f, settings);
                 winStarted = true;
                 win.Run();
             });
@@ -35,7 +36,7 @@ namespace Black_Midi_Render
                 lock (f.globalDisplayNotes)
                 {
                     var i = f.globalDisplayNotes.Iterate();
-                    double cutoffTime = win.midiTime - win.deltaTimeOnScreen;
+                    double cutoffTime = win.midiTime - settings.deltaTimeOnScreen;
                     while (i.MoveNext(out n))
                     {
                         //nc++;
