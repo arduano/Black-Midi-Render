@@ -1,7 +1,7 @@
 ﻿#version 330 core
 
 in vec2 position;
-in vec4 defColor;
+in vec4 glColor;
 in vec2 attrib;
 
 
@@ -115,11 +115,11 @@ vec3 hsv2rgb(vec3 hsv)
 void main()
 {
     gl_Position = gl_ModelViewProjectionMatrix * vec4(position.x, position.y, 1, 1.0f);
-    if(attrib.x == 0) color = defColor;
+    if(attrib.x == 0) color = glColor;
     else
     { 
-        vec3 hsv = rgb2hsv(defColor.xyz);
+        vec3 hsv = rgb2hsv(glColor.xyz);
         hsv.z += attrib.x;
-        color = vec4(hsv2rgb(hsv), defColor.w);
+        color = vec4(hsv2rgb(hsv), glColor.w);
     }
 }
