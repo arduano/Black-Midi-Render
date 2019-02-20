@@ -21,8 +21,6 @@ namespace Black_Midi_Render
         public FastList<Tempo> globalTempoEvents;
         MidiFile midi;
 
-        View view = new View(new Vector2(0.5f, 0.5f), 0, 2);
-
         RenderSettings settings;
 
         public double midiTime = 0;
@@ -136,13 +134,13 @@ namespace Black_Midi_Render
             for (int i = 0; i < quadAttribbuff.Length;)
             {
 
-                quadAttribbuff[i++] = 0.5;
+                quadAttribbuff[i++] = 0.1;
                 quadAttribbuff[i++] = 0;
-                quadAttribbuff[i++] = -0.5;
+                quadAttribbuff[i++] = -0.2;
                 quadAttribbuff[i++] = 0;
-                quadAttribbuff[i++] = 0.5;
+                quadAttribbuff[i++] = 0.1;
                 quadAttribbuff[i++] = 0;
-                quadAttribbuff[i++] = -0.3;
+                quadAttribbuff[i++] = -0.0;
                 quadAttribbuff[i++] = 0;
             }
 
@@ -191,7 +189,6 @@ namespace Black_Midi_Render
 
                 baseRenderBuff.BindBuffer();
                 GL.Viewport(0, 0, settings.width, settings.height);
-                view.ApplyTransform(1, 1);
                 GL.Clear(ClearBufferMask.ColorBufferBit);
 
                 settings.ResetVariableState();
@@ -203,7 +200,6 @@ namespace Black_Midi_Render
                     GL.UseProgram(glowShader);
                     glowMaskFirstPassBuff.BindBuffer();
                     GL.Viewport(0, 0, settings.width, settings.height);
-                    view.ApplyTransform(1, 1);
                     GL.Clear(ClearBufferMask.ColorBufferBit);
 
                     GL.Uniform1(glowTextureSize_var, (float)settings.width);
@@ -217,7 +213,6 @@ namespace Black_Midi_Render
 
                     glowMaskSecondPassBuff.BindBuffer();
                     GL.Viewport(0, 0, settings.width, settings.height);
-                    view.ApplyTransform(1, 1);
                     GL.Clear(ClearBufferMask.ColorBufferBit);
                     GL.Uniform1(glowPass_var, 1);
                     GL.Uniform1(glowTextureSize_var, (float)settings.height);
@@ -227,7 +222,6 @@ namespace Black_Midi_Render
 
                     finalCompositeBuff.BindBuffer();
                     GL.Viewport(0, 0, settings.width, settings.height);
-                    view.ApplyTransform(1, 1);
                     GL.Clear(ClearBufferMask.ColorBufferBit);
 
                     GL.UseProgram(postShader);
@@ -240,7 +234,6 @@ namespace Black_Midi_Render
                 {
                     finalCompositeBuff.BindBuffer();
                     GL.Viewport(0, 0, settings.width, settings.height);
-                    view.ApplyTransform(1, 1);
                     GL.Clear(ClearBufferMask.ColorBufferBit);
 
                     GL.UseProgram(postShader);

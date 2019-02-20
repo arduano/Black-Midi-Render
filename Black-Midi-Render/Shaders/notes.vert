@@ -4,8 +4,6 @@ in vec2 position;
 in vec4 glColor;
 in vec2 attrib;
 
-
-uniform mat4 gl_ModelViewProjectionMatrix;
 out vec4 color;
 
 
@@ -114,12 +112,12 @@ vec3 hsv2rgb(vec3 hsv)
 
 void main()
 {
-    gl_Position = gl_ModelViewProjectionMatrix * vec4(position.x, position.y, 1, 1.0f);
+    gl_Position = vec4(position.x * 2 - 1, position.y * 2 - 1, 1.0f, 1.0f);
     if(attrib.x == 0) color = glColor;
     else
     { 
-        vec3 hsv = rgb2hsv(glColor.xyz);
-        hsv.z += attrib.x;
-        color = vec4(hsv2rgb(hsv), glColor.w);
+        //vec3 hsv = rgb2hsv(glColor.xyz);
+        //hsv.z += attrib.x;
+        color = vec4(glColor.xyz + attrib.x, glColor.w);//vec4(hsv2rgb(hsv), glColor.w);
     }
 }
