@@ -14,6 +14,7 @@ namespace Black_Midi_Render
         static void Main(string[] args)
         {
             Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new SettingsForm());
         }
     }
