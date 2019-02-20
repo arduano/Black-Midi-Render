@@ -171,7 +171,8 @@ namespace Black_Midi_Render
             long nc = -1;
             while (Running && (midiTime < midi.maxTrackTime + settings.deltaTimeOnScreen + settings.fps * tempoFrameStep * 5 || midi.unendedTracks != 0))
             {
-                SpinWait.SpinUntil(() => midi.currentSyncTime > midiTime + tempoFrameStep || midi.unendedTracks == 0);
+                SpinWait.SpinUntil(() => midi.currentSyncTime > midiTime + tempoFrameStep || midi.unendedTracks == 0 || !Running);
+                if (!Running) break;
 
                 GL.UseProgram(noteShader);
 

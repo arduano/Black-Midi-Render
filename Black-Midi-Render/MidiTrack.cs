@@ -46,7 +46,7 @@ namespace Black_Midi_Render
 
         byte channelPrefix = 0;
 
-        public FastList<Note>[] UnendedNotes = new FastList<Note>[256 * 16];
+        public FastList<Note>[] UnendedNotes = null;
         public LinkedList<Tempo> Tempos = new LinkedList<Tempo>();
 
         FastList<Note> globalDisplayNotes;
@@ -60,7 +60,7 @@ namespace Black_Midi_Render
 
         public void Reset()
         {
-            foreach (var un in UnendedNotes) un.Unlink();
+            if (UnendedNotes != null) foreach (var un in UnendedNotes) un.Unlink();
             reader.Reset();
             ResetColors();
             trackTime = 0;
@@ -68,6 +68,7 @@ namespace Black_Midi_Render
             readDelta = false;
             channelPrefix = 0;
             noteCount = 0;
+            UnendedNotes = null;
         }
 
         public void ResetColors()
@@ -86,10 +87,6 @@ namespace Black_Midi_Render
             globalTempoEvents = globalTempos;
             this.reader = reader;
             trackID = id;
-            for (int i = 0; i < 256 * 16; i++)
-            {
-                UnendedNotes[i] = new FastList<Note>();
-            }
             ResetColors();
         }
 
@@ -142,18 +139,19 @@ namespace Black_Midi_Render
         void EndTrack()
         {
             trackEnded = true;
-
-            foreach (var un in UnendedNotes)
-            {
-                var iter = un.Iterate();
-                Note n;
-                while (iter.MoveNext(out n))
+            if (UnendedNotes != null)
+                foreach (var un in UnendedNotes)
                 {
-                    n.end = trackTime;
-                    n.hasEnded = true;
+                    var iter = un.Iterate();
+                    Note n;
+                    while (iter.MoveNext(out n))
+                    {
+                        n.end = trackTime;
+                        n.hasEnded = true;
+                    }
+                    un.Unlink();
                 }
-                un.Unlink();
-            }
+            UnendedNotes = null;
         }
 
         public void ParseNextEvent(bool readOnly = false)
@@ -199,6 +197,14 @@ namespace Black_Midi_Render
                         n.channel = channel;
                         if (!readOnly)
                         {
+                            if (UnendedNotes == null)
+                            {
+                                UnendedNotes = new FastList<Note>[256 * 16];
+                                for (int i = 0; i < 256 * 16; i++)
+                                {
+                                    UnendedNotes[i] = new FastList<Note>();
+                                }
+                            }
                             UnendedNotes[note << 4 | channel].Add(n);
                             globalDisplayNotes.Add(n);
                         }

@@ -35,7 +35,6 @@
             this.glowCheck = new System.Windows.Forms.CheckBox();
             this.label11 = new System.Windows.Forms.Label();
             this.maxBuffer_nud = new System.Windows.Forms.NumericUpDown();
-            this.label12 = new System.Windows.Forms.Label();
             this.bitrate_nud = new System.Windows.Forms.NumericUpDown();
             this.label10 = new System.Windows.Forms.Label();
             this.imgpath = new System.Windows.Forms.TextBox();
@@ -93,7 +92,6 @@
             this.groupBox1.Controls.Add(this.glowCheck);
             this.groupBox1.Controls.Add(this.label11);
             this.groupBox1.Controls.Add(this.maxBuffer_nud);
-            this.groupBox1.Controls.Add(this.label12);
             this.groupBox1.Controls.Add(this.bitrate_nud);
             this.groupBox1.Controls.Add(this.label10);
             this.groupBox1.Controls.Add(this.imgpath);
@@ -169,7 +167,7 @@
             // label11
             // 
             this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(230, 208);
+            this.label11.Location = new System.Drawing.Point(96, 54);
             this.label11.Name = "label11";
             this.label11.Size = new System.Drawing.Size(192, 13);
             this.label11.TabIndex = 28;
@@ -177,7 +175,7 @@
             // 
             // maxBuffer_nud
             // 
-            this.maxBuffer_nud.Location = new System.Drawing.Point(140, 206);
+            this.maxBuffer_nud.Location = new System.Drawing.Point(6, 52);
             this.maxBuffer_nud.Margin = new System.Windows.Forms.Padding(3, 7, 3, 3);
             this.maxBuffer_nud.Maximum = new decimal(new int[] {
             -2147483648,
@@ -188,15 +186,6 @@
             this.maxBuffer_nud.Size = new System.Drawing.Size(84, 20);
             this.maxBuffer_nud.TabIndex = 10;
             this.maxBuffer_nud.ValueChanged += new System.EventHandler(this.maxBuffer_nud_ValueChanged);
-            // 
-            // label12
-            // 
-            this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(6, 208);
-            this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(128, 13);
-            this.label12.TabIndex = 26;
-            this.label12.Text = "Max track byte buffer size";
             // 
             // bitrate_nud
             // 
@@ -315,7 +304,7 @@
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(160, 148);
+            this.label9.Location = new System.Drawing.Point(160, 178);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(91, 13);
             this.label9.TabIndex = 15;
@@ -324,7 +313,7 @@
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(215, 178);
+            this.label8.Location = new System.Drawing.Point(215, 208);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(74, 13);
             this.label8.TabIndex = 14;
@@ -332,7 +321,7 @@
             // 
             // noteDT_nud
             // 
-            this.noteDT_nud.Location = new System.Drawing.Point(125, 176);
+            this.noteDT_nud.Location = new System.Drawing.Point(125, 206);
             this.noteDT_nud.Margin = new System.Windows.Forms.Padding(3, 7, 3, 3);
             this.noteDT_nud.Maximum = new decimal(new int[] {
             10000,
@@ -357,7 +346,7 @@
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(6, 178);
+            this.label7.Location = new System.Drawing.Point(6, 208);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(113, 13);
             this.label7.TabIndex = 12;
@@ -365,7 +354,7 @@
             // 
             // pianoHeight_nud
             // 
-            this.pianoHeight_nud.Location = new System.Drawing.Point(80, 146);
+            this.pianoHeight_nud.Location = new System.Drawing.Point(80, 176);
             this.pianoHeight_nud.Margin = new System.Windows.Forms.Padding(3, 15, 3, 3);
             this.pianoHeight_nud.Name = "pianoHeight_nud";
             this.pianoHeight_nud.Size = new System.Drawing.Size(74, 20);
@@ -375,7 +364,7 @@
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(6, 148);
+            this.label6.Location = new System.Drawing.Point(6, 178);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(68, 13);
             this.label6.TabIndex = 10;
@@ -384,7 +373,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(142, 118);
+            this.label5.Location = new System.Drawing.Point(142, 148);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(53, 13);
             this.label5.TabIndex = 9;
@@ -393,7 +382,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(6, 118);
+            this.label4.Location = new System.Drawing.Point(6, 148);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(52, 13);
             this.label4.TabIndex = 8;
@@ -402,7 +391,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(343, 90);
+            this.label3.Location = new System.Drawing.Point(343, 120);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(27, 13);
             this.label3.TabIndex = 7;
@@ -411,7 +400,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(173, 88);
+            this.label2.Location = new System.Drawing.Point(173, 118);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(38, 13);
             this.label2.TabIndex = 6;
@@ -420,7 +409,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(6, 88);
+            this.label1.Location = new System.Drawing.Point(6, 118);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(35, 13);
             this.label1.TabIndex = 5;
@@ -428,7 +417,7 @@
             // 
             // maxNote_nud
             // 
-            this.maxNote_nud.Location = new System.Drawing.Point(201, 116);
+            this.maxNote_nud.Location = new System.Drawing.Point(201, 146);
             this.maxNote_nud.Maximum = new decimal(new int[] {
             256,
             0,
@@ -451,7 +440,7 @@
             // 
             // minNote_nud
             // 
-            this.minNote_nud.Location = new System.Drawing.Point(68, 116);
+            this.minNote_nud.Location = new System.Drawing.Point(68, 146);
             this.minNote_nud.Margin = new System.Windows.Forms.Padding(3, 15, 3, 3);
             this.minNote_nud.Maximum = new decimal(new int[] {
             255,
@@ -486,7 +475,7 @@
             // 
             // fps_nud
             // 
-            this.fps_nud.Location = new System.Drawing.Point(376, 86);
+            this.fps_nud.Location = new System.Drawing.Point(376, 116);
             this.fps_nud.Maximum = new decimal(new int[] {
             300,
             0,
@@ -510,7 +499,7 @@
             // unloadButton
             // 
             this.unloadButton.Enabled = false;
-            this.unloadButton.Location = new System.Drawing.Point(68, 48);
+            this.unloadButton.Location = new System.Drawing.Point(68, 78);
             this.unloadButton.Name = "unloadButton";
             this.unloadButton.Size = new System.Drawing.Size(56, 23);
             this.unloadButton.TabIndex = 2;
@@ -520,7 +509,7 @@
             // 
             // height_nud
             // 
-            this.height_nud.Location = new System.Drawing.Point(217, 86);
+            this.height_nud.Location = new System.Drawing.Point(217, 116);
             this.height_nud.Maximum = new decimal(new int[] {
             4320,
             0,
@@ -544,7 +533,7 @@
             // loadButton
             // 
             this.loadButton.Enabled = false;
-            this.loadButton.Location = new System.Drawing.Point(6, 48);
+            this.loadButton.Location = new System.Drawing.Point(6, 78);
             this.loadButton.Name = "loadButton";
             this.loadButton.Size = new System.Drawing.Size(56, 23);
             this.loadButton.TabIndex = 1;
@@ -554,7 +543,7 @@
             // 
             // width_nud
             // 
-            this.width_nud.Location = new System.Drawing.Point(47, 86);
+            this.width_nud.Location = new System.Drawing.Point(47, 116);
             this.width_nud.Maximum = new decimal(new int[] {
             7680,
             0,
@@ -577,7 +566,7 @@
             // 
             // numericUpDown1
             // 
-            this.numericUpDown1.Location = new System.Drawing.Point(47, 86);
+            this.numericUpDown1.Location = new System.Drawing.Point(47, 116);
             this.numericUpDown1.Name = "numericUpDown1";
             this.numericUpDown1.Size = new System.Drawing.Size(120, 20);
             this.numericUpDown1.TabIndex = 0;
@@ -680,7 +669,6 @@
         private System.Windows.Forms.Button stopButton;
         private System.Windows.Forms.Label label11;
         private System.Windows.Forms.NumericUpDown maxBuffer_nud;
-        private System.Windows.Forms.Label label12;
         private System.Windows.Forms.NumericUpDown bitrate_nud;
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.TextBox imgpath;
