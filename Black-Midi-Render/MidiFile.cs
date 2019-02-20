@@ -20,6 +20,7 @@ namespace Black_Midi_Render
         public MidiTrack[] tracks;
 
         public long maxTrackTime;
+        long noteCount = 0;
 
         public long currentSyncTime = 0;
 
@@ -136,13 +137,14 @@ namespace Black_Midi_Render
                 {
                     try
                     {
-                        t.ParseNextEvent(true);
+                        t.ParseNextEventFast();
                     }
                     catch
                     {
                         break;
                     }
                 }
+                noteCount += t.noteCount;
                 tracklens[i] = t.trackTime;
                 if (useBufferStream)
                 {

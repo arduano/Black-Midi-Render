@@ -183,26 +183,39 @@ namespace Black_Midi_Render
                 long time = 0;
                 int nc = -1;
                 inRenderLoop = true;
-                while ((midifile.ParseUpTo(time += (long)(win.tempoFrameStep * 10)) || nc != 0) && win.Running && running)
+                try
                 {
-                    SpinWait.SpinUntil(() => midifile.currentSyncTime < win.midiTime + (long)(win.tempoFrameStep * 10) || !win.Running);
-                    nc = 0;
-                    Note n;
-                    lock (midifile.globalDisplayNotes)
+                    while ((midifile.ParseUpTo(time += (long)(win.tempoFrameStep * 10)) || nc != 0) && win.Running && running)
                     {
-                        var i = midifile.globalDisplayNotes.Iterate();
-                        double cutoffTime = win.midiTime - settings.deltaTimeOnScreen;
-                        while (i.MoveNext(out n))
+                        SpinWait.SpinUntil(() => midifile.currentSyncTime < win.midiTime + (long)(win.tempoFrameStep * 10) || !win.Running);
+                        nc = 0;
+                        Note n;
+                        lock (midifile.globalDisplayNotes)
                         {
-                            if (n.hasEnded && n.end < cutoffTime)
-                                i.Remove();
-                            else nc++;
+                            var i = midifile.globalDisplayNotes.Iterate();
+                            double cutoffTime = win.midiTime - settings.deltaTimeOnScreen;
+                            while (i.MoveNext(out n))
+                            {
+                                if (n.hasEnded && n.end < cutoffTime)
+                                    i.Remove();
+                                else nc++;
+                            }
                         }
+                        Console.WriteLine(Math.Round((double)time / midifile.maxTrackTime * 10000) / 100 + "% Notes: " + nc);
                     }
-                    Console.WriteLine(Math.Round((double)time / midifile.maxTrackTime * 10000) / 100 + "% Notes: " + nc);
                 }
-                win.Running = false;
+                catch
+                {
+                    MessageBox.Show("An error occurred while opeining render window. Please try again.");
+                    try
+                    {
+                        win.Running = false;
+                    }
+                    catch { }
+                    inRenderLoop = false;
+                }
                 winthread.Join();
+                win.Running = false;
                 midifile.Reset();
             });
             inRenderLoop = false;

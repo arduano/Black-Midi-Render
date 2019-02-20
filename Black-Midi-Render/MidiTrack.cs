@@ -42,6 +42,7 @@ namespace Black_Midi_Render
         public bool trackEnded = false;
 
         public long trackTime = 0;
+        public long noteCount = 0;
 
         byte channelPrefix = 0;
 
@@ -66,6 +67,7 @@ namespace Black_Midi_Render
             trackEnded = false;
             readDelta = false;
             channelPrefix = 0;
+            noteCount = 0;
         }
 
         public void ResetColors()
@@ -457,6 +459,197 @@ namespace Black_Midi_Render
                         {
                             data[i] = reader.Read();
                         }
+                    }
+                    else
+                    {
+                        throw new Exception("Corrupt Track");
+                    }
+                }
+                else
+                {
+                    throw new Exception("Corrupt Track");
+                }
+            }
+            catch
+            {
+                EndTrack();
+            }
+        }
+
+        public void ParseNextEventFast()
+        {
+            try
+            {
+                trackTime += ReadVariableLen();
+                byte command = reader.Read();
+                byte comm = (byte)(command & 0b11110000);
+                if (comm == 0b10010000)
+                {
+                    byte channel = (byte)(command & 0b00001111);
+                    reader.Skip(2);
+                    noteCount++;
+                }
+                else if (comm == 0b10000000)
+                {
+                    int channel = command & 0b00001111;
+                    reader.Skip(2);
+                }
+                else if (comm == 0b10100000)
+                {
+                    int channel = command & 0b00001111;
+                    reader.Skip(2);
+                }
+                else if (comm == 0b10100000)
+                {
+                    int channel = command & 0b00001111;
+                    reader.Skip(2);
+                }
+                else if (comm == 0b11000000)
+                {
+                    int channel = command & 0b00001111;
+                    reader.Skip(1);
+                }
+                else if (comm == 0b11010000)
+                {
+
+                    int channel = command & 0b00001111;
+                    reader.Skip(1);
+                }
+                else if (comm == 0b11100000)
+                {
+                    int channel = command & 0b00001111;
+                    reader.Skip(2);
+                }
+                else if (comm == 0b10110000)
+                {
+                    int channel = command & 0b00001111;
+                    reader.Skip(2);
+                }
+                else if (command == 0b11110000)
+                {
+                }
+                else if (command == 0b11110100 || command == 0b11110001 || command == 0b11110101 || command == 0b11111001 || command == 0b11111101)
+                {
+                    //printf("Undefined\n");
+                }
+                else if (command == 0b11110010)
+                {
+                    int channel = command & 0b00001111;
+                    reader.Skip(2);
+
+                }
+                else if (command == 0b11110011)
+                {
+                    byte ss = reader.Read();
+                }
+                else if (command == 0b11110110)
+                {
+                }
+                else if (command == 0b11110111)
+                {
+                }
+                else if (command == 0b11111000)
+                {
+                }
+                else if (command == 0b11111010)
+                {
+                }
+                else if (command == 0b11111100)
+                {
+                }
+                else if (command == 0b11111110)
+                {
+                }
+                else if (command == 0xFF)
+                {
+                    command = reader.Read();
+                    if (command == 0x00)
+                    {
+                        if (reader.Read() != 0)
+                        {
+                            throw new Exception("Corrupt Track");
+                        }
+                    }
+                    else if (command == 0x01 ||
+                            command == 0x02 ||
+                            command == 0x03 ||
+                            command == 0x04 ||
+                            command == 0x05 ||
+                            command == 0x06 ||
+                            command == 0x07)
+                    {
+                        int size = (int)ReadVariableLen();
+                        reader.Skip(size);
+                    }
+                    else if (command == 0x20)
+                    {
+                        command = reader.Read();
+                        if (command != 1)
+                        {
+                            throw new Exception("Corrupt Track");
+                        }
+                        channelPrefix = reader.Read();
+                    }
+                    else if (command == 0x21)
+                    {
+                        command = reader.Read();
+                        if (command != 1)
+                        {
+                            throw new Exception("Corrupt Track");
+                        }
+                        reader.Skip(1);
+                        //TODO:  MIDI port
+                    }
+                    else if (command == 0x2F)
+                    {
+                        command = reader.Read();
+                        if (command != 0)
+                        {
+                            throw new Exception("Corrupt Track");
+                        }
+                        EndTrack();
+                    }
+                    else if (command == 0x51)
+                    {
+                        command = reader.Read();
+                        if (command != 3)
+                        {
+                            throw new Exception("Corrupt Track");
+                        }
+                        reader.Skip(3);
+                    }
+                    else if (command == 0x54)
+                    {
+                        command = reader.Read();
+                        if (command != 5)
+                        {
+                            throw new Exception("Corrupt Track");
+                        }
+                        reader.Skip(4);
+                    }
+                    else if (command == 0x58)
+                    {
+                        command = reader.Read();
+                        if (command != 4)
+                        {
+                            throw new Exception("Corrupt Track");
+                        }
+                        reader.Skip(4);
+                    }
+                    else if (command == 0x59)
+                    {
+                        command = reader.Read();
+                        if (command != 2)
+                        {
+                            throw new Exception("Corrupt Track");
+                        }
+                        reader.Skip(2);
+                        //TODO: Key Signature
+                    }
+                    else if (command == 0x7F)
+                    {
+                        int size = (int)ReadVariableLen();
+                        reader.Skip(size);
                     }
                     else
                     {

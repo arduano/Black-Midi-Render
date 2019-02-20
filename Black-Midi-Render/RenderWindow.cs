@@ -90,7 +90,7 @@ namespace Black_Midi_Render
             if (!settings.vsync) VSync = VSyncMode.Off;
             if (settings.ffRender)
             {
-                string args = "-y -f rawvideo -s " + settings.width + "x" + settings.height + " -pix_fmt rgb32 -r " + settings.fps + " -i - -c:v h264 -vf vflip -an -b:v " + settings.bitrate + "k \"" + settings.ffPath + "\"";
+                string args = "-y -f rawvideo -s " + settings.width + "x" + settings.height + " -pix_fmt rgb32 -r " + settings.fps + " -i - -c:v h264 -vf vflip -an -b:v " + settings.bitrate + "k -maxrate " + settings.bitrate + "k -minrate " + settings.bitrate + "k \"" + settings.ffPath + "\"";
                 ffmpeg.StartInfo = new ProcessStartInfo("ffmpeg", args);
                 ffmpeg.StartInfo.RedirectStandardInput = true;
                 ffmpeg.StartInfo.UseShellExecute = false;
@@ -241,13 +241,19 @@ namespace Black_Midi_Render
                     baseRenderBuff.BindTexture();
                     DrawScreenQuad();
                 }
+                bool stepped = false;
                 if (globalTempoEvents.First != null)
-                    if (midiTime + tempoFrameStep > globalTempoEvents.First.pos && globalTempoEvents.First.pos >= midiTime)
+                {
+                    if (midiTime + tempoFrameStep > globalTempoEvents.First.pos)
                     {
                         var t = globalTempoEvents.Pop();
+                        var _t = 1 - (t.pos - midiTime) / tempoFrameStep;
                         tempoFrameStep = ((double)midi.division / t.tempo) * (1000000 / settings.fps);
+                        midiTime = t.pos + tempoFrameStep * _t;
+                        stepped = true;
                     }
-                midiTime += tempoFrameStep;
+                }
+                if(!stepped) midiTime += tempoFrameStep;
 
                 if (settings.ffRender)
                 {
