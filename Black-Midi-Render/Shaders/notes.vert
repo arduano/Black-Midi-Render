@@ -1,8 +1,8 @@
 ﻿#version 330 core
 
-in vec2 position;
-in vec4 glColor;
-in vec2 attrib;
+layout(location = 0) in vec3 position;
+layout(location = 1) in vec4 glColor;
+layout(location = 2) in vec2 attrib;
 
 out vec4 color;
 
