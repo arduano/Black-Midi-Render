@@ -152,7 +152,7 @@
             0});
             this.glowRad_nud.Name = "glowRad_nud";
             this.glowRad_nud.Size = new System.Drawing.Size(84, 20);
-            this.glowRad_nud.TabIndex = 30;
+            this.glowRad_nud.TabIndex = 11;
             this.glowRad_nud.ValueChanged += new System.EventHandler(this.glowRad_nud_ValueChanged);
             // 
             // glowCheck
@@ -186,7 +186,7 @@
             0});
             this.maxBuffer_nud.Name = "maxBuffer_nud";
             this.maxBuffer_nud.Size = new System.Drawing.Size(84, 20);
-            this.maxBuffer_nud.TabIndex = 27;
+            this.maxBuffer_nud.TabIndex = 10;
             this.maxBuffer_nud.ValueChanged += new System.EventHandler(this.maxBuffer_nud_ValueChanged);
             // 
             // label12
@@ -210,7 +210,7 @@
             0});
             this.bitrate_nud.Name = "bitrate_nud";
             this.bitrate_nud.Size = new System.Drawing.Size(94, 20);
-            this.bitrate_nud.TabIndex = 25;
+            this.bitrate_nud.TabIndex = 12;
             this.bitrate_nud.ValueChanged += new System.EventHandler(this.bitrate_nud_ValueChanged);
             // 
             // label10
@@ -252,7 +252,7 @@
             this.browseImgButton.Location = new System.Drawing.Point(92, 323);
             this.browseImgButton.Name = "browseImgButton";
             this.browseImgButton.Size = new System.Drawing.Size(94, 23);
-            this.browseImgButton.TabIndex = 21;
+            this.browseImgButton.TabIndex = 14;
             this.browseImgButton.Text = "Browse Folder";
             this.browseImgButton.UseVisualStyleBackColor = true;
             this.browseImgButton.Click += new System.EventHandler(this.browseImgButton_Click);
@@ -263,7 +263,7 @@
             this.browseFFButton.Location = new System.Drawing.Point(92, 271);
             this.browseFFButton.Name = "browseFFButton";
             this.browseFFButton.Size = new System.Drawing.Size(94, 23);
-            this.browseFFButton.TabIndex = 20;
+            this.browseFFButton.TabIndex = 13;
             this.browseFFButton.Text = "Browse File";
             this.browseFFButton.UseVisualStyleBackColor = true;
             this.browseFFButton.Click += new System.EventHandler(this.browseFFButton_Click);
@@ -346,7 +346,7 @@
             0});
             this.noteDT_nud.Name = "noteDT_nud";
             this.noteDT_nud.Size = new System.Drawing.Size(84, 20);
-            this.noteDT_nud.TabIndex = 13;
+            this.noteDT_nud.TabIndex = 9;
             this.noteDT_nud.Value = new decimal(new int[] {
             1,
             0,
@@ -369,7 +369,7 @@
             this.pianoHeight_nud.Margin = new System.Windows.Forms.Padding(3, 15, 3, 3);
             this.pianoHeight_nud.Name = "pianoHeight_nud";
             this.pianoHeight_nud.Size = new System.Drawing.Size(74, 20);
-            this.pianoHeight_nud.TabIndex = 11;
+            this.pianoHeight_nud.TabIndex = 8;
             this.pianoHeight_nud.ValueChanged += new System.EventHandler(this.pianoHeight_nud_ValueChanged);
             // 
             // label6
@@ -441,7 +441,7 @@
             0});
             this.maxNote_nud.Name = "maxNote_nud";
             this.maxNote_nud.Size = new System.Drawing.Size(71, 20);
-            this.maxNote_nud.TabIndex = 4;
+            this.maxNote_nud.TabIndex = 7;
             this.maxNote_nud.Value = new decimal(new int[] {
             2,
             0,
@@ -465,7 +465,7 @@
             0});
             this.minNote_nud.Name = "minNote_nud";
             this.minNote_nud.Size = new System.Drawing.Size(68, 20);
-            this.minNote_nud.TabIndex = 3;
+            this.minNote_nud.TabIndex = 6;
             this.minNote_nud.Value = new decimal(new int[] {
             1,
             0,
@@ -499,7 +499,7 @@
             0});
             this.fps_nud.Name = "fps_nud";
             this.fps_nud.Size = new System.Drawing.Size(50, 20);
-            this.fps_nud.TabIndex = 2;
+            this.fps_nud.TabIndex = 5;
             this.fps_nud.Value = new decimal(new int[] {
             1,
             0,
@@ -533,7 +533,7 @@
             0});
             this.height_nud.Name = "height_nud";
             this.height_nud.Size = new System.Drawing.Size(120, 20);
-            this.height_nud.TabIndex = 1;
+            this.height_nud.TabIndex = 4;
             this.height_nud.Value = new decimal(new int[] {
             1,
             0,
@@ -567,7 +567,7 @@
             0});
             this.width_nud.Name = "width_nud";
             this.width_nud.Size = new System.Drawing.Size(120, 20);
-            this.width_nud.TabIndex = 0;
+            this.width_nud.TabIndex = 3;
             this.width_nud.Value = new decimal(new int[] {
             1,
             0,
@@ -598,7 +598,7 @@
             this.stopButton.Location = new System.Drawing.Point(91, 412);
             this.stopButton.Name = "stopButton";
             this.stopButton.Size = new System.Drawing.Size(75, 23);
-            this.stopButton.TabIndex = 29;
+            this.stopButton.TabIndex = 16;
             this.stopButton.Text = "Stop";
             this.stopButton.UseVisualStyleBackColor = true;
             this.stopButton.Click += new System.EventHandler(this.stopButton_Click);
@@ -609,7 +609,7 @@
             this.startButton.Location = new System.Drawing.Point(12, 412);
             this.startButton.Name = "startButton";
             this.startButton.Size = new System.Drawing.Size(75, 23);
-            this.startButton.TabIndex = 30;
+            this.startButton.TabIndex = 15;
             this.startButton.Text = "Start";
             this.startButton.UseVisualStyleBackColor = true;
             this.startButton.Click += new System.EventHandler(this.startButton_Click);

@@ -286,7 +286,14 @@ namespace Black_Midi_Render
                 DrawScreenQuad();
                 GLPostbuffer.UnbindTextures();
 
-                SwapBuffers();
+                try
+                {
+                    SwapBuffers();
+                }
+                catch
+                {
+                    break;
+                }
                 ProcessEvents();
             }
             Running = false;

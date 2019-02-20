@@ -36,8 +36,8 @@ namespace Black_Midi_Render
 
         public void ResetVariableState()
         {
-            keyColors = new Color4[256];
-            for (int i = 0; i < 256; i++) keyColors[i] = Color4.Transparent;
+            keyColors = new Color4[512];
+            for (int i = 0; i < 512; i++) keyColors[i] = Color4.Transparent;
         }
     }
 }

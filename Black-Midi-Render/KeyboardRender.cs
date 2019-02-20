@@ -19,14 +19,14 @@ namespace Black_Midi_Render
         int colorBufferID;
         int attrib1BufferID;
 
-        int quadBufferLength = 2048;
+        int quadBufferLength = 2048 * 2;
         double[] quadVertexbuff;
         float[] quadColorbuff;
         double[] quadAttribbuff;
         int quadBufferPos = 0;
 
         int indexBufferId;
-        uint[] indexes = new uint[2048 * 16];
+        uint[] indexes = new uint[2048 * 4 * 6];
 
         public KeyboardRender(RenderSettings rendersettings)
         {
@@ -40,7 +40,15 @@ namespace Black_Midi_Render
             GL.GenBuffers(1, out vertexBufferID);
             GL.GenBuffers(1, out colorBufferID);
             GL.GenBuffers(1, out attrib1BufferID);
-            for (uint i = 0; i < indexes.Length; i++) indexes[i] = i;
+            for (uint i = 0; i < indexes.Length / 6; i++)
+            {
+                indexes[i * 6 + 0] = i * 4 + 0;
+                indexes[i * 6 + 1] = i * 4 + 2;
+                indexes[i * 6 + 2] = i * 4 + 1;
+                indexes[i * 6 + 3] = i * 4 + 0;
+                indexes[i * 6 + 4] = i * 4 + 3;
+                indexes[i * 6 + 5] = i * 4 + 2;
+            }
             for (int i = 0; i < quadAttribbuff.Length;)
             {
 
@@ -89,7 +97,8 @@ namespace Black_Midi_Render
             GL.BindBuffer(BufferTarget.ArrayBuffer, attrib1BufferID);
             GL.VertexAttribPointer(2, 2, VertexAttribPointerType.Double, false, 16, 0);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, indexBufferId);
-            GL.DrawElements(PrimitiveType.Quads, quadBufferPos * 4, DrawElementsType.UnsignedInt, IntPtr.Zero);
+            GL.IndexPointer(IndexPointerType.Int, 1, 0);
+            GL.DrawElements(PrimitiveType.Triangles, quadBufferPos * 6, DrawElementsType.UnsignedInt, IntPtr.Zero);
             quadBufferPos = 0;
         }
 
@@ -173,19 +182,20 @@ namespace Black_Midi_Render
                     quadVertexbuff[pos] = y1;
 
                     pos = quadBufferPos * 16;
-                    var col = keyColors[n];
+                    var coll = keyColors[n * 2];
+                    var colr = keyColors[n * 2 + 1];
                     var origcol = origColors[n];
-                    float blendfac = col.A;
+                    float blendfac = coll.A;
                     float revblendfac = 1 - blendfac;
-                    col = new Color4(
-                        col.R * blendfac + origcol.R * revblendfac,
-                        col.G * blendfac + origcol.G * revblendfac,
-                        col.B * blendfac + origcol.B * revblendfac,
+                    coll = new Color4(
+                        coll.R * blendfac + origcol.R * revblendfac,
+                        coll.G * blendfac + origcol.G * revblendfac,
+                        coll.B * blendfac + origcol.B * revblendfac,
                         1);
-                    r = col.R;
-                    g = col.G;
-                    b = col.B;
-                    a = col.A;
+                    r = coll.R;
+                    g = coll.G;
+                    b = coll.B;
+                    a = coll.A;
                     quadColorbuff[pos++] = r;
                     quadColorbuff[pos++] = g;
                     quadColorbuff[pos++] = b;
@@ -194,6 +204,17 @@ namespace Black_Midi_Render
                     quadColorbuff[pos++] = g;
                     quadColorbuff[pos++] = b;
                     quadColorbuff[pos++] = a;
+                    blendfac = colr.A;
+                    revblendfac = 1 - blendfac;
+                    colr = new Color4(
+                        colr.R * blendfac + origcol.R * revblendfac,
+                        colr.G * blendfac + origcol.G * revblendfac,
+                        colr.B * blendfac + origcol.B * revblendfac,
+                        1);
+                    r = colr.R;
+                    g = colr.G;
+                    b = colr.B;
+                    a = colr.A;
                     quadColorbuff[pos++] = r;
                     quadColorbuff[pos++] = g;
                     quadColorbuff[pos++] = b;

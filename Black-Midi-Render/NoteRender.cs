@@ -26,7 +26,7 @@ namespace Black_Midi_Render
         int quadBufferPos = 0;
 
         int indexBufferId;
-        uint[] indexes = new uint[2048 * 16];
+        uint[] indexes = new uint[2048 * 4 * 6];
 
         public NoteRender(RenderSettings rendersettings)
         {
@@ -40,17 +40,24 @@ namespace Black_Midi_Render
             GL.GenBuffers(1, out vertexBufferID);
             GL.GenBuffers(1, out colorBufferID);
             GL.GenBuffers(1, out attrib1BufferID);
-            for (uint i = 0; i < indexes.Length; i++) indexes[i] = i;
+            for (uint i = 0; i < indexes.Length / 6; i++)
+            {
+                indexes[i * 6 + 0] = i * 4 + 0;
+                indexes[i * 6 + 1] = i * 4 + 1;
+                indexes[i * 6 + 2] = i * 4 + 3;
+                indexes[i * 6 + 3] = i * 4 + 1;
+                indexes[i * 6 + 4] = i * 4 + 3;
+                indexes[i * 6 + 5] = i * 4 + 2;
+            }
             for (int i = 0; i < quadAttribbuff.Length;)
             {
-
-                quadAttribbuff[i++] = 0.5;
+                quadAttribbuff[i++] = -0.1;
                 quadAttribbuff[i++] = 0;
-                quadAttribbuff[i++] = -0.5;
-                quadAttribbuff[i++] = 0;
-                quadAttribbuff[i++] = 0.5;
+                quadAttribbuff[i++] = 0.3;
                 quadAttribbuff[i++] = 0;
                 quadAttribbuff[i++] = -0.3;
+                quadAttribbuff[i++] = 0;
+                quadAttribbuff[i++] = 0.3;
                 quadAttribbuff[i++] = 0;
             }
             GL.BindBuffer(BufferTarget.ArrayBuffer, attrib1BufferID);
@@ -90,7 +97,8 @@ namespace Black_Midi_Render
             GL.BindBuffer(BufferTarget.ArrayBuffer, attrib1BufferID);
             GL.VertexAttribPointer(2, 2, VertexAttribPointerType.Double, false, 16, 0);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, indexBufferId);
-            GL.DrawElements(PrimitiveType.Quads, quadBufferPos * 4, DrawElementsType.UnsignedInt, IntPtr.Zero);
+            GL.IndexPointer(IndexPointerType.Int, 1, 0);
+            GL.DrawElements(PrimitiveType.Triangles, quadBufferPos * 6, DrawElementsType.UnsignedInt, IntPtr.Zero);
             quadBufferPos = 0;
         }
         
@@ -116,10 +124,14 @@ namespace Black_Midi_Render
                             if (n.note >= firstNote && n.note < lastNote)
                             {
                                 nc++;
-                                Color4 col = n.track.trkColor;
+                                Color4 coll = n.track.trkColor[n.channel * 2];
+                                Color4 colr = n.track.trkColor[n.channel * 2 + 1];
                                 int k = n.note;
                                 if (n.start < renderCutoff)
-                                    keyColors[k] = col;
+                                {
+                                    keyColors[k * 2] = coll;
+                                    keyColors[k * 2 + 1] = colr;
+                                }
 
                                 double x1;
                                 x1 = (float)(k - firstNote) / (lastNote - firstNote);
@@ -132,20 +144,20 @@ namespace Black_Midi_Render
                                     y1 = 1;
 
                                 int pos = quadBufferPos * 8;
-                                quadVertexbuff[pos++] = x1;
-                                quadVertexbuff[pos++] = y2;
                                 quadVertexbuff[pos++] = x2;
                                 quadVertexbuff[pos++] = y2;
                                 quadVertexbuff[pos++] = x2;
                                 quadVertexbuff[pos++] = y1;
                                 quadVertexbuff[pos++] = x1;
-                                quadVertexbuff[pos] = y1;
+                                quadVertexbuff[pos++] = y1;
+                                quadVertexbuff[pos++] = x1;
+                                quadVertexbuff[pos++] = y2;
 
                                 pos = quadBufferPos * 16;
-                                r = col.R;
-                                g = col.G;
-                                b = col.B;
-                                a = col.A;
+                                r = coll.R;
+                                g = coll.G;
+                                b = coll.B;
+                                a = coll.A;
                                 quadColorbuff[pos++] = r;
                                 quadColorbuff[pos++] = g;
                                 quadColorbuff[pos++] = b;
@@ -154,6 +166,10 @@ namespace Black_Midi_Render
                                 quadColorbuff[pos++] = g;
                                 quadColorbuff[pos++] = b;
                                 quadColorbuff[pos++] = a;
+                                r = colr.R;
+                                g = colr.G;
+                                b = colr.B;
+                                a = colr.A;
                                 quadColorbuff[pos++] = r;
                                 quadColorbuff[pos++] = g;
                                 quadColorbuff[pos++] = b;

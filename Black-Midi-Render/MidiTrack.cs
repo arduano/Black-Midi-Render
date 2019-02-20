@@ -51,7 +51,7 @@ namespace Black_Midi_Render
         FastList<Note> globalDisplayNotes;
         FastList<Tempo> globalTempoEvents;
 
-        public Color4 trkColor;
+        public Color4[] trkColor;
 
         bool readDelta = false;
 
@@ -60,12 +60,22 @@ namespace Black_Midi_Render
         public void Reset()
         {
             foreach (var un in UnendedNotes) un.Unlink();
-            trkColor = Color4.FromHsv(new OpenTK.Vector4(trackID * 1.36271f % 1, 1.0f, 1.0f, 1f));
             reader.Reset();
+            ResetColors();
             trackTime = 0;
             trackEnded = false;
             readDelta = false;
             channelPrefix = 0;
+        }
+
+        public void ResetColors()
+        {
+            trkColor = new Color4[32];
+            for (int i = 0; i < 16; i++)
+            {
+                trkColor[i * 2] = Color4.FromHsv(new OpenTK.Vector4((trackID * 16 + i) * 1.36271f % 1, 1.0f, 1.0f, 1f));
+                trkColor[i * 2 + 1] = Color4.FromHsv(new OpenTK.Vector4((trackID * 16 + i) * 1.36271f % 1, 1.0f, 1.0f, 1f));
+            }
         }
 
         public MidiTrack(int id, IByteReader reader, FastList<Note> globalNotes, FastList<Tempo> globalTempos)
@@ -78,7 +88,7 @@ namespace Black_Midi_Render
             {
                 UnendedNotes[i] = new FastList<Note>();
             }
-            trkColor = Color4.FromHsv(new OpenTK.Vector4(id * 1.36271f % 1, 1.0f, 1.0f, 1f));
+            ResetColors();
         }
 
         long ReadVariableLen()
