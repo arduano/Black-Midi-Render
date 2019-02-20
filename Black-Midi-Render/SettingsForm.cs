@@ -57,15 +57,15 @@ namespace Black_Midi_Render
                 MessageBox.Show("Midi file doesn't exist");
                 return;
             }
-            //try
+            try
             {
                 midifile = new MidiFile(MidiBox.Text, settings);
             }
-            //catch (Exception ex)
-           // {
-            //    Console.WriteLine(ex.Message + "\n" + ex.StackTrace);
-            //    MessageBox.Show(ex.Message + "\n" + ex.StackTrace);
-           // }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message + "\n" + ex.StackTrace);
+                MessageBox.Show(ex.Message + "\n" + ex.StackTrace);
+            }
             unloadButton.Enabled = true;
             startButton.Enabled = true;
         }
