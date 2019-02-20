@@ -228,10 +228,10 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.imgpath.Enabled = false;
-            this.imgpath.Location = new System.Drawing.Point(192, 325);
+            this.imgpath.Location = new System.Drawing.Point(218, 325);
             this.imgpath.Name = "imgpath";
             this.imgpath.ReadOnly = true;
-            this.imgpath.Size = new System.Drawing.Size(341, 20);
+            this.imgpath.Size = new System.Drawing.Size(315, 20);
             this.imgpath.TabIndex = 23;
             // 
             // ffpath
@@ -249,7 +249,7 @@
             // browseImgButton
             // 
             this.browseImgButton.Enabled = false;
-            this.browseImgButton.Location = new System.Drawing.Point(92, 323);
+            this.browseImgButton.Location = new System.Drawing.Point(115, 323);
             this.browseImgButton.Name = "browseImgButton";
             this.browseImgButton.Size = new System.Drawing.Size(94, 23);
             this.browseImgButton.TabIndex = 14;
@@ -295,9 +295,9 @@
             this.img_radio.AutoSize = true;
             this.img_radio.Location = new System.Drawing.Point(6, 326);
             this.img_radio.Name = "img_radio";
-            this.img_radio.Size = new System.Drawing.Size(76, 17);
+            this.img_radio.Size = new System.Drawing.Size(104, 17);
             this.img_radio.TabIndex = 17;
-            this.img_radio.Text = "Image strip";
+            this.img_radio.Text = "Image sequence";
             this.img_radio.UseVisualStyleBackColor = true;
             this.img_radio.CheckedChanged += new System.EventHandler(this.img_radio_CheckedChanged);
             // 

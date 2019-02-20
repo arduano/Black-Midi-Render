@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
@@ -304,6 +305,12 @@ namespace Black_Midi_Render
                 ffmpeg.Close();
             }
             this.Close();
+        }
+
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            base.OnClosing(e);
+            Running = false;
         }
 
         void DrawScreenQuad()

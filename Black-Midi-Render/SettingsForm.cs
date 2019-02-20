@@ -140,6 +140,7 @@ namespace Black_Midi_Render
 
         bool running = true;
         RenderWindow win = null;
+        bool inRenderLoop = false;
         private void startButton_Click(object sender, EventArgs e)
         {
             if (midifile == null)
@@ -181,6 +182,7 @@ namespace Black_Midi_Render
                 SpinWait.SpinUntil(() => winStarted);
                 long time = 0;
                 int nc = -1;
+                inRenderLoop = true;
                 while ((midifile.ParseUpTo(time += (long)(win.tempoFrameStep * 10)) || nc != 0) && win.Running && running)
                 {
                     SpinWait.SpinUntil(() => midifile.currentSyncTime < win.midiTime + (long)(win.tempoFrameStep * 10) || !win.Running);
@@ -203,6 +205,7 @@ namespace Black_Midi_Render
                 winthread.Join();
                 midifile.Reset();
             });
+            inRenderLoop = false;
             renderThread.Start();
             startButton.Enabled = false;
             stopButton.Enabled = true;
@@ -230,7 +233,7 @@ namespace Black_Midi_Render
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-            if (win != null && !win.Running)
+            if (win != null && !inRenderLoop)
             {
                 startButton.Enabled = true;
                 stopButton.Enabled = false;
