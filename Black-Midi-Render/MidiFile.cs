@@ -42,6 +42,7 @@ namespace Black_Midi_Render
             Console.WriteLine("Loading tracks into memory");
             LoadAndParseAll(true);
             Console.WriteLine("Loaded!");
+            Console.WriteLine("Notr count: " + noteCount);
             unendedTracks = trackcount;
         }
 

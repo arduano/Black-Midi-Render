@@ -245,7 +245,7 @@ namespace Black_Midi_Render
                 bool stepped = false;
                 if (globalTempoEvents.First != null)
                 {
-                    if (midiTime + tempoFrameStep > globalTempoEvents.First.pos)
+                    if (midiTime + tempoFrameStep - settings.deltaTimeOnScreen > globalTempoEvents.First.pos)
                     {
                         var t = globalTempoEvents.Pop();
                         var _t = 1 - (t.pos - midiTime) / tempoFrameStep;
