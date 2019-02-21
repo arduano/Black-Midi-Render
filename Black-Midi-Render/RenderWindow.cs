@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.IO.Pipes;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -32,8 +33,6 @@ namespace Black_Midi_Render
         Process ffmpeg = new Process();
         long imgnumber = 0;
         Task lastRenderPush = null;
-
-        public bool Running = true;
 
         GLPostbuffer finalCompositeBuff;
         GLPostbuffer baseRenderBuff;
@@ -81,16 +80,25 @@ namespace Black_Midi_Render
         public RenderWindow(MidiFile midi, RenderSettings settings) : base((int)(DisplayDevice.Default.Width / 1.5), (int)(DisplayDevice.Default.Height / 1.5), new GraphicsMode(new ColorFormat(8, 8, 8, 8)), "Render", GameWindowFlags.Default, DisplayDevice.Default)
         {
             this.settings = settings;
+            midiTime = -settings.deltaTimeOnScreen;
 
             //WindowBorder = WindowBorder.Hidden;
             globalDisplayNotes = midi.globalDisplayNotes;
             globalTempoEvents = midi.globalTempoEvents;
             this.midi = midi;
-            tempoFrameStep = ((double)midi.division / 50000) * (1000000 / settings.fps);
+            tempoFrameStep = ((double)96 / 50000) * (1000000 / settings.fps);
             if (!settings.vsync) VSync = VSyncMode.Off;
             if (settings.ffRender)
             {
-                string args = "-y -f rawvideo -s " + settings.width + "x" + settings.height + " -pix_fmt rgb32 -r " + settings.fps + " -i - -c:v h264 -vf vflip -an -b:v " + settings.bitrate + "k -maxrate " + settings.bitrate + "k -minrate " + settings.bitrate + "k \"" + settings.ffPath + "\"";
+                string args = "" +
+                    " -f rawvideo -s " + settings.width + "x" + settings.height +
+                    " -pix_fmt rgb32 -r " + settings.fps + " -i -" +
+                    " -itsoffset 0.21 -i E:\\scarletzone.wav" +
+                    " -vf vflip -vcodec libx264 -acodec aac" +
+                    " -b:v " + settings.bitrate + "k" +
+                    " -maxrate " + settings.bitrate + "k" +
+                    " -minrate " + settings.bitrate + "k" +
+                    " -y \"" + settings.ffPath + "\"";
                 ffmpeg.StartInfo = new ProcessStartInfo("ffmpeg", args);
                 ffmpeg.StartInfo.RedirectStandardInput = true;
                 ffmpeg.StartInfo.UseShellExecute = false;
@@ -169,10 +177,10 @@ namespace Black_Midi_Render
         protected override void OnRenderFrame(FrameEventArgs e)
         {
             long nc = -1;
-            while (Running && (midiTime < midi.maxTrackTime + settings.deltaTimeOnScreen + settings.fps * tempoFrameStep * 5 || midi.unendedTracks != 0))
+            while (settings.running && (midiTime < midi.maxTrackTime + settings.deltaTimeOnScreen + settings.fps * tempoFrameStep * 5 || midi.unendedTracks != 0))
             {
-                SpinWait.SpinUntil(() => midi.currentSyncTime > midiTime + tempoFrameStep || midi.unendedTracks == 0 || !Running);
-                if (!Running) break;
+                SpinWait.SpinUntil(() => midi.currentSyncTime > midiTime + tempoFrameStep || midi.unendedTracks == 0 || !settings.running);
+                if (!settings.running) break;
 
                 GL.UseProgram(noteShader);
 
@@ -301,7 +309,7 @@ namespace Black_Midi_Render
                 }
                 ProcessEvents();
             }
-            Running = false;
+            settings.running = false;
             if (settings.ffRender)
             {
                 if (lastRenderPush != null) lastRenderPush.GetAwaiter().GetResult();
@@ -314,7 +322,14 @@ namespace Black_Midi_Render
         protected override void OnClosing(CancelEventArgs e)
         {
             base.OnClosing(e);
-            Running = false;
+            settings.running = false;
+        }
+
+        public bool Closed = false;
+        protected override void OnClosed(EventArgs e)
+        {
+            base.OnClosed(e);
+            Closed = true;
         }
 
         void DrawScreenQuad()

@@ -138,7 +138,6 @@ namespace Black_Midi_Render
             settings.bitrate = (int)bitrate_nud.Value;
         }
 
-        bool running = true;
         RenderWindow win = null;
         bool inRenderLoop = false;
         private void startButton_Click(object sender, EventArgs e)
@@ -149,15 +148,16 @@ namespace Black_Midi_Render
                 return;
             }
 
+            settings.running = true;
             midifile.Reset();
-            running = true;
 
             settings.vsync = noneVsync_radio.Checked;
             settings.ffRender = ff_radio.Checked;
             settings.imgRender = img_radio.Checked;
             settings.ffPath = ffpath.Text;
             settings.imgPath = imgpath.Text;
-
+            settings.includeAudio = useAudioCheck.Checked;
+            if (useAudioCheck.Checked) settings.audioPath = wavPath.Text;
             if (settings.ffRender && settings.ffPath == "")
             {
                 MessageBox.Show("Please specify a save file");
@@ -185,9 +185,10 @@ namespace Black_Midi_Render
                 inRenderLoop = true;
                 try
                 {
-                    while ((midifile.ParseUpTo(time += (long)(win.tempoFrameStep * 10)) || nc != 0) && win.Running && running)
+                    while ((midifile.ParseUpTo(time += (long)(win.tempoFrameStep * 10)) || nc != 0) && settings.running)
                     {
-                        SpinWait.SpinUntil(() => midifile.currentSyncTime < win.midiTime + (long)(win.tempoFrameStep * 10) || !win.Running);
+                        SpinWait.SpinUntil(() => midifile.currentSyncTime < win.midiTime + (long)(win.tempoFrameStep * 10) || !settings.running);
+                        if (!settings.running) break;
                         nc = 0;
                         Note n;
                         lock (midifile.globalDisplayNotes)
@@ -207,15 +208,12 @@ namespace Black_Midi_Render
                 catch
                 {
                     MessageBox.Show("An error occurred while opeining render window. Please try again.");
-                    try
-                    {
-                        win.Running = false;
-                    }
-                    catch { }
+                    settings.running = false;
                     inRenderLoop = false;
                 }
+                inRenderLoop = false;
                 winthread.Join();
-                win.Running = false;
+                settings.running = false;
                 midifile.Reset();
             });
             inRenderLoop = false;
@@ -229,7 +227,7 @@ namespace Black_Midi_Render
         {
             if (MessageBox.Show("Are you sure you want to stop?", "Stop rendering", MessageBoxButtons.YesNo) != DialogResult.Yes) return;
             Console.WriteLine("Stopping and reseting");
-            running = false;
+            settings.running = false;
             renderThread.Join();
             stopButton.Enabled = false;
             startButton.Enabled = true;
@@ -240,7 +238,7 @@ namespace Black_Midi_Render
         private void SettingsForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             if (MessageBox.Show("Are you sure you want to close?", "Close", MessageBoxButtons.YesNo) != DialogResult.Yes) return;
-            running = false;
+            settings.running = false;
             if (renderThread != null) renderThread.Join();
         }
 
@@ -276,12 +274,31 @@ namespace Black_Midi_Render
             browseFFButton.Enabled = ff_radio.Checked;
             bitrate_nud.Enabled = ff_radio.Checked;
             ffpath.Enabled = ff_radio.Checked;
+            useAudioCheck.Enabled = ff_radio.Checked;
+            wavPath.Enabled = useAudioCheck.Checked && ff_radio.Checked;
+            browseWavButton.Enabled = useAudioCheck.Checked && ff_radio.Checked;
         }
 
         private void img_radio_CheckedChanged(object sender, EventArgs e)
         {
             browseImgButton.Enabled = img_radio.Checked;
             imgpath.Enabled = img_radio.Checked;
+        }
+
+        private void useAudioCheck_CheckedChanged(object sender, EventArgs e)
+        {
+            settings.includeAudio = useAudioCheck.Checked;
+            wavPath.Enabled = useAudioCheck.Checked;
+            browseWavButton.Enabled = useAudioCheck.Checked;
+        }
+
+        private void browseWavButton_Click(object sender, EventArgs e)
+        {
+            var save = new SaveFileDialog();
+            save.OverwritePrompt = false;
+            save.Filter = "Common audio files (*.mp3;*.wav;*.ogg;*.flac)|*.mp3;*.wav;*.ogg;*.flac";
+            if (save.ShowDialog() != DialogResult.OK) return;
+            wavPath.Text = save.FileName;
         }
     }
 }

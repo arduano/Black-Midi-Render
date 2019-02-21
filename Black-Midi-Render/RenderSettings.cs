@@ -26,6 +26,9 @@ namespace Black_Midi_Render
         public string imgPath = "imgs";
         public bool vsync = false;
 
+        public bool includeAudio = false;
+        public string audioPath = "";
+
         public int maxTrackBufferSize = 10000;
         public int bitrate = 12000;
 
@@ -33,6 +36,8 @@ namespace Black_Midi_Render
         public int glowRadius = 200;
 
         public Color4[] keyColors;
+
+        public bool running = false;
 
         public void ResetVariableState()
         {
