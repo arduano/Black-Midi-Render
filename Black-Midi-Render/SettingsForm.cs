@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -183,6 +184,11 @@ namespace Black_Midi_Render
                 long time = 0;
                 int nc = -1;
                 inRenderLoop = true;
+                long maxRam = 0;
+                long avgRam = 0;
+                long ramSample = 0;
+                Stopwatch timewatch = new Stopwatch();
+                timewatch.Start();
                 try
                 {
                     while ((midifile.ParseUpTo(time += (long)(win.tempoFrameStep * 10)) || nc != 0) && settings.running)
@@ -203,6 +209,10 @@ namespace Black_Midi_Render
                             }
                         }
                         Console.WriteLine(Math.Round((double)time / midifile.maxTrackTime * 10000) / 100 + "% Notes: " + nc);
+                        long ram = Process.GetCurrentProcess().PrivateMemorySize64;
+                        if (maxRam < ram) maxRam = ram;
+                        avgRam = (long)((double)avgRam * ramSample + ram) / (ramSample + 1);
+                        ramSample++;
                     }
                 }
                 catch
@@ -215,6 +225,10 @@ namespace Black_Midi_Render
                 winthread.Join();
                 settings.running = false;
                 midifile.Reset();
+                Console.WriteLine(
+                        "Finished render\nRAM usage (Private bytes)\nPeak: " + Math.Round((double)maxRam / 1000 / 1000 / 1000 * 100) / 100 +
+                        "GB\nAvg: " + Math.Round((double)avgRam / 1000 / 1000 / 1000 * 100) / 100 +
+                        "GB\nMinutes to render: " + Math.Round((double)timewatch.ElapsedMilliseconds / 1000 / 60 * 100) / 100);
             });
             inRenderLoop = false;
             renderThread.Start();

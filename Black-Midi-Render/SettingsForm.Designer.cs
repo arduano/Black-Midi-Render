@@ -36,7 +36,6 @@
             this.browseWavButton = new System.Windows.Forms.Button();
             this.useAudioCheck = new System.Windows.Forms.CheckBox();
             this.browseButton = new System.Windows.Forms.Button();
-            this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
             this.width_nud = new System.Windows.Forms.NumericUpDown();
             this.loadButton = new System.Windows.Forms.Button();
             this.label11 = new System.Windows.Forms.Label();
@@ -78,7 +77,6 @@
             this.groupBox1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.width_nud)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.height_nud)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.maxBuffer_nud)).BeginInit();
@@ -121,7 +119,6 @@
             this.tabPage1.Controls.Add(this.browseWavButton);
             this.tabPage1.Controls.Add(this.useAudioCheck);
             this.tabPage1.Controls.Add(this.browseButton);
-            this.tabPage1.Controls.Add(this.numericUpDown1);
             this.tabPage1.Controls.Add(this.width_nud);
             this.tabPage1.Controls.Add(this.loadButton);
             this.tabPage1.Controls.Add(this.label11);
@@ -195,13 +192,6 @@
             this.browseButton.Text = "Browse";
             this.browseButton.UseVisualStyleBackColor = true;
             this.browseButton.Click += new System.EventHandler(this.browseButton_Click);
-            // 
-            // numericUpDown1
-            // 
-            this.numericUpDown1.Location = new System.Drawing.Point(47, 103);
-            this.numericUpDown1.Name = "numericUpDown1";
-            this.numericUpDown1.Size = new System.Drawing.Size(120, 20);
-            this.numericUpDown1.TabIndex = 0;
             // 
             // width_nud
             // 
@@ -703,7 +693,6 @@
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
             this.tabPage1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.width_nud)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.height_nud)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.maxBuffer_nud)).EndInit();
@@ -733,7 +722,6 @@
         private System.Windows.Forms.NumericUpDown fps_nud;
         private System.Windows.Forms.NumericUpDown height_nud;
         private System.Windows.Forms.NumericUpDown width_nud;
-        private System.Windows.Forms.NumericUpDown numericUpDown1;
         private System.Windows.Forms.RadioButton noneVsync_radio;
         private System.Windows.Forms.RadioButton none_radio;
         private System.Windows.Forms.RadioButton img_radio;

@@ -57,6 +57,8 @@ namespace Black_Midi_Render
         int indexBufferId;
         uint[] indexes = new uint[2048 * 16];
 
+        byte[] pixels;
+
         int glowTextureSize_var;
         int glowWidth_var;
         int glowSigma_var;
@@ -81,6 +83,7 @@ namespace Black_Midi_Render
         {
             this.settings = settings;
             midiTime = -settings.deltaTimeOnScreen;
+            pixels = new byte[settings.width * settings.height * 4];
 
             //WindowBorder = WindowBorder.Hidden;
             globalDisplayNotes = midi.globalDisplayNotes;
@@ -96,7 +99,7 @@ namespace Black_Midi_Render
                     args = "" +
                         " -f rawvideo -s " + settings.width + "x" + settings.height +
                         " -pix_fmt rgb32 -r " + settings.fps + " -i -" +
-                        " -itsoffset 0.21 -i " + settings.audioPath +
+                        " -itsoffset 0.21 -i \"" + settings.audioPath + "\"" + 
                         " -vf vflip -vcodec libx264 -acodec aac" +
                         " -b:v " + settings.bitrate + "k" +
                         " -maxrate " + settings.bitrate + "k" +
@@ -279,7 +282,6 @@ namespace Black_Midi_Render
                 if (settings.ffRender)
                 {
                     finalCompositeBuff.BindBuffer();
-                    byte[] pixels = new byte[settings.width * settings.height * 4];
                     IntPtr unmanagedPointer = Marshal.AllocHGlobal(pixels.Length);
                     GL.ReadPixels(0, 0, settings.width, settings.height, PixelFormat.Bgra, PixelType.UnsignedByte, unmanagedPointer);
                     Marshal.Copy(unmanagedPointer, pixels, 0, pixels.Length);
@@ -290,10 +292,8 @@ namespace Black_Midi_Render
                 if (settings.imgRender)
                 {
                     finalCompositeBuff.BindBuffer();
-                    byte[] pixels = new byte[settings.width * settings.height * 4];
                     IntPtr unmanagedPointer = Marshal.AllocHGlobal(pixels.Length);
                     GL.ReadPixels(0, 0, settings.width, settings.height, PixelFormat.Bgra, PixelType.UnsignedByte, unmanagedPointer);
-                    Marshal.Copy(unmanagedPointer, pixels, 0, pixels.Length);
                     if (lastRenderPush != null) lastRenderPush.GetAwaiter().GetResult();
                     lastRenderPush = Task.Run(() =>
                     {
