@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace Black_Midi_Render
 {
@@ -36,13 +38,71 @@ namespace Black_Midi_Render
             this.settings = settings;
             MidiFileReader = new StreamReader(filename).BaseStream;
             ParseHeaderChunk();
-            while (MidiFileReader.Position < MidiFileReader.Length) ParseTrackChunk();
+            try
+            {
+                while (MidiFileReader.Position < MidiFileReader.Length)
+                {
+                    ParseTrackChunk();
+                }
+            }
+            catch
+            {
+                var r = MessageBox.Show("This midi has corrupt track chunks.\nBMC can use what it has alreadt parsed, or it can attempt to recover all the tracks manually. However track recovery can take some time, depending on the midi size, and might not recover anything.\nPerform track recovery?", "Corrupt headers", MessageBoxButtons.YesNo);
+                if(r == DialogResult.Yes)
+                {
+                    long start;
+                    long end = MidiFileReader.Length;
+                    long pos;
+                    Stopwatch printtimer = new Stopwatch();
+                    printtimer.Start();
+                    if (trackBeginnings.Count == 0)
+                    {
+                        start = 4 + 4 + 6;
+                    }
+                    else start = trackBeginnings[trackBeginnings.Count - 1];
+                    pos = start;
+
+                    long prevstart = -1;
+                    bool noerror = true;
+                    while (pos < end)
+                    {
+                        MidiFileReader.Position = pos;
+                        noerror = true;
+                        try
+                        {
+                            AssertText("MTrk");
+                        }
+                        catch { noerror = false; }
+                        if(noerror)
+                        {
+                            if (prevstart != -1)
+                            {
+                                trackBeginnings.Add(pos + 8);
+                                trackLengths.Add((uint)(pos - prevstart));
+                            }
+                            prevstart = pos + 8;
+                        }
+                        pos++;
+                        if(printtimer.ElapsedMilliseconds > 2000)
+                        {
+                            Console.WriteLine("Processed: " + Math.Round(((double)pos - start) / (end  - start) * 10000) / 100 +"%");
+                            printtimer.Reset();
+                            printtimer.Start();
+                        }
+                    }
+                    if (prevstart != -1)
+                    {
+                        trackBeginnings.Add(pos + 4);
+                        trackLengths.Add((uint)(pos - prevstart));
+                    }
+                }
+            }
             tracks = new MidiTrack[trackcount];
 
             Console.WriteLine("Loading tracks into memory");
             LoadAndParseAll(true);
             Console.WriteLine("Loaded!");
-            Console.WriteLine("Notr count: " + noteCount);
+            Console.WriteLine("Note count: " + noteCount);
             unendedTracks = trackcount;
         }
 
