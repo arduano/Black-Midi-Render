@@ -90,15 +90,30 @@ namespace Black_Midi_Render
             if (!settings.vsync) VSync = VSyncMode.Off;
             if (settings.ffRender)
             {
-                string args = "" +
-                    " -f rawvideo -s " + settings.width + "x" + settings.height +
-                    " -pix_fmt rgb32 -r " + settings.fps + " -i -" +
-                    " -itsoffset 0.21 -i E:\\scarletzone.wav" +
-                    " -vf vflip -vcodec libx264 -acodec aac" +
-                    " -b:v " + settings.bitrate + "k" +
-                    " -maxrate " + settings.bitrate + "k" +
-                    " -minrate " + settings.bitrate + "k" +
-                    " -y \"" + settings.ffPath + "\"";
+                string args = "";
+                if (settings.includeAudio)
+                {
+                    args = "" +
+                        " -f rawvideo -s " + settings.width + "x" + settings.height +
+                        " -pix_fmt rgb32 -r " + settings.fps + " -i -" +
+                        " -itsoffset 0.21 -i " + settings.audioPath +
+                        " -vf vflip -vcodec libx264 -acodec aac" +
+                        " -b:v " + settings.bitrate + "k" +
+                        " -maxrate " + settings.bitrate + "k" +
+                        " -minrate " + settings.bitrate + "k" +
+                        " -y \"" + settings.ffPath + "\"";
+                }
+                else
+                {
+                    args = "" +
+                        " -f rawvideo -s " + settings.width + "x" + settings.height +
+                        " -pix_fmt rgb32 -r " + settings.fps + " -i -" +
+                        " -vf vflip -vcodec libx264" +
+                        " -b:v " + settings.bitrate + "k" +
+                        " -maxrate " + settings.bitrate + "k" +
+                        " -minrate " + settings.bitrate + "k" +
+                        " -y \"" + settings.ffPath + "\"";
+                }
                 ffmpeg.StartInfo = new ProcessStartInfo("ffmpeg", args);
                 ffmpeg.StartInfo.RedirectStandardInput = true;
                 ffmpeg.StartInfo.UseShellExecute = false;

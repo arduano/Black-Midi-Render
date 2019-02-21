@@ -20,14 +20,12 @@ namespace Black_Midi_Render
             GL.ShaderSource(_vertexObj, File.ReadAllText("Shaders\\" + name + ".vert"));
             GL.CompileShader(_vertexObj);
             info = GL.GetShaderInfoLog(_vertexObj);
-            Console.WriteLine(string.Format("triangle.vert compile: {0}", info));
             GL.GetShader(_vertexObj, ShaderParameter.CompileStatus, out statusCode);
             if (statusCode != 1) throw new ApplicationException(info);
 
             GL.ShaderSource(_fragObj, File.ReadAllText("Shaders\\" + name + ".frag"));
             GL.CompileShader(_fragObj);
             info = GL.GetShaderInfoLog(_fragObj);
-            Console.WriteLine(string.Format("triangle.frag compile: {0}", info));
             GL.GetShader(_fragObj, ShaderParameter.CompileStatus, out statusCode);
             if (statusCode != 1) throw new ApplicationException(info);
 
@@ -35,8 +33,6 @@ namespace Black_Midi_Render
             GL.AttachShader(shader, _fragObj);
             GL.AttachShader(shader, _vertexObj);
             GL.LinkProgram(shader);
-            Console.WriteLine(string.Format("link program: {0}", GL.GetProgramInfoLog(shader)));
-            Console.WriteLine(string.Format("use program: {0}", GL.GetProgramInfoLog(shader)));
             return shader;
         }
 
@@ -50,14 +46,12 @@ namespace Black_Midi_Render
             GL.ShaderSource(_vertexObj, File.ReadAllText("Shaders\\Post\\post.vert"));
             GL.CompileShader(_vertexObj);
             info = GL.GetShaderInfoLog(_vertexObj);
-            Console.WriteLine(string.Format("triangle.vert compile: {0}", info));
             GL.GetShader(_vertexObj, ShaderParameter.CompileStatus, out statusCode);
             if (statusCode != 1) throw new ApplicationException(info);
 
             GL.ShaderSource(_fragObj, File.ReadAllText("Shaders\\Post\\" + name + ".frag"));
             GL.CompileShader(_fragObj);
             info = GL.GetShaderInfoLog(_fragObj);
-            Console.WriteLine(string.Format("triangle.frag compile: {0}", info));
             GL.GetShader(_fragObj, ShaderParameter.CompileStatus, out statusCode);
             if (statusCode != 1) throw new ApplicationException(info);
 
@@ -65,8 +59,6 @@ namespace Black_Midi_Render
             GL.AttachShader(shader, _fragObj);
             GL.AttachShader(shader, _vertexObj);
             GL.LinkProgram(shader);
-            Console.WriteLine(string.Format("link program: {0}", GL.GetProgramInfoLog(shader)));
-            Console.WriteLine(string.Format("use program: {0}", GL.GetProgramInfoLog(shader)));
             return shader;
         }
 

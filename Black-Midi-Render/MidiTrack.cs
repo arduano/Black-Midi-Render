@@ -97,13 +97,13 @@ namespace Black_Midi_Render
             for (int i = 0; i < 4; i++)
             {
                 c = reader.Read();
-                if (c > 127)
+                if (c > 0x7F)
                 {
-                    val = (c - 128) + val * 128;
+                    val = (val << 7) | (c & 0x7F);
                 }
                 else
                 {
-                    val = val * 128 + c;
+                    val = val << 7 | c;
                     return val;
                 }
             }
