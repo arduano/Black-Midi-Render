@@ -242,19 +242,16 @@ namespace Black_Midi_Render
                     baseRenderBuff.BindTexture();
                     DrawScreenQuad();
                 }
-                bool stepped = false;
-                if (globalTempoEvents.First != null)
+                double mv = 1;
+                while (globalTempoEvents.First != null && midiTime + (tempoFrameStep * mv) - settings.deltaTimeOnScreen > globalTempoEvents.First.pos)
                 {
-                    if (midiTime + tempoFrameStep - settings.deltaTimeOnScreen > globalTempoEvents.First.pos)
-                    {
-                        var t = globalTempoEvents.Pop();
-                        var _t = 1 - (t.pos - midiTime) / tempoFrameStep;
-                        tempoFrameStep = ((double)midi.division / t.tempo) * (1000000 / settings.fps);
-                        midiTime = t.pos + tempoFrameStep * _t;
-                        stepped = true;
-                    }
+                    var t = globalTempoEvents.Pop();
+                    var _t = ((t.pos + settings.deltaTimeOnScreen) - midiTime) / (tempoFrameStep * mv);
+                    mv *= 1 - _t;
+                    tempoFrameStep = ((double)midi.division / t.tempo) * (1000000 / settings.fps);
+                    midiTime = t.pos + settings.deltaTimeOnScreen;
                 }
-                if(!stepped) midiTime += tempoFrameStep;
+                midiTime += mv * tempoFrameStep;
 
                 if (settings.ffRender)
                 {
