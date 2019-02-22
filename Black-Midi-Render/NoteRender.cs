@@ -9,7 +9,7 @@ using OpenTK.Graphics.OpenGL;
 
 namespace Black_Midi_Render
 {
-    class NoteRender
+    class NoteRender : INoteRender
     {
         RenderSettings settings;
 

@@ -17,6 +17,16 @@ using OpenTK.Graphics.OpenGL;
 
 namespace Black_Midi_Render
 {
+    interface INoteRender
+    {
+        long Render(FastList<Note> notes, double midiTime);
+    }
+
+    interface IKeyboardRender
+    {
+        void Render();
+    }
+
     class RenderWindow : GameWindow
     {
         FastList<Note> globalDisplayNotes;
@@ -43,19 +53,6 @@ namespace Black_Midi_Render
         int postShader;
         int glowShader;
         int defaultShader;
-
-        int vertexBufferID;
-        int colorBufferID;
-        int attrib1BufferID;
-
-        int quadBufferLength = 2048;
-        double[] quadVertexbuff;
-        float[] quadColorbuff;
-        double[] quadAttribbuff;
-        int quadBufferPos = 0;
-
-        int indexBufferId;
-        uint[] indexes = new uint[2048 * 16];
 
         byte[] pixels;
 
@@ -149,52 +146,17 @@ namespace Black_Midi_Render
             glowShader = GLUtils.MakePostShaderProgram("glow");
             BindUniforms();
 
-            quadVertexbuff = new double[quadBufferLength * 8];
-            quadColorbuff = new float[quadBufferLength * 16];
-            quadAttribbuff = new double[quadBufferLength * 8];
-
-            GL.GenBuffers(1, out vertexBufferID);
-            GL.GenBuffers(1, out colorBufferID);
-            GL.GenBuffers(1, out attrib1BufferID);
-
-            for (uint i = 0; i < indexes.Length; i++) indexes[i] = i;
-            for (int i = 0; i < quadAttribbuff.Length;)
-            {
-
-                quadAttribbuff[i++] = 0.1;
-                quadAttribbuff[i++] = 0;
-                quadAttribbuff[i++] = -0.2;
-                quadAttribbuff[i++] = 0;
-                quadAttribbuff[i++] = 0.1;
-                quadAttribbuff[i++] = 0;
-                quadAttribbuff[i++] = -0.0;
-                quadAttribbuff[i++] = 0;
-            }
-
-            GL.BindBuffer(BufferTarget.ArrayBuffer, attrib1BufferID);
-            GL.BufferData(
-                BufferTarget.ArrayBuffer,
-                (IntPtr)(quadAttribbuff.Length * 8),
-                quadAttribbuff,
-                BufferUsageHint.StaticDraw);
-
-            GL.GenBuffers(1, out indexBufferId);
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, indexBufferId);
-            GL.BufferData(
-                BufferTarget.ElementArrayBuffer,
-                (IntPtr)(indexes.Length * 4),
-                indexes,
-                BufferUsageHint.StaticDraw);
-
             noteRender = new NoteRender(settings);
-            keyboardRender = new KeyboardRender(settings);
+            keyboardRender = new NewKeyboardRender(settings);
         }
-        NoteRender noteRender;
-        KeyboardRender keyboardRender;
+        INoteRender noteRender;
+        IKeyboardRender keyboardRender;
 
         protected override void OnRenderFrame(FrameEventArgs e)
         {
             long nc = -1;
+            Stopwatch watch = new Stopwatch();
+            watch.Start();
             while (settings.running && (midiTime < midi.maxTrackTime + settings.deltaTimeOnScreen + settings.fps * tempoFrameStep * 5 || midi.unendedTracks != 0))
             {
                 SpinWait.SpinUntil(() => midi.currentSyncTime > midiTime + tempoFrameStep || midi.unendedTracks == 0 || !settings.running);
@@ -323,6 +285,11 @@ namespace Black_Midi_Render
                     break;
                 }
                 ProcessEvents();
+                settings.notesOnScreen = nc;
+                double fr = 10000000.0 / watch.ElapsedTicks;
+                settings.liveFps = (settings.liveFps * 2 + fr) / 3;
+                watch.Reset();
+                watch.Start();
             }
             settings.running = false;
             if (settings.ffRender)
@@ -356,36 +323,5 @@ namespace Black_Midi_Render
             GL.Vertex2(0, 1);
             GL.End();
         }
-
-        bool isBlackNote(int n)
-        {
-            n = n % 12;
-            return n == 1 || n == 3 || n == 6 || n == 8 || n == 10;
-        }
-
-        void FlushQuadBuffer()
-        {
-            if (quadBufferPos == 0) return;
-            GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBufferID);
-            GL.BufferData(
-                BufferTarget.ArrayBuffer,
-                (IntPtr)(quadVertexbuff.Length * 8),
-                quadVertexbuff,
-                BufferUsageHint.StaticDraw);
-            GL.VertexAttribPointer(0, 2, VertexAttribPointerType.Double, false, 16, 0);
-            GL.BindBuffer(BufferTarget.ArrayBuffer, colorBufferID);
-            GL.BufferData(
-                BufferTarget.ArrayBuffer,
-                (IntPtr)(quadColorbuff.Length * 4),
-                quadColorbuff,
-                BufferUsageHint.StaticDraw);
-            GL.VertexAttribPointer(1, 4, VertexAttribPointerType.Float, false, 16, 0);
-            GL.BindBuffer(BufferTarget.ArrayBuffer, attrib1BufferID);
-            GL.VertexAttribPointer(2, 2, VertexAttribPointerType.Double, false, 16, 0);
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, indexBufferId);
-            GL.DrawElements(PrimitiveType.Quads, quadBufferPos * 4, DrawElementsType.UnsignedInt, IntPtr.Zero);
-            quadBufferPos = 0;
-        }
-
     }
 }

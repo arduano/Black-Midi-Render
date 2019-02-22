@@ -208,7 +208,11 @@ namespace Black_Midi_Render
                                 else nc++;
                             }
                         }
-                        Console.WriteLine(Math.Round((double)time / midifile.maxTrackTime * 10000) / 100 + "% Notes: " + nc);
+                        Console.WriteLine(
+                            Math.Round((double)time / midifile.maxTrackTime * 10000) / 100 + "%\tNotes loaded: " + nc + 
+                            "\tNotes drawn: " + settings.notesOnScreen + 
+                            "\tRender FPS: " + Math.Round(settings.liveFps)
+                            );
                         long ram = Process.GetCurrentProcess().PrivateMemorySize64;
                         if (maxRam < ram) maxRam = ram;
                         avgRam = (long)((double)avgRam * ramSample + ram) / (ramSample + 1);

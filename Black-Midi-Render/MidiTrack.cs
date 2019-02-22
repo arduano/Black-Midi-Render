@@ -455,7 +455,7 @@ namespace Black_Midi_Render
                         t.pos = trackTime;
                         t.tempo = btempo;
 
-                        if (trackID == 0)
+                        if (trackID <= 1)
                         {
                             if (!readOnly)
                             {

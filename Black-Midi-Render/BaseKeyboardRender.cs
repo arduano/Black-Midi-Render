@@ -8,7 +8,7 @@ using OpenTK.Graphics.OpenGL;
 
 namespace Black_Midi_Render
 {
-    class KeyboardRender
+    class BaseKeyboardRender : IKeyboardRender
     {
         RenderSettings settings;
 
@@ -28,7 +28,7 @@ namespace Black_Midi_Render
         int indexBufferId;
         uint[] indexes = new uint[2048 * 4 * 6];
 
-        public KeyboardRender(RenderSettings rendersettings)
+        public BaseKeyboardRender(RenderSettings rendersettings)
         {
             settings = rendersettings;
             noteShader = GLUtils.MakeShaderProgram("notes");

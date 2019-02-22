@@ -39,6 +39,9 @@ namespace Black_Midi_Render
 
         public bool running = false;
 
+        public long notesOnScreen = 0;
+        public double liveFps = 0;
+
         public void ResetVariableState()
         {
             keyColors = new Color4[512];
