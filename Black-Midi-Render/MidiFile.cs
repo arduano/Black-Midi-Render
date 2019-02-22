@@ -48,7 +48,7 @@ namespace Black_Midi_Render
             catch
             {
                 var r = MessageBox.Show("This midi has corrupt track chunks.\nBMC can use what it has alreadt parsed, or it can attempt to recover all the tracks manually. However track recovery can take some time, depending on the midi size, and might not recover anything.\nPerform track recovery?", "Corrupt headers", MessageBoxButtons.YesNo);
-                if(r == DialogResult.Yes)
+                if (r == DialogResult.Yes)
                 {
                     long start;
                     long end = MidiFileReader.Length;
@@ -73,7 +73,7 @@ namespace Black_Midi_Render
                             AssertText("MTrk");
                         }
                         catch { noerror = false; }
-                        if(noerror)
+                        if (noerror)
                         {
                             if (prevstart != -1)
                             {
@@ -83,9 +83,9 @@ namespace Black_Midi_Render
                             prevstart = pos + 8;
                         }
                         pos++;
-                        if(printtimer.ElapsedMilliseconds > 2000)
+                        if (printtimer.ElapsedMilliseconds > 2000)
                         {
-                            Console.WriteLine("Processed: " + Math.Round(((double)pos - start) / (end  - start) * 10000) / 100 +"%");
+                            Console.WriteLine("Processed: " + Math.Round(((double)pos - start) / (end - start) * 10000) / 100 + "%");
                             printtimer.Reset();
                             printtimer.Start();
                         }
@@ -166,10 +166,7 @@ namespace Black_Midi_Render
                 {
                     var t = tracks[trk];
                     if (!t.trackEnded) ut++;
-                    //while (t.trackTime < targetTime && !t.trackEnded)
-                    {
-                        t.Step(currentSyncTime);
-                    }
+                    t.Step(currentSyncTime);
                 }
                 unendedTracks = ut;
             }

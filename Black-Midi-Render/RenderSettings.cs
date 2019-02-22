@@ -7,6 +7,17 @@ using System.Threading.Tasks;
 
 namespace Black_Midi_Render
 {
+    enum KeyboardRenderers
+    {
+        Legacy,
+        New
+    }
+
+    enum NoteRenderers
+    {
+        Shaded
+    }
+
     class RenderSettings
     {
 
@@ -35,6 +46,9 @@ namespace Black_Midi_Render
         public bool glowEnabled = false;
         public int glowRadius = 200;
 
+        public KeyboardRenderers kbrender = KeyboardRenderers.New;
+        public NoteRenderers ntrender = NoteRenderers.Shaded;
+
         public Color4[] keyColors;
 
         public bool running = false;
@@ -46,6 +60,19 @@ namespace Black_Midi_Render
         {
             keyColors = new Color4[512];
             for (int i = 0; i < 512; i++) keyColors[i] = Color4.Transparent;
+        }
+
+        public IKeyboardRender GetKeyboardRenderer()
+        {
+            if (kbrender == KeyboardRenderers.Legacy) return new BaseKeyboardRender(this);
+            if (kbrender == KeyboardRenderers.New) return new NewKeyboardRender(this);
+            throw new Exception("No renderer selected");
+        }
+
+        public INoteRender GetNoteRenderer()
+        {
+            if (ntrender == NoteRenderers.Shaded) return new NoteRender(this);
+            throw new Exception("No renderer selected");
         }
     }
 }

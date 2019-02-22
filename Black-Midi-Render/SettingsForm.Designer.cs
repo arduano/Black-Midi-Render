@@ -74,6 +74,10 @@
             this.stopButton = new System.Windows.Forms.Button();
             this.startButton = new System.Windows.Forms.Button();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.keyboardRenderBox = new System.Windows.Forms.ComboBox();
+            this.label12 = new System.Windows.Forms.Label();
+            this.label14 = new System.Windows.Forms.Label();
+            this.noteRenderBox = new System.Windows.Forms.ComboBox();
             this.groupBox1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -461,6 +465,10 @@
             // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.noteRenderBox);
+            this.tabPage2.Controls.Add(this.label14);
+            this.tabPage2.Controls.Add(this.label12);
+            this.tabPage2.Controls.Add(this.keyboardRenderBox);
             this.tabPage2.Controls.Add(this.label13);
             this.tabPage2.Controls.Add(this.glowRad_nud);
             this.tabPage2.Controls.Add(this.glowCheck);
@@ -485,7 +493,7 @@
             // label13
             // 
             this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(198, 103);
+            this.label13.Location = new System.Drawing.Point(195, 155);
             this.label13.Name = "label13";
             this.label13.Size = new System.Drawing.Size(67, 13);
             this.label13.TabIndex = 44;
@@ -493,7 +501,7 @@
             // 
             // glowRad_nud
             // 
-            this.glowRad_nud.Location = new System.Drawing.Point(107, 101);
+            this.glowRad_nud.Location = new System.Drawing.Point(104, 153);
             this.glowRad_nud.Margin = new System.Windows.Forms.Padding(3, 7, 3, 3);
             this.glowRad_nud.Maximum = new decimal(new int[] {
             1000,
@@ -508,7 +516,7 @@
             // glowCheck
             // 
             this.glowCheck.AutoSize = true;
-            this.glowCheck.Location = new System.Drawing.Point(9, 102);
+            this.glowCheck.Location = new System.Drawing.Point(6, 154);
             this.glowCheck.Name = "glowCheck";
             this.glowCheck.Size = new System.Drawing.Size(92, 17);
             this.glowCheck.TabIndex = 43;
@@ -677,6 +685,49 @@
             this.timer1.Enabled = true;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
+            // keyboardRenderBox
+            // 
+            this.keyboardRenderBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.keyboardRenderBox.FormattingEnabled = true;
+            this.keyboardRenderBox.Items.AddRange(new object[] {
+            "Legacy",
+            "New"});
+            this.keyboardRenderBox.Location = new System.Drawing.Point(111, 97);
+            this.keyboardRenderBox.Name = "keyboardRenderBox";
+            this.keyboardRenderBox.Size = new System.Drawing.Size(121, 21);
+            this.keyboardRenderBox.TabIndex = 45;
+            this.keyboardRenderBox.SelectedIndexChanged += new System.EventHandler(this.keyboardRenderBox_SelectedIndexChanged);
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(6, 100);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(99, 13);
+            this.label12.TabIndex = 46;
+            this.label12.Text = "Keyboard Renderer";
+            // 
+            // label14
+            // 
+            this.label14.AutoSize = true;
+            this.label14.Location = new System.Drawing.Point(6, 127);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(77, 13);
+            this.label14.TabIndex = 47;
+            this.label14.Text = "Note Renderer";
+            // 
+            // noteRenderBox
+            // 
+            this.noteRenderBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.noteRenderBox.FormattingEnabled = true;
+            this.noteRenderBox.Items.AddRange(new object[] {
+            "Shaded"});
+            this.noteRenderBox.Location = new System.Drawing.Point(111, 124);
+            this.noteRenderBox.Name = "noteRenderBox";
+            this.noteRenderBox.Size = new System.Drawing.Size(121, 21);
+            this.noteRenderBox.TabIndex = 48;
+            this.noteRenderBox.SelectedIndexChanged += new System.EventHandler(this.noteRenderBox_SelectedIndexChanged);
+            // 
             // SettingsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -756,5 +807,9 @@
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.NumericUpDown noteDT_nud;
+        private System.Windows.Forms.ComboBox keyboardRenderBox;
+        private System.Windows.Forms.ComboBox noteRenderBox;
+        private System.Windows.Forms.Label label14;
+        private System.Windows.Forms.Label label12;
     }
 }

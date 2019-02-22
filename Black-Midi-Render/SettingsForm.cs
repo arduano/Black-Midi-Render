@@ -35,6 +35,8 @@ namespace Black_Midi_Render
             glowRad_nud.Enabled = glowCheck.Checked;
             glowRad_nud.Value = settings.glowRadius;
             bitrate_nud.Value = settings.bitrate;
+            keyboardRenderBox.SelectedIndex = (int)settings.kbrender;
+            noteRenderBox.SelectedIndex = (int)settings.ntrender;
         }
 
         MidiFile midifile = null;
@@ -317,6 +319,16 @@ namespace Black_Midi_Render
             save.Filter = "Common audio files (*.mp3;*.wav;*.ogg;*.flac)|*.mp3;*.wav;*.ogg;*.flac";
             if (save.ShowDialog() != DialogResult.OK) return;
             wavPath.Text = save.FileName;
+        }
+
+        private void keyboardRenderBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            settings.kbrender = (KeyboardRenderers)keyboardRenderBox.SelectedIndex;
+        }
+
+        private void noteRenderBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            settings.ntrender = (NoteRenderers)noteRenderBox.SelectedIndex;
         }
     }
 }

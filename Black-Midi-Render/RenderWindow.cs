@@ -146,8 +146,8 @@ namespace Black_Midi_Render
             glowShader = GLUtils.MakePostShaderProgram("glow");
             BindUniforms();
 
-            noteRender = new NoteRender(settings);
-            keyboardRender = new NewKeyboardRender(settings);
+            noteRender = settings.GetNoteRenderer();
+            keyboardRender = settings.GetKeyboardRenderer();
         }
         INoteRender noteRender;
         IKeyboardRender keyboardRender;
