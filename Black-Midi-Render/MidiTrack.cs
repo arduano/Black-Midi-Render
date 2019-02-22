@@ -268,6 +268,7 @@ namespace Black_Midi_Render
                 }
                 else if (command == 0b11110000)
                 {
+                    while (reader.Read() != 0b11110111) ;
                 }
                 else if (command == 0b11110100 || command == 0b11110001 || command == 0b11110101 || command == 0b11111001 || command == 0b11111101)
                 {
@@ -382,6 +383,36 @@ namespace Black_Midi_Render
                         }
                         string str = new string(text);
                     }
+                    else if (command == 0x08)
+                    {
+                        int size = (int)ReadVariableLen();
+                        char[] text = new char[size];
+                        for (int i = 0; i < size; i++)
+                        {
+                            text[i] = (char)reader.Read();
+                        }
+                        string str = new string(text);
+                    }
+                    else if (command == 0x09)
+                    {
+                        int size = (int)ReadVariableLen();
+                        char[] text = new char[size];
+                        for (int i = 0; i < size; i++)
+                        {
+                            text[i] = (char)reader.Read();
+                        }
+                        string str = new string(text);
+                    }
+                    else if (command == 0x0A)
+                    {
+                        int size = (int)ReadVariableLen();
+                        char[] text = new char[size];
+                        for (int i = 0; i < size; i++)
+                        {
+                            text[i] = (char)reader.Read();
+                        }
+                        string str = new string(text);
+                    }
                     else if (command == 0x20)
                     {
                         command = reader.Read();
@@ -424,9 +455,12 @@ namespace Black_Midi_Render
                         t.pos = trackTime;
                         t.tempo = btempo;
 
-                        if (!readOnly)
+                        if (trackID == 0)
                         {
-                            globalTempoEvents.Add(t);
+                            if (!readOnly)
+                            {
+                                globalTempoEvents.Add(t);
+                            }
                         }
                     }
                     else if (command == 0x54)
@@ -533,6 +567,7 @@ namespace Black_Midi_Render
                 }
                 else if (command == 0b11110000)
                 {
+                    while (reader.Read() != 0b11110111) ;
                 }
                 else if (command == 0b11110100 || command == 0b11110001 || command == 0b11110101 || command == 0b11111001 || command == 0b11111101)
                 {
@@ -576,13 +611,8 @@ namespace Black_Midi_Render
                             throw new Exception("Corrupt Track");
                         }
                     }
-                    else if (command == 0x01 ||
-                            command == 0x02 ||
-                            command == 0x03 ||
-                            command == 0x04 ||
-                            command == 0x05 ||
-                            command == 0x06 ||
-                            command == 0x07)
+                    else if (command >= 0x01 &&
+                            command <= 0x0A)
                     {
                         int size = (int)ReadVariableLen();
                         reader.Skip(size);
