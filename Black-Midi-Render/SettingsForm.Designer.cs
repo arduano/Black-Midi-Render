@@ -307,7 +307,7 @@
             // 
             this.fps_nud.Location = new System.Drawing.Point(376, 103);
             this.fps_nud.Maximum = new decimal(new int[] {
-            300,
+            2147483647,
             0,
             0,
             0});

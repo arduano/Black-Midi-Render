@@ -232,7 +232,7 @@ namespace Black_Midi_Render
                     var t = globalTempoEvents.Pop();
                     var _t = ((t.pos + settings.deltaTimeOnScreen) - midiTime) / (tempoFrameStep * mv);
                     mv *= 1 - _t;
-                    tempoFrameStep = ((double)midi.division / t.tempo) * (1000000 / settings.fps);
+                    tempoFrameStep = ((double)midi.division / t.tempo) * (1000000.0 / settings.fps);
                     midiTime = t.pos + settings.deltaTimeOnScreen;
                 }
                 midiTime += mv * tempoFrameStep;

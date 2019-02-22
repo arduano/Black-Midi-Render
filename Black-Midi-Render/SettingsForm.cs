@@ -213,7 +213,7 @@ namespace Black_Midi_Render
                         Console.WriteLine(
                             Math.Round((double)time / midifile.maxTrackTime * 10000) / 100 + "%\tNotes loaded: " + nc + 
                             "\tNotes drawn: " + settings.notesOnScreen + 
-                            "\tRender FPS: " + Math.Round(settings.liveFps)
+                            "\tRender FPS: " + Math.Round(settings.liveFps) + "        "
                             );
                         long ram = Process.GetCurrentProcess().PrivateMemorySize64;
                         if (maxRam < ram) maxRam = ram;
@@ -257,7 +257,11 @@ namespace Black_Midi_Render
 
         private void SettingsForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (MessageBox.Show("Are you sure you want to close?", "Close", MessageBoxButtons.YesNo) != DialogResult.Yes) return;
+            if (MessageBox.Show("Are you sure you want to close?", "Close", MessageBoxButtons.YesNo) != DialogResult.Yes)
+            {
+                e.Cancel = true;
+                return;
+            }
             settings.running = false;
             if (renderThread != null) renderThread.Join();
         }
