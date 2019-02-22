@@ -10,12 +10,14 @@ namespace Black_Midi_Render
     enum KeyboardRenderers
     {
         Legacy,
-        New
+        New,
+        Flat
     }
 
     enum NoteRenderers
     {
-        Shaded
+        Shaded,
+        Flat
     }
 
     class RenderSettings
@@ -66,12 +68,14 @@ namespace Black_Midi_Render
         {
             if (kbrender == KeyboardRenderers.Legacy) return new BaseKeyboardRender(this);
             if (kbrender == KeyboardRenderers.New) return new NewKeyboardRender(this);
+            if (kbrender == KeyboardRenderers.Flat) return new FlatKeyboardRender(this);
             throw new Exception("No renderer selected");
         }
 
         public INoteRender GetNoteRenderer()
         {
-            if (ntrender == NoteRenderers.Shaded) return new NoteRender(this);
+            if (ntrender == NoteRenderers.Shaded) return new ShadedNoteRender(this);
+            if (ntrender == NoteRenderers.Flat) return new FlatNoteRender(this);
             throw new Exception("No renderer selected");
         }
     }

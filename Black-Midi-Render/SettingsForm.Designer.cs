@@ -691,7 +691,8 @@
             this.keyboardRenderBox.FormattingEnabled = true;
             this.keyboardRenderBox.Items.AddRange(new object[] {
             "Legacy",
-            "New"});
+            "New",
+            "Flat"});
             this.keyboardRenderBox.Location = new System.Drawing.Point(111, 97);
             this.keyboardRenderBox.Name = "keyboardRenderBox";
             this.keyboardRenderBox.Size = new System.Drawing.Size(121, 21);
@@ -721,7 +722,8 @@
             this.noteRenderBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.noteRenderBox.FormattingEnabled = true;
             this.noteRenderBox.Items.AddRange(new object[] {
-            "Shaded"});
+            "Shaded",
+            "Flat"});
             this.noteRenderBox.Location = new System.Drawing.Point(111, 124);
             this.noteRenderBox.Name = "noteRenderBox";
             this.noteRenderBox.Size = new System.Drawing.Size(121, 21);

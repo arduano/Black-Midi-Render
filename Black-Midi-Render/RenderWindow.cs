@@ -48,8 +48,7 @@ namespace Black_Midi_Render
         GLPostbuffer baseRenderBuff;
         GLPostbuffer glowMaskFirstPassBuff;
         GLPostbuffer glowMaskSecondPassBuff;
-
-        int noteShader;
+        
         int postShader;
         int glowShader;
         int defaultShader;
@@ -141,7 +140,6 @@ namespace Black_Midi_Render
             glowMaskSecondPassBuff = new GLPostbuffer(settings);
 
             defaultShader = GLUtils.MakeShaderProgram("default");
-            noteShader = GLUtils.MakeShaderProgram("notes");
             postShader = GLUtils.MakePostShaderProgram("post");
             glowShader = GLUtils.MakePostShaderProgram("glow");
             BindUniforms();
@@ -161,8 +159,6 @@ namespace Black_Midi_Render
             {
                 SpinWait.SpinUntil(() => midi.currentSyncTime > midiTime + tempoFrameStep || midi.unendedTracks == 0 || !settings.running);
                 if (!settings.running) break;
-
-                GL.UseProgram(noteShader);
 
                 GL.Enable(EnableCap.LineSmooth);
                 GL.Enable(EnableCap.Blend);

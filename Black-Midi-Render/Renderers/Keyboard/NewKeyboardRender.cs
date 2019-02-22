@@ -110,6 +110,7 @@ namespace Black_Midi_Render
 
         public void Render()
         {
+            GL.UseProgram(noteShader);
             int firstNote = settings.firstNote;
             int lastNote = settings.lastNote;
             int deltaTimeOnScreen = settings.deltaTimeOnScreen;
