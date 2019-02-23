@@ -29,6 +29,7 @@ namespace Black_Midi_Render
 
         public FastList<Note> globalDisplayNotes = new FastList<Note>();
         public FastList<Tempo> globalTempoEvents = new FastList<Tempo>();
+        public FastList<ColorChange> globalColorEvents = new FastList<ColorChange>();
 
         public int unendedTracks = 0;
 
@@ -190,7 +191,7 @@ namespace Black_Midi_Render
                     MidiFileReader.Position = trackBeginnings[i];
                     MidiFileReader.Read(trackbytes, 0, (int)trackLengths[i]);
                 }
-                tracks[i] = new MidiTrack(i, new MemoryByteReader(trackbytes), globalDisplayNotes, globalTempoEvents, settings);
+                tracks[i] = new MidiTrack(i, new MemoryByteReader(trackbytes), this, settings);
                 var t = tracks[i];
                 while (!t.trackEnded)
                 {
@@ -208,7 +209,9 @@ namespace Black_Midi_Render
                 if (useBufferStream)
                 {
                     t.Dispose();
-                    tracks[i] = new MidiTrack(i, new BufferByteReader(MidiFileReader, settings.maxTrackBufferSize, trackBeginnings[i], trackLengths[i]), globalDisplayNotes, globalTempoEvents, settings);
+                    tracks[i] = new MidiTrack(i, 
+                        new BufferByteReader(MidiFileReader, settings.maxTrackBufferSize, trackBeginnings[i], trackLengths[i]),
+                        this, settings);
                 }
                 else t.Reset();
                 Console.WriteLine("Loaded track " + p++ + "/" + tracks.Length);
@@ -221,6 +224,7 @@ namespace Black_Midi_Render
         {
             globalDisplayNotes.Unlink();
             globalTempoEvents.Unlink();
+            globalColorEvents.Unlink();
             currentSyncTime = 0;
             unendedTracks = trackcount;
             foreach (var t in tracks) t.Reset();

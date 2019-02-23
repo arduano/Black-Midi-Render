@@ -30,7 +30,8 @@ namespace Black_Midi_Render
     class RenderWindow : GameWindow
     {
         FastList<Note> globalDisplayNotes;
-        public FastList<Tempo> globalTempoEvents;
+        FastList<Tempo> globalTempoEvents;
+        FastList<ColorChange> globalColorEvents;
         MidiFile midi;
 
         RenderSettings settings;
@@ -84,6 +85,7 @@ namespace Black_Midi_Render
             //WindowBorder = WindowBorder.Hidden;
             globalDisplayNotes = midi.globalDisplayNotes;
             globalTempoEvents = midi.globalTempoEvents;
+            globalColorEvents = midi.globalColorEvents;
             this.midi = midi;
             tempoFrameStep = ((double)96 / 50000) * (1000000 / settings.fps);
             if (!settings.vsync) VSync = VSyncMode.Off;
@@ -236,6 +238,25 @@ namespace Black_Midi_Render
                     midiTime = t.pos + settings.deltaTimeOnScreen;
                 }
                 midiTime += mv * tempoFrameStep;
+                
+                while(globalColorEvents.First != null && globalColorEvents.First.pos + settings.deltaTimeOnScreen < midiTime)
+                {
+                    var c = globalColorEvents.Pop();
+                    var track = c.track;
+                    if(c.channel == 0x7F)
+                    {
+                        for(int i = 0; i < 16; i++)
+                        {
+                            c.track.trkColor[i * 2] = c.col1;
+                            c.track.trkColor[i * 2 + 1] = c.col2;
+                        }
+                    }
+                    else
+                    {
+                        c.track.trkColor[c.channel * 2] = c.col1;
+                        c.track.trkColor[c.channel * 2 + 1] = c.col2;
+                    }
+                }
 
                 if (settings.ffRender)
                 {

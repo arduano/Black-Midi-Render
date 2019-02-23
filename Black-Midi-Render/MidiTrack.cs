@@ -15,7 +15,6 @@ namespace Black_Midi_Render
         public bool hasEnded;
         public byte channel;
         public byte note;
-        public byte vel;
         public MidiTrack track;
     }
 
@@ -23,6 +22,15 @@ namespace Black_Midi_Render
     {
         public long pos;
         public int tempo;
+    }
+
+    class ColorChange
+    {
+        public long pos;
+        public Color4 col1;
+        public Color4 col2;
+        public byte channel;
+        public MidiTrack track;
     }
 
     class MidiTrack : IDisposable
@@ -41,6 +49,7 @@ namespace Black_Midi_Render
 
         FastList<Note> globalDisplayNotes;
         FastList<Tempo> globalTempoEvents;
+        FastList<ColorChange> globalColorEvents;
 
         public Color4[] trkColor;
 
@@ -72,11 +81,12 @@ namespace Black_Midi_Render
         }
 
         RenderSettings settings;
-        public MidiTrack(int id, IByteReader reader, FastList<Note> globalNotes, FastList<Tempo> globalTempos, RenderSettings settings)
+        public MidiTrack(int id, IByteReader reader, MidiFile file, RenderSettings settings)
         {
             this.settings = settings;
-            globalDisplayNotes = globalNotes;
-            globalTempoEvents = globalTempos;
+            globalDisplayNotes = file.globalDisplayNotes;
+            globalTempoEvents = file.globalTempoEvents;
+            globalColorEvents = file.globalColorEvents;
             this.reader = reader;
             trackID = id;
             ResetColors();
@@ -184,7 +194,6 @@ namespace Black_Midi_Render
                         Note n = new Note();
                         n.start = trackTime;
                         n.note = note;
-                        n.vel = vel;
                         n.track = this;
                         n.channel = channel;
                         if (!readOnly)
@@ -490,6 +499,23 @@ namespace Black_Midi_Render
                         for (int i = 0; i < size; i++)
                         {
                             data[i] = reader.Read();
+                        }
+                        if (data.Length == 8 || data.Length == 12)
+                        {
+                            if (data[0] == 0x00 &&
+                                data[1] == 0x0F)
+                            {
+                                Color4 col1 = new Color4(data[4], data[5], data[6], data[7]);
+                                Color4 col2;
+                                if (data.Length == 12)
+                                    col2 = new Color4(data[8], data[9], data[10], data[11]);
+                                else col2 = col1;
+                                if (data[2] < 0x10 || data[2] == 0x7F)
+                                {
+                                    var c = new ColorChange() { pos = trackTime, col1 = col1, col2 = col2, channel = data[2], track = this };
+                                    globalColorEvents.Add(c);
+                                }
+                            }
                         }
                     }
                     else
