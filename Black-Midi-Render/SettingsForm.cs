@@ -37,6 +37,7 @@ namespace Black_Midi_Render
             bitrate_nud.Value = settings.bitrate;
             keyboardRenderBox.SelectedIndex = (int)settings.kbrender;
             noteRenderBox.SelectedIndex = (int)settings.ntrender;
+            noteBrightness_nud.Value = (decimal)settings.noteBrightness;
         }
 
         MidiFile midifile = null;
@@ -333,6 +334,11 @@ namespace Black_Midi_Render
         private void noteRenderBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             settings.ntrender = (NoteRenderers)noteRenderBox.SelectedIndex;
+        }
+
+        private void noteBrightness_nud_ValueChanged(object sender, EventArgs e)
+        {
+            settings.noteBrightness = (float)noteBrightness_nud.Value;
         }
     }
 }

@@ -6,9 +6,9 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Black_Midi_Render
+namespace MidiUtils
 {
-    class BufferByteReader : IByteReader
+    public class BufferByteReader : IByteReader
     {
         long pos;
         int buffersize;

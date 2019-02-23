@@ -5,6 +5,10 @@ VisualStudioVersion = 15.0.28307.329
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Black-Midi-Render", "Black-Midi-Render\Black-Midi-Render.csproj", "{273DA7BD-C89A-4574-97DE-AF425529FAAE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Colour-Event-Inject", "Colour-Event-Inject\Colour-Event-Inject.csproj", "{BC8FDEC9-BC6D-46E9-9A83-82BE30039CB3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MidiUtils", "MidiUtils\MidiUtils.csproj", "{1A849712-B3E2-4AC5-B899-3A5AA3018F7A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +25,22 @@ Global
 		{273DA7BD-C89A-4574-97DE-AF425529FAAE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{273DA7BD-C89A-4574-97DE-AF425529FAAE}.Release|x64.ActiveCfg = Release|x64
 		{273DA7BD-C89A-4574-97DE-AF425529FAAE}.Release|x64.Build.0 = Release|x64
+		{BC8FDEC9-BC6D-46E9-9A83-82BE30039CB3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BC8FDEC9-BC6D-46E9-9A83-82BE30039CB3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BC8FDEC9-BC6D-46E9-9A83-82BE30039CB3}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{BC8FDEC9-BC6D-46E9-9A83-82BE30039CB3}.Debug|x64.Build.0 = Debug|Any CPU
+		{BC8FDEC9-BC6D-46E9-9A83-82BE30039CB3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BC8FDEC9-BC6D-46E9-9A83-82BE30039CB3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BC8FDEC9-BC6D-46E9-9A83-82BE30039CB3}.Release|x64.ActiveCfg = Release|Any CPU
+		{BC8FDEC9-BC6D-46E9-9A83-82BE30039CB3}.Release|x64.Build.0 = Release|Any CPU
+		{1A849712-B3E2-4AC5-B899-3A5AA3018F7A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1A849712-B3E2-4AC5-B899-3A5AA3018F7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1A849712-B3E2-4AC5-B899-3A5AA3018F7A}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{1A849712-B3E2-4AC5-B899-3A5AA3018F7A}.Debug|x64.Build.0 = Debug|Any CPU
+		{1A849712-B3E2-4AC5-B899-3A5AA3018F7A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1A849712-B3E2-4AC5-B899-3A5AA3018F7A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1A849712-B3E2-4AC5-B899-3A5AA3018F7A}.Release|x64.ActiveCfg = Release|Any CPU
+		{1A849712-B3E2-4AC5-B899-3A5AA3018F7A}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

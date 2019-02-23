@@ -48,6 +48,8 @@ namespace Black_Midi_Render
         public bool glowEnabled = false;
         public int glowRadius = 200;
 
+        public float noteBrightness = 1;
+
         public KeyboardRenderers kbrender = KeyboardRenderers.New;
         public NoteRenderers ntrender = NoteRenderers.Shaded;
 

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MidiUtils;
 
 namespace Black_Midi_Render
 {
@@ -22,17 +23,6 @@ namespace Black_Midi_Render
     {
         public long pos;
         public int tempo;
-    }
-
-    interface IByteReader : IDisposable
-    {
-        byte Read();
-        void Reset();
-        void Skip(int count);
-        long Location
-        {
-            get;
-        }
     }
 
     class MidiTrack : IDisposable
@@ -76,13 +66,15 @@ namespace Black_Midi_Render
             trkColor = new Color4[32];
             for (int i = 0; i < 16; i++)
             {
-                trkColor[i * 2] = Color4.FromHsv(new OpenTK.Vector4((trackID * 16 + i) * 1.36271f % 1, 1.0f, 1.0f, 1f));
-                trkColor[i * 2 + 1] = Color4.FromHsv(new OpenTK.Vector4((trackID * 16 + i) * 1.36271f % 1, 1.0f, 1.0f, 1f));
+                trkColor[i * 2] = Color4.FromHsv(new OpenTK.Vector4((trackID * 16 + i) * 1.36271f % 1, 1.0f, settings.noteBrightness, 1f));
+                trkColor[i * 2 + 1] = Color4.FromHsv(new OpenTK.Vector4((trackID * 16 + i) * 1.36271f % 1, 1.0f, settings.noteBrightness, 1f));
             }
         }
 
-        public MidiTrack(int id, IByteReader reader, FastList<Note> globalNotes, FastList<Tempo> globalTempos)
+        RenderSettings settings;
+        public MidiTrack(int id, IByteReader reader, FastList<Note> globalNotes, FastList<Tempo> globalTempos, RenderSettings settings)
         {
+            this.settings = settings;
             globalDisplayNotes = globalNotes;
             globalTempoEvents = globalTempos;
             this.reader = reader;
@@ -308,7 +300,7 @@ namespace Black_Midi_Render
                     command = reader.Read();
                     if (command == 0x00)
                     {
-                        if (reader.Read() != 0)
+                        if (reader.Read() != 2)
                         {
                             throw new Exception("Corrupt Track");
                         }
@@ -606,7 +598,7 @@ namespace Black_Midi_Render
                     command = reader.Read();
                     if (command == 0x00)
                     {
-                        if (reader.Read() != 0)
+                        if (reader.Read() != 2)
                         {
                             throw new Exception("Corrupt Track");
                         }

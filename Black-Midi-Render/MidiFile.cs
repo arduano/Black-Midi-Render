@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using MidiUtils;
 
 namespace Black_Midi_Render
 {
@@ -189,7 +190,7 @@ namespace Black_Midi_Render
                     MidiFileReader.Position = trackBeginnings[i];
                     MidiFileReader.Read(trackbytes, 0, (int)trackLengths[i]);
                 }
-                tracks[i] = new MidiTrack(i, new MemoryByteReader(trackbytes), globalDisplayNotes, globalTempoEvents);
+                tracks[i] = new MidiTrack(i, new MemoryByteReader(trackbytes), globalDisplayNotes, globalTempoEvents, settings);
                 var t = tracks[i];
                 while (!t.trackEnded)
                 {
@@ -207,7 +208,7 @@ namespace Black_Midi_Render
                 if (useBufferStream)
                 {
                     t.Dispose();
-                    tracks[i] = new MidiTrack(i, new BufferByteReader(MidiFileReader, settings.maxTrackBufferSize, trackBeginnings[i], trackLengths[i]), globalDisplayNotes, globalTempoEvents);
+                    tracks[i] = new MidiTrack(i, new BufferByteReader(MidiFileReader, settings.maxTrackBufferSize, trackBeginnings[i], trackLengths[i]), globalDisplayNotes, globalTempoEvents, settings);
                 }
                 else t.Reset();
                 Console.WriteLine("Loaded track " + p++ + "/" + tracks.Length);

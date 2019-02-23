@@ -302,12 +302,10 @@ namespace Black_Midi_Render
             base.OnClosing(e);
             settings.running = false;
         }
-
-        public bool Closed = false;
+        
         protected override void OnClosed(EventArgs e)
         {
             base.OnClosed(e);
-            Closed = true;
         }
 
         void DrawScreenQuad()

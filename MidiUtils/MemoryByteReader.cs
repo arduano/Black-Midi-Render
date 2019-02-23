@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MidiUtils;
 
-namespace Black_Midi_Render
+namespace MidiUtils
 {
-    class MemoryByteReader : IByteReader
+    public class MemoryByteReader : IByteReader
     {
         byte[] bytes;
         long pos;
