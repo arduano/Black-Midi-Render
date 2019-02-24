@@ -4,6 +4,7 @@ os.system("copy dist\\bmr\\index.html 404.html")
 os.remove('dist/bmr/index.html')
 
 s = open('404.html').read()
+s = s.replace('<base href="/">', '/Black-Midi-Render/')
 s = s.replace('"styles.', '"dist/bmr/styles.')
 s = s.replace('"runtime', '"dist/bmr/runtime')
 s = s.replace('"main', '"dist/bmr/main')
