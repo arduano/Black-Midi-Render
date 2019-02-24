@@ -9,9 +9,9 @@ import { BenchmarksPageComponent } from './pages/benchmarks-page/benchmarks-page
 
 
 const routes: Routes = [
-  { path: '', redirectTo: 'start', pathMatch: 'full' },
+  { path: 'Black-Midi-Render', redirectTo: 'Black-Midi-Render/start', pathMatch: 'full' },
   {
-    path: '', component: MainComponent, children: [
+    path: 'Black-Midi-Render', component: MainComponent, children: [
       { path: 'start', component: StartPageComponent },
       { path: 'about', component: AboutPageComponent },
       { path: 'works', component: WorksPageComponent },
