@@ -37,7 +37,13 @@ namespace Black_Midi_Render
         public string ffPath = "out.mp4";
         public bool imgRender = false;
         public string imgPath = "imgs";
-        public bool vsync = false;
+        public bool vsync = true;
+
+        public bool paused = false;
+        public bool forceReRender = false;
+        public double tempoMultiplier = 1;
+
+        public bool clickDebug = true;
 
         public bool includeAudio = false;
         public string audioPath = "";

@@ -1,0 +1,149 @@
+﻿<Window x:Class="Black_Midi_Render.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
+        xmlns:local="clr-namespace:Black_Midi_Render"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="434.389" Width="658.056">
+    <Window.Resources>
+        <local:AndValueConverter x:Key="AndValueConverter"/>
+        <local:OrValueConverter x:Key="OrValueConverter"/>
+        <local:NotValueConverter x:Key="NotValueConverter"/>
+
+        <sys:Boolean x:Key="staticControlsEnabled" >True</sys:Boolean>
+
+        <sys:Boolean x:Key="previewStartEnabled" >False</sys:Boolean>
+        <sys:Boolean x:Key="previewStopEnabled" >False</sys:Boolean>
+        <sys:Boolean x:Key="unloadEnabled" >False</sys:Boolean>
+        <sys:Boolean x:Key="notPreviewing" >True</sys:Boolean>
+        <sys:Boolean x:Key="notRendering" >True</sys:Boolean>
+        <sys:Boolean x:Key="midiLoaded" >False</sys:Boolean>
+    </Window.Resources>
+    <Grid>
+        <Grid Name="midiLoaded" IsEnabled="{DynamicResource midiLoaded}"></Grid>
+        <Grid Name="notRendering" IsEnabled="{DynamicResource notRendering}"></Grid>
+        <Grid Name="notPreviewing" IsEnabled="{DynamicResource notPreviewing}"></Grid>
+        <Grid Name="notPreviewingOrRendering">
+            <Grid.IsEnabled>
+                <MultiBinding Converter="{StaticResource AndValueConverter}">
+                    <Binding ElementName="notPreviewing" Path="IsEnabled"/>
+                    <Binding ElementName="notRendering" Path="IsEnabled"/>
+                </MultiBinding>
+            </Grid.IsEnabled>
+        </Grid>
+        <Grid Name="previewStartEnabled">
+            <Grid.IsEnabled>
+                <MultiBinding Converter="{StaticResource AndValueConverter}">
+                    <Binding ElementName="notPreviewing" Path="IsEnabled"/>
+                    <Binding ElementName="notRendering" Path="IsEnabled"/>
+                    <Binding ElementName="midiLoaded" Path="IsEnabled"/>
+                </MultiBinding>
+            </Grid.IsEnabled>
+        </Grid>
+        <Grid Name="isRendering">
+            <Grid.IsEnabled>
+                <MultiBinding Converter="{StaticResource NotValueConverter}">
+                    <Binding ElementName="notRendering" Path="IsEnabled"/>
+                </MultiBinding>
+            </Grid.IsEnabled>
+        </Grid>
+        <Grid Name="isPreviewing">
+            <Grid.IsEnabled>
+                <MultiBinding Converter="{StaticResource NotValueConverter}">
+                    <Binding ElementName="notPreviewing" Path="IsEnabled"/>
+                </MultiBinding>
+            </Grid.IsEnabled>
+        </Grid>
+        <Grid Name="stopEnabled">
+            <Grid.IsEnabled>
+                <MultiBinding Converter="{StaticResource OrValueConverter}">
+                    <Binding ElementName="isRendering" Path="IsEnabled"/>
+                    <Binding ElementName="isPreviewing" Path="IsEnabled"/>
+                </MultiBinding>
+            </Grid.IsEnabled>
+        </Grid>
+        <TabControl>
+            <TabItem Header="Midi I/O">
+                <Grid Background="#FFE5E5E5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Button Content="Browse" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="73" x:Name="browseMidiButton" Click="BrowseMidiButton_Click" IsEnabled="{Binding ElementName=notPreviewingOrRendering, Path=IsEnabled}"/>
+                    <TextBox Height="20" Margin="88,10,11,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" x:Name="midiPath" IsEnabled="False"/>
+                    <Label Content="Maximum track buffer size (bytes)" HorizontalAlignment="Left" Margin="133,37,0,0" VerticalAlignment="Top" Width="219"/>
+                    <xctk:DecimalUpDown x:Name="maxBufferSize" FormatString="F0" Value="1" Increment="1"  Maximum="10000000000000" Minimum="1" Margin="10,37,0,0" HorizontalAlignment="Left" Width="118" Height="26" VerticalAlignment="Top" IsEnabled="{Binding ElementName=notPreviewingOrRendering, Path=IsEnabled}"  />
+                    <Button x:Name="loadButton" Content="Load" HorizontalAlignment="Left" Margin="10,71,0,0" VerticalAlignment="Top" Width="73" Click="LoadButton_Click" IsEnabled="{Binding ElementName=notPreviewingOrRendering, Path=IsEnabled}"/>
+                    <Button x:Name="unloadButton" Content="Unload" HorizontalAlignment="Left" Margin="89,71,0,0" VerticalAlignment="Top" Width="72" Click="UnloadButton_Click" >
+                        <Button.IsEnabled>
+                            <MultiBinding Converter="{StaticResource AndValueConverter}">
+                                <Binding ElementName="notPreviewingOrRendering" Path="IsEnabled"/>
+                                <Binding ElementName="midiLoaded" Path="IsEnabled"/>
+                            </MultiBinding>
+                        </Button.IsEnabled>
+                    </Button>
+                    <Label Content="Width" HorizontalAlignment="Left" Margin="10,96,0,0" VerticalAlignment="Top" Width="42"/>
+                    <xctk:DecimalUpDown x:Name="viewWidth" FormatString="F0" Value="1" Increment="1"  Maximum="7680" Minimum="1" Margin="57,96,0,0" HorizontalAlignment="Left" Width="118" Height="26" VerticalAlignment="Top" IsEnabled="{Binding ElementName=notPreviewingOrRendering, Path=IsEnabled}"  />
+                    <Label Content="Height" HorizontalAlignment="Left" Margin="180,96,0,0" VerticalAlignment="Top" Width="46"/>
+                    <xctk:DecimalUpDown x:Name="viewHeight" FormatString="F0" Value="1" Increment="1"  Maximum="4320" Minimum="1" Margin="231,96,0,0" HorizontalAlignment="Left" Width="118" Height="26" VerticalAlignment="Top" IsEnabled="{Binding ElementName=notPreviewingOrRendering, Path=IsEnabled}"  />
+                    <Label Content="FPS" HorizontalAlignment="Left" Margin="354,96,0,0" VerticalAlignment="Top" Width="30"/>
+                    <xctk:DecimalUpDown x:Name="viewFps" FormatString="F0" Value="1" Increment="1"  Maximum="1000" Minimum="1" Margin="389,96,0,0" HorizontalAlignment="Left" Width="77" Height="26" VerticalAlignment="Top" IsEnabled="{Binding ElementName=notPreviewingOrRendering, Path=IsEnabled}"  />
+                    <Label Content="Warning: BMR Preview renders in the resolution above, then downscales to the window size" HorizontalAlignment="Left" Margin="10,127,0,0" VerticalAlignment="Top"/>
+                    <Button Content="Start Preview" HorizontalAlignment="Left" Margin="10,0,0,10" Width="98" IsEnabled="{Binding ElementName=previewStartEnabled, Path=IsEnabled}" Height="20" VerticalAlignment="Bottom" Click="StartButton_Click" />
+                    <Button Content="Stop" HorizontalAlignment="Left" Margin="113,0,0,10" Width="75" IsEnabled="{Binding ElementName=stopEnabled, Path=IsEnabled}" Height="20" VerticalAlignment="Bottom" Click="StopButton_Click" />
+                    <Label Content="Render" HorizontalAlignment="Left" Margin="10,169,0,0" VerticalAlignment="Top"/>
+                    <Button x:Name="browseVideoSaveButton" Content="Browse" HorizontalAlignment="Left" Margin="76,203,0,0" VerticalAlignment="Top" Width="75" IsEnabled="{DynamicResource notRendering}" Click="BrowseVideoSaveButton_Click"/>
+                    <Label Content="Save Path" HorizontalAlignment="Left" Margin="10,200,0,0" VerticalAlignment="Top"/>
+                    <TextBox x:Name="videoPath" Height="19" Margin="156,204,10,0" IsEnabled="False" TextWrapping="Wrap" Text="" VerticalAlignment="Top"/>
+                    <CheckBox x:Name="includeAudio" Content="Include Audio" HorizontalAlignment="Left" Margin="10,231,0,0" VerticalAlignment="Top" IsEnabled="{DynamicResource notRendering}"/>
+                    <Button x:Name="browseAudioButton" Content="Browse" HorizontalAlignment="Left" Margin="108,228,0,0" VerticalAlignment="Top" Width="75" Click="BrowseAudioButton_Click" >
+                        <Button.IsEnabled>
+                            <MultiBinding Converter="{StaticResource AndValueConverter}">
+                                <Binding ElementName="includeAudio" Path="IsChecked" />
+                                <Binding ElementName="notRendering" Path="IsEnabled"/>
+                            </MultiBinding>
+                        </Button.IsEnabled>
+                    </Button>
+                    <TextBox x:Name="audioPath" Height="19" Margin="188,228,10,0" IsEnabled="False" TextWrapping="Wrap" Text="" VerticalAlignment="Top"/>
+                    <Button x:Name="startRenderButton" Content="Start Render" HorizontalAlignment="Left" Margin="10,251,0,0" VerticalAlignment="Top" Width="94" Click="StartRenderButton_Click" IsEnabled="{Binding ElementName=notPreviewingOrRendering, Path=IsEnabled}"/>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Graphics" IsEnabled="{DynamicResource notRendering}">
+                <Grid Background="#FFE5E5E5">
+                    <xctk:DecimalUpDown x:Name="firstNote" FormatString="F0" Value="1" Increment="1"  Maximum="254" Minimum="0" Margin="77,10,0,0" HorizontalAlignment="Left" Width="80" Height="26" VerticalAlignment="Top" ValueChanged="Nud_ValueChanged"  />
+                    <Label Content="First Note" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
+                    <xctk:DecimalUpDown x:Name="lastNote" FormatString="F0" Value="1" Increment="1"  Maximum="255" Minimum="1" Margin="229,10,0,0" HorizontalAlignment="Left" Width="80" Height="26" VerticalAlignment="Top" ValueChanged="Nud_ValueChanged"  />
+                    <Label Content="Last Note" HorizontalAlignment="Left" Margin="162,10,0,0" VerticalAlignment="Top"/>
+                    <xctk:DecimalUpDown x:Name="pianoHeight" FormatString="F0" Value="1" Increment="1"  Maximum="100" Minimum="1" Margin="411,10,0,0" HorizontalAlignment="Left" Width="80" Height="26" VerticalAlignment="Top"  ValueChanged="Nud_ValueChanged"  />
+                    <Label Content="Piano Height %" HorizontalAlignment="Left" Margin="314,10,0,0" VerticalAlignment="Top"/>
+                    <Button Content="Start Preview" HorizontalAlignment="Left" Margin="10,0,0,10" Width="98" IsEnabled="{Binding ElementName=previewStartEnabled, Path=IsEnabled}" Height="20" VerticalAlignment="Bottom" Click="StartButton_Click" />
+                    <Button Content="Stop" HorizontalAlignment="Left" Margin="113,0,0,10" Width="75" IsEnabled="{Binding ElementName=stopEnabled, Path=IsEnabled}" Height="20" VerticalAlignment="Bottom" Click="StopButton_Click" />
+                    <Label Content="Initial Note Brightness" HorizontalAlignment="Left" Margin="10,41,0,0" VerticalAlignment="Top"/>
+                    <xctk:DecimalUpDown x:Name="noteBrightness" FormatString="F2" Value="1" Increment="0.1"  Maximum="1" Minimum="0" Margin="142,41,0,0" HorizontalAlignment="Left" Width="80" Height="26" VerticalAlignment="Top" ValueChanged="Nud_ValueChanged"  />
+                    <Label Content="Note screen time" HorizontalAlignment="Left" Margin="10,72,0,0" VerticalAlignment="Top"/>
+                    <xctk:DecimalUpDown x:Name="noteDeltaScreenTime" FormatString="F0" Value="1" Increment="1"  Maximum="10000" Minimum="1" Margin="116,72,0,0" HorizontalAlignment="Left" Width="89" Height="26" VerticalAlignment="Top" ValueChanged="Nud_ValueChanged"  />
+                    <Label Content="Ticks. Lower = Faster" HorizontalAlignment="Left" Margin="210,72,0,0" VerticalAlignment="Top"/>
+
+                </Grid>
+            </TabItem>
+            <TabItem Header="Debug" IsEnabled="{DynamicResource notRendering}">
+                <Grid Background="#FFE5E5E5" KeyDown="Grid_KeyDown">
+                    <CheckBox x:Name="vsyncEnabled" Content="V-Sync Enabled" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Checked="VsyncEnabled_Checked" Unchecked="VsyncEnabled_Checked" Focusable="False"/>
+                    <CheckBox x:Name="previewPaused" Content="Preview Paused" HorizontalAlignment="Left" Margin="10,87,0,0" VerticalAlignment="Top" Checked="Paused_Checked" Unchecked="Paused_Checked"/>
+                    <Slider x:Name="tempoSlider" HorizontalAlignment="Left" Margin="115,35,0,0" VerticalAlignment="Top" Width="337" Height="21" ValueChanged="TempoSlider_ValueChanged" Maximum="6" TickPlacement="BottomRight" LargeChange="0" SmallChange="0.2" TickFrequency="0.2" Minimum="-6" IsSnapToTickEnabled="True" MouseDown="TempoSlider_MouseDown"/>
+                    <Label Content="Tempo Multiplier" HorizontalAlignment="Left" Margin="10,30,0,0" VerticalAlignment="Top"/>
+                    <Label x:Name="tempoValue" Content="1" HorizontalAlignment="Left" Margin="452,30,0,0" VerticalAlignment="Top"/>
+                    <Button Content="Start Preview" HorizontalAlignment="Left" Margin="10,0,0,10" Width="98" IsEnabled="{Binding IsEnabled, ElementName=previewStartEnabled}" Height="20" VerticalAlignment="Bottom" Click="StartButton_Click" />
+                    <Button Content="Stop" HorizontalAlignment="Left" Margin="113,0,0,10" Width="75" IsEnabled="{Binding IsEnabled, ElementName=stopEnabled}" Height="20" VerticalAlignment="Bottom" Click="StopButton_Click" />
+                    <CheckBox x:Name="forceReRender" Content="Force re-render each frame" HorizontalAlignment="Left" Margin="10,107,0,0" VerticalAlignment="Top" Checked="ForceReRender_Checked" Unchecked="ForceReRender_Checked" IsEnabled="{Binding ElementName=previewPaused, Path=IsChecked}"/>
+                    <CheckBox x:Name="clickDebug" Content="Also print note data" HorizontalAlignment="Left" Margin="10,167,0,0" VerticalAlignment="Top" IsEnabled="{Binding ElementName=previewPaused, Path=IsChecked}" Checked="ClickDebug_Checked" Unchecked="ClickDebug_Checked"/>
+                    <Label Content="When paused, click the window to get debug information" HorizontalAlignment="Left" Margin="10,141,0,0" VerticalAlignment="Top"/>
+                    <Label Content="Right click slider or press space to toggle pause" HorizontalAlignment="Left" Margin="10,56,0,0" VerticalAlignment="Top"/>
+                </Grid>
+            </TabItem>
+        </TabControl>
+
+    </Grid>
+</Window>

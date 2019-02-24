@@ -14,6 +14,7 @@ using System.Windows.Forms;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
+using OpenTK.Input;
 
 namespace Black_Midi_Render
 {
@@ -49,7 +50,7 @@ namespace Black_Midi_Render
         GLPostbuffer baseRenderBuff;
         GLPostbuffer glowMaskFirstPassBuff;
         GLPostbuffer glowMaskSecondPassBuff;
-        
+
         int postShader;
         int glowShader;
         int defaultShader;
@@ -88,7 +89,6 @@ namespace Black_Midi_Render
             globalColorEvents = midi.globalColorEvents;
             this.midi = midi;
             tempoFrameStep = ((double)96 / 50000) * (1000000 / settings.fps);
-            if (!settings.vsync) VSync = VSyncMode.Off;
             if (settings.ffRender)
             {
                 string args = "";
@@ -97,7 +97,7 @@ namespace Black_Midi_Render
                     args = "" +
                         " -f rawvideo -s " + settings.width + "x" + settings.height +
                         " -pix_fmt rgb32 -r " + settings.fps + " -i -" +
-                        " -itsoffset 0.21 -i \"" + settings.audioPath + "\"" + 
+                        " -itsoffset 0.21 -i \"" + settings.audioPath + "\"" +
                         " -vf vflip -vcodec libx264 -acodec aac" +
                         " -b:v " + settings.bitrate + "k" +
                         " -maxrate " + settings.bitrate + "k" +
@@ -128,12 +128,16 @@ namespace Black_Midi_Render
                     settings.ffRender = false;
                 }
             }
-            if (settings.imgRender)
+            else if (settings.imgRender)
             {
                 if (!Directory.Exists(settings.imgPath))
                 {
                     Directory.CreateDirectory(settings.imgPath);
                 }
+            }
+            else
+            {
+                if (!settings.vsync) VSync = VSyncMode.Off;
             }
 
             finalCompositeBuff = new GLPostbuffer(settings);
@@ -175,77 +179,84 @@ namespace Black_Midi_Render
                 GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
                 GL.LineWidth(1);
 
-                baseRenderBuff.BindBuffer();
-                GL.Viewport(0, 0, settings.width, settings.height);
-                GL.Clear(ClearBufferMask.ColorBufferBit);
-
-                settings.ResetVariableState();
-                nc = noteRender.Render(globalDisplayNotes, midiTime);
-                keyboardRender.Render();
-
-                if (settings.glowEnabled)
+                if (!settings.paused || settings.forceReRender)
                 {
-                    GL.UseProgram(glowShader);
-                    glowMaskFirstPassBuff.BindBuffer();
+                    baseRenderBuff.BindBuffer();
                     GL.Viewport(0, 0, settings.width, settings.height);
                     GL.Clear(ClearBufferMask.ColorBufferBit);
 
-                    GL.Uniform1(glowTextureSize_var, (float)settings.width);
-                    GL.Uniform1(glowStrength_var, 10f);
-                    GL.Uniform1(glowSigma_var, 1f);
-                    GL.Uniform1(glowWidth_var, settings.glowRadius);
-                    GL.Uniform1(glowPass_var, 0);
 
-                    baseRenderBuff.BindTexture();
-                    DrawScreenQuad();
+                    settings.ResetVariableState();
+                    nc = noteRender.Render(globalDisplayNotes, midiTime);
+                    keyboardRender.Render();
 
-                    glowMaskSecondPassBuff.BindBuffer();
-                    GL.Viewport(0, 0, settings.width, settings.height);
-                    GL.Clear(ClearBufferMask.ColorBufferBit);
-                    GL.Uniform1(glowPass_var, 1);
-                    GL.Uniform1(glowTextureSize_var, (float)settings.height);
+                    if (settings.glowEnabled)
+                    {
+                        GL.UseProgram(glowShader);
+                        glowMaskFirstPassBuff.BindBuffer();
+                        GL.Viewport(0, 0, settings.width, settings.height);
+                        GL.Clear(ClearBufferMask.ColorBufferBit);
 
-                    glowMaskFirstPassBuff.BindTexture();
-                    DrawScreenQuad();
+                        GL.Uniform1(glowTextureSize_var, (float)settings.width);
+                        GL.Uniform1(glowStrength_var, 10f);
+                        GL.Uniform1(glowSigma_var, 1f);
+                        GL.Uniform1(glowWidth_var, settings.glowRadius);
+                        GL.Uniform1(glowPass_var, 0);
 
-                    finalCompositeBuff.BindBuffer();
-                    GL.Viewport(0, 0, settings.width, settings.height);
-                    GL.Clear(ClearBufferMask.ColorBufferBit);
+                        baseRenderBuff.BindTexture();
+                        DrawScreenQuad();
 
-                    GL.UseProgram(postShader);
-                    glowMaskSecondPassBuff.BindTexture();
-                    DrawScreenQuad();
-                    baseRenderBuff.BindTexture();
-                    DrawScreenQuad();
-                }
-                else
-                {
-                    finalCompositeBuff.BindBuffer();
-                    GL.Viewport(0, 0, settings.width, settings.height);
-                    GL.Clear(ClearBufferMask.ColorBufferBit);
+                        glowMaskSecondPassBuff.BindBuffer();
+                        GL.Viewport(0, 0, settings.width, settings.height);
+                        GL.Clear(ClearBufferMask.ColorBufferBit);
+                        GL.Uniform1(glowPass_var, 1);
+                        GL.Uniform1(glowTextureSize_var, (float)settings.height);
 
-                    GL.UseProgram(postShader);
-                    baseRenderBuff.BindTexture();
-                    DrawScreenQuad();
+                        glowMaskFirstPassBuff.BindTexture();
+                        DrawScreenQuad();
+
+                        finalCompositeBuff.BindBuffer();
+                        GL.Viewport(0, 0, settings.width, settings.height);
+                        GL.Clear(ClearBufferMask.ColorBufferBit);
+
+                        GL.UseProgram(postShader);
+                        glowMaskSecondPassBuff.BindTexture();
+                        DrawScreenQuad();
+                        baseRenderBuff.BindTexture();
+                        DrawScreenQuad();
+                    }
+                    else
+                    {
+                        finalCompositeBuff.BindBuffer();
+                        GL.Viewport(0, 0, settings.width, settings.height);
+                        GL.Clear(ClearBufferMask.ColorBufferBit);
+
+                        GL.UseProgram(postShader);
+                        baseRenderBuff.BindTexture();
+                        DrawScreenQuad();
+                    }
                 }
                 double mv = 1;
-                while (globalTempoEvents.First != null && midiTime + (tempoFrameStep * mv) - settings.deltaTimeOnScreen > globalTempoEvents.First.pos)
+                while (globalTempoEvents.First != null && midiTime + (tempoFrameStep * mv * settings.tempoMultiplier) - settings.deltaTimeOnScreen > globalTempoEvents.First.pos)
                 {
                     var t = globalTempoEvents.Pop();
-                    var _t = ((t.pos + settings.deltaTimeOnScreen) - midiTime) / (tempoFrameStep * mv);
+                    var _t = ((t.pos + settings.deltaTimeOnScreen) - midiTime) / (tempoFrameStep * mv * settings.tempoMultiplier);
                     mv *= 1 - _t;
                     tempoFrameStep = ((double)midi.division / t.tempo) * (1000000.0 / settings.fps);
                     midiTime = t.pos + settings.deltaTimeOnScreen;
                 }
-                midiTime += mv * tempoFrameStep;
-                
-                while(globalColorEvents.First != null && globalColorEvents.First.pos + settings.deltaTimeOnScreen < midiTime)
+                if (!settings.paused)
+                {
+                    midiTime += mv * tempoFrameStep * settings.tempoMultiplier;
+                }
+
+                while (globalColorEvents.First != null && globalColorEvents.First.pos + settings.deltaTimeOnScreen < midiTime)
                 {
                     var c = globalColorEvents.Pop();
                     var track = c.track;
-                    if(c.channel == 0x7F)
+                    if (c.channel == 0x7F)
                     {
-                        for(int i = 0; i < 16; i++)
+                        for (int i = 0; i < 16; i++)
                         {
                             c.track.trkColor[i * 2] = c.col1;
                             c.track.trkColor[i * 2 + 1] = c.col2;
@@ -292,6 +303,8 @@ namespace Black_Midi_Render
                 //GL.ClearColor(1, 1, 1, 1);
                 DrawScreenQuad();
                 GLPostbuffer.UnbindTextures();
+                if (settings.vsync) VSync = VSyncMode.On;
+                else VSync = VSyncMode.Off;
 
                 try
                 {
@@ -318,12 +331,59 @@ namespace Black_Midi_Render
             this.Close();
         }
 
+        protected override void OnMouseDown(MouseButtonEventArgs e)
+        {
+            base.OnMouseDown(e);
+            if (settings.paused)
+            {
+                double x = (double)e.X / Width;
+                double y = (double)e.Y / Height;
+                y = 1 - y;
+                int key = (int)Math.Floor(x * (settings.lastNote - settings.firstNote) + settings.firstNote);
+
+                double time = (settings.deltaTimeOnScreen - midiTime + midiTime * settings.pianoHeight - settings.deltaTimeOnScreen * y) / (settings.pianoHeight - 1);
+                Console.WriteLine("--------------------------");
+                Console.WriteLine("Time (ticks): " + Math.Round(time * 10) / 10);
+                Console.WriteLine("Key number: " + key);
+                Console.WriteLine("Nearest quarter note ticks: " + Math.Round(time / midi.division) * midi.division);
+                Console.WriteLine("Nearest full note ticks: " + Math.Round(time / midi.division / 4) * midi.division * 4);
+
+                if (settings.clickDebug)
+                {
+                    Console.WriteLine("\nSearching for note...");
+                    Note note = null;
+                    lock (globalDisplayNotes)
+                    {
+                        foreach (Note n in globalDisplayNotes)
+                        {
+                            if (n.note == key && n.start < time && (n.end > time || !n.hasEnded))
+                            {
+                                note = n;
+                            }
+                        }
+                    }
+                    if (note == null) Console.WriteLine("No note was found");
+                    else
+                    {
+                        Console.WriteLine("Note start (ticks): " + note.start);
+                        if (note.hasEnded)
+                            Console.WriteLine("Note end (ticks): " + note.end);
+                        else
+                            Console.WriteLine("Note end (ticks): [Not parsed yet]");
+                        Console.WriteLine("Note velocity: " + note.vel);
+                        Console.WriteLine("Note track: " + note.track.trackID);
+                        Console.WriteLine("Note channel: " + note.channel);
+                    }
+                }
+            }
+        }
+
         protected override void OnClosing(CancelEventArgs e)
         {
             base.OnClosing(e);
             settings.running = false;
         }
-        
+
         protected override void OnClosed(EventArgs e)
         {
             base.OnClosed(e);

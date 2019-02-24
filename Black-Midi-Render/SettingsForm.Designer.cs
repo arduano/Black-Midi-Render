@@ -773,7 +773,7 @@
             this.Controls.Add(this.groupBox1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Name = "SettingsForm";
-            this.Text = "Settings";
+            this.Text = "7";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.SettingsForm_FormClosing);
             this.groupBox1.ResumeLayout(false);
             this.tabControl1.ResumeLayout(false);

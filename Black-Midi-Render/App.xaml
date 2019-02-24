@@ -1,0 +1,9 @@
+﻿<Application x:Class="SettingsWPF.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:SettingsWPF"
+             StartupUri="Program.cs">
+    <Application.Resources>
+         
+    </Application.Resources>
+</Application>

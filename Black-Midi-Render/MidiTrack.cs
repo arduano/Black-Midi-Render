@@ -15,6 +15,7 @@ namespace Black_Midi_Render
         public bool hasEnded;
         public byte channel;
         public byte note;
+        public byte vel;
         public MidiTrack track;
     }
 
@@ -196,6 +197,7 @@ namespace Black_Midi_Render
                         n.note = note;
                         n.track = this;
                         n.channel = channel;
+                        n.vel = vel;
                         if (!readOnly)
                         {
                             if (UnendedNotes == null)

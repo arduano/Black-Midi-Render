@@ -71,16 +71,13 @@ namespace MidiUtils
             List<byte> track = new List<byte>();
             long trackTime = 0;
             bool hasEndEvent = false;
-            bool readDeltaTime = false;
             while (true)
             {
                 try
                 {
-                    readDeltaTime = false;
                     int dtime = 0;
                     var dtimeb = ReadVariableLen(reader, out dtime);
                     trackTime += dtime;
-                    readDeltaTime = true;
                     byte command = reader.Read();
                     byte comm = (byte)(command & 0b11110000);
                     if (comm == 0b10010000)
@@ -384,6 +381,7 @@ namespace MidiUtils
                     break;
                 }
             }
+            if (!hasEndEvent) track.AddRange(new byte[] { 0, 0xFF, 0x2F, 0x00 });
             return track.ToArray();
         }
     }
