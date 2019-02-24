@@ -7,3 +7,7 @@ Minutes to render: 7.51
 
 Smash mouth - All Star
 Note count: 44529227
+Peak: 1.51GB
+Avg: 0.65GB
+Minutes to render: 5.38
+
