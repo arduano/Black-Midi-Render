@@ -409,12 +409,28 @@ namespace Black_Midi_Render
                     else if (command == 0x0A)
                     {
                         int size = (int)ReadVariableLen();
-                        char[] text = new char[size];
+                        byte[] data = new byte[size];
                         for (int i = 0; i < size; i++)
                         {
-                            text[i] = (char)reader.Read();
+                            data[i] = reader.Read();
                         }
-                        string str = new string(text);
+                        if (data.Length == 8 || data.Length == 12)
+                        {
+                            if (data[0] == 0x00 &&
+                                data[1] == 0x0F)
+                            {
+                                Color4 col1 = new Color4(data[4], data[5], data[6], data[7]);
+                                Color4 col2;
+                                if (data.Length == 12)
+                                    col2 = new Color4(data[8], data[9], data[10], data[11]);
+                                else col2 = col1;
+                                if (data[2] < 0x10 || data[2] == 0x7F)
+                                {
+                                    var c = new ColorChange() { pos = trackTime, col1 = col1, col2 = col2, channel = data[2], track = this };
+                                    globalColorEvents.Add(c);
+                                }
+                            }
+                        }
                     }
                     else if (command == 0x20)
                     {
@@ -501,23 +517,6 @@ namespace Black_Midi_Render
                         for (int i = 0; i < size; i++)
                         {
                             data[i] = reader.Read();
-                        }
-                        if (data.Length == 8 || data.Length == 12)
-                        {
-                            if (data[0] == 0x00 &&
-                                data[1] == 0x0F)
-                            {
-                                Color4 col1 = new Color4(data[4], data[5], data[6], data[7]);
-                                Color4 col2;
-                                if (data.Length == 12)
-                                    col2 = new Color4(data[8], data[9], data[10], data[11]);
-                                else col2 = col1;
-                                if (data[2] < 0x10 || data[2] == 0x7F)
-                                {
-                                    var c = new ColorChange() { pos = trackTime, col1 = col1, col2 = col2, channel = data[2], track = this };
-                                    globalColorEvents.Add(c);
-                                }
-                            }
                         }
                     }
                     else

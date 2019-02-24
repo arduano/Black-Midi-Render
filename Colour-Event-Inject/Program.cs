@@ -19,7 +19,7 @@ namespace Colour_Event_Inject
             //Application.Run(new ColourForm());
 
             var midiout = new StreamWriter(@"E:\test.mid");
-            var midiin = new StreamReader(@"E:\Midi\[Black MIDI]scarlet_zone-& The Young Descendant of Tepes V.2.mid");
+            var midiin = new StreamReader(@"E:\Midi\Pi.mid");
             MidiWriter writer = new MidiWriter(midiout.BaseStream);
             writer.Init();
 
@@ -44,7 +44,7 @@ namespace Colour_Event_Inject
                 filter.MidiEventFilter = (byte[] dtimeb, int dtime, byte[] data, long time) =>
                 {
                     //byte[] e = new byte[] { 0xFF, 0x7F, 0x08, 0x00, 0x0F, 0x7F, 0x00, 0x00, 0x00, 0x00, 0xFF };
-                    byte[] e = new byte[] { 0xFF, 0x7F, 0x0C, 0x00, 0x0F, 0x7F, 0x00, 0x00, 0x00, 0x00, 0xFF, 0x00, 0x00, 0x00, 0xFF };
+                    byte[] e = new byte[] { 0xFF, 0x0A, 0x0C, 0x00, 0x0F, 0x7F, 0x00, 0x00, 0x00, 0x00, 0xFF, 0x00, 0x00, 0x00, 0xFF };
                     if (time - prevtime > d)
                     {
                         List<byte> o = new List<byte>();
