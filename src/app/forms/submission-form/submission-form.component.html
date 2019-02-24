@@ -1,0 +1,38 @@
+<div class="forms-content">
+  <div class="forms">
+    <div class='formCard'>
+      <form class='formContent' [formGroup]="submissionForm">
+        <h3>Submit a song to MSTKE Music.</h3>
+        <p>Keep in mind that I won't release any songs.
+          <p>
+            <mat-form-field class="small-width">
+              <input matInput formControlName="artist" placeholder="Artist name" required>
+            </mat-form-field>
+            <br>
+            <!--<mat-form-field class="small-width">
+              <input matInput placeholder="Email" formControlName="email" [errorStateMatcher]="matcher" required>
+              <mat-error *ngIf="submissionForm.controls['email'].hasError('email') && !generalForm.controls['email'].hasError('required')">
+                Please enter a valid email address
+              </mat-error>
+              <mat-error *ngIf="submissionForm.controls['email'].hasError('required')">
+                Email is <strong>required</strong>
+              </mat-error>
+            </mat-form-field>
+            <br>-->
+            <mat-form-field class="small-width">
+              <input matInput formControlName="link" placeholder="How can I contact you?" required>
+            </mat-form-field>
+            <br>
+            <mat-form-field class="small-width">
+              <input matInput formControlName="link" placeholder="Link to the song" required>
+            </mat-form-field>
+            <br>
+            <mat-form-field class="half-width">
+              <textarea matInput formControlName="comment" placeholder="Comment"></textarea>
+            </mat-form-field>
+            <br>
+            <button mat-stroked-button color="primary" (click)="onSubmit()">Submit</button>
+      </form>
+    </div>
+  </div>
+</div>

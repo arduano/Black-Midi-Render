@@ -1,0 +1,48 @@
+import os
+os.system("ng build --prod")
+os.system("copy dist\\mstke-web\\index.html 404.html")
+os.remove('dist/mstke-web/index.html')
+
+s = open('404.html').read()
+s = s.replace('"styles.', '"dist/mstke-web/styles.')
+s = s.replace('"runtime', '"dist/mstke-web/runtime')
+s = s.replace('"main', '"dist/mstke-web/main')
+s = s.replace('"polyfills', '"dist/mstke-web/polyfills')
+s = s.replace('assets/css-element-queries', 'dist/mstke-web/assets/css-element-queries')
+
+
+def replaceAssetPaths(f, r):
+    global s
+    txt = open('dist/mstke-web/' + f).read()
+    print('---', f)
+    for root, _, files in os.walk('src/assets'):
+        for _f in files:
+            d = root.replace('\\', '/')[4:] + '/' + _f
+            if d in txt:
+                print('replaced', d, 'with', 'dist/mstke-web/' + d)
+                txt = txt.replace(d, 'dist/mstke-web/' + d)
+    s = s.replace(f, r)
+    open('dist/mstke-web/' + r, 'w').write(txt)
+    os.remove('dist/mstke-web/' + f)
+    
+
+dirs = os.listdir('dist/mstke-web')
+print('Replacing asset paths')
+for d in dirs:
+    if d.startswith('main.'):
+        replaceAssetPaths(d, 'main.ng.js')
+    if d.startswith('styles.'):
+        replaceAssetPaths(d, 'styles.ng.css')
+    if d.startswith('runtime.'):
+        replaceAssetPaths(d, 'runtime.ng.js')
+    if d.startswith('polyfills.'):
+        replaceAssetPaths(d, 'polyfills.ng.js')
+
+
+open('404.html', 'w').write(s)
+os.system("copy 404.html index.html")
+
+
+os.system("git add .")
+os.system("git commit -m \"deploy\"")
+os.system("git push")
