@@ -71,6 +71,6 @@ export class MainComponent implements OnInit {
   }
 
   routeTo(url) {
-    this.router.navigate([url])
+    this.router.navigate(['Black-Midi-Render/' + url])
   }
 }
