@@ -27,10 +27,6 @@ export class MainComponent implements OnInit {
 
   public links:any[] = [
     {name:'Start', url:'start'},
-    {name:'About', url:'about'},
-    {name:'Works', url:'works'},
-    {name:'Setup', url:'setup'},
-    {name:'Contact', url:'contact'},
     {name:'Benchmarks', url:'benchmarks'}
   ]
 

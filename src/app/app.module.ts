@@ -11,18 +11,13 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { InfoBoxComponent } from './misc/info-box/info-box.component';
 import { WorksPageComponent } from './pages/works-page/works-page.component';
 import { SetupPageComponent } from './pages/setup-page/setup-page.component';
-import { ContactPageComponent } from './pages/contact-page/contact-page.component';
 import { PageScrollerComponent } from './core/page-scroller/page-scroller.component';
 import { SocialMediaComponent } from './misc/social-media/social-media.component';
 import { MatButtonModule, MatCheckboxModule, MatCardModule, MatFormFieldModule, MatInputModule, MatNativeDateModule, MatRadioModule, MatProgressBarModule,} from '@angular/material';
-import { GeneralFormComponent } from './forms/general-form/general-form.component';
-import { SubmissionFormComponent } from './forms/submission-form/submission-form.component';
-import { TakedownFormComponent } from './forms/takedown-form/takedown-form.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { GoogleFormsService } from './services/google-forms/google-forms.service';
 import { HttpClient } from 'selenium-webdriver/http';
 import { HttpClientModule } from '@angular/common/http';
-import { FormSuccessComponent } from './forms/form-success/form-success.component';
 import { BenchmarksPageComponent } from './pages/benchmarks-page/benchmarks-page.component';
 import { BenchmarkComponent } from './misc/benchmark/benchmark.component';
 
@@ -36,21 +31,16 @@ import { BenchmarkComponent } from './misc/benchmark/benchmark.component';
     InfoBoxComponent,
     WorksPageComponent,
     SetupPageComponent,
-    ContactPageComponent,
     PageScrollerComponent,
     SocialMediaComponent,
-    GeneralFormComponent,
-    SubmissionFormComponent,
-    TakedownFormComponent,
-    FormSuccessComponent,
     BenchmarksPageComponent,
     BenchmarkComponent,
   ],
   imports: [
     BrowserModule,
-    BrowserAnimationsModule, 
+    BrowserAnimationsModule,
 
-    MatButtonModule, MatCheckboxModule, MatCardModule, 
+    MatButtonModule, MatCheckboxModule, MatCardModule,
     MatFormFieldModule, MatInputModule, MatRadioModule,
     MatProgressBarModule,
 
