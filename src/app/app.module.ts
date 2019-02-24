@@ -23,6 +23,8 @@ import { GoogleFormsService } from './services/google-forms/google-forms.service
 import { HttpClient } from 'selenium-webdriver/http';
 import { HttpClientModule } from '@angular/common/http';
 import { FormSuccessComponent } from './forms/form-success/form-success.component';
+import { BenchmarksPageComponent } from './pages/benchmarks-page/benchmarks-page.component';
+import { BenchmarkComponent } from './misc/benchmark/benchmark.component';
 
 
 @NgModule({
@@ -41,6 +43,8 @@ import { FormSuccessComponent } from './forms/form-success/form-success.componen
     SubmissionFormComponent,
     TakedownFormComponent,
     FormSuccessComponent,
+    BenchmarksPageComponent,
+    BenchmarkComponent,
   ],
   imports: [
     BrowserModule,

@@ -10,6 +10,7 @@ import { ContactPageComponent } from './pages/contact-page/contact-page.componen
 import { SetupPageComponent } from './pages/setup-page/setup-page.component';
 import { GeneralFormComponent } from './forms/general-form/general-form.component';
 import { SubmissionFormComponent } from './forms/submission-form/submission-form.component';
+import { BenchmarksPageComponent } from './pages/benchmarks-page/benchmarks-page.component';
 
 
 const routes: Routes = [
@@ -21,6 +22,7 @@ const routes: Routes = [
       { path: 'works', component: WorksPageComponent },
       { path: 'setup', component: SetupPageComponent },
       { path: 'contact', component: ContactPageComponent},
+      { path: 'benchmarks', component: BenchmarksPageComponent},
     ]
   }
 ];

@@ -22,7 +22,7 @@ export class MainComponent implements OnInit {
   public navbarOut: boolean = false;
   public navbarCollapseUp: boolean = false;
   public navbarCollapseDown: boolean = false;
-  
+
   private timer:any = null;
 
   public links:any[] = [
@@ -30,7 +30,8 @@ export class MainComponent implements OnInit {
     {name:'About', url:'about'},
     {name:'Works', url:'works'},
     {name:'Setup', url:'setup'},
-    {name:'Contact', url:'contact'}
+    {name:'Contact', url:'contact'},
+    {name:'Benchmarks', url:'benchmarks'}
   ]
 
   toggleMenu(){
@@ -66,7 +67,7 @@ export class MainComponent implements OnInit {
   routeActivated(){
     this.route.firstChild.url.subscribe(url => {
       this.urlChild = url[0].path
-    })  
+    })
   }
 
   transition(o){

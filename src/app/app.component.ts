@@ -7,6 +7,5 @@ import { Router } from '@angular/router';
   styleUrls: ['./app.component.less']
 })
 export class AppComponent {
-  title = 'mstke-web';
   constructor(public router: Router){}
 }

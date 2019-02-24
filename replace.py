@@ -1,32 +1,32 @@
 import os
 os.system("ng build --prod")
-os.system("copy dist\\mstke-web\\index.html 404.html")
-os.remove('dist/mstke-web/index.html')
+os.system("copy dist\\bmr\\index.html 404.html")
+os.remove('dist/bmr/index.html')
 
 s = open('404.html').read()
-s = s.replace('"styles.', '"dist/mstke-web/styles.')
-s = s.replace('"runtime', '"dist/mstke-web/runtime')
-s = s.replace('"main', '"dist/mstke-web/main')
-s = s.replace('"polyfills', '"dist/mstke-web/polyfills')
-s = s.replace('assets/css-element-queries', 'dist/mstke-web/assets/css-element-queries')
+s = s.replace('"styles.', '"dist/bmr/styles.')
+s = s.replace('"runtime', '"dist/bmr/runtime')
+s = s.replace('"main', '"dist/bmr/main')
+s = s.replace('"polyfills', '"dist/bmr/polyfills')
+s = s.replace('assets/css-element-queries', 'dist/bmr/assets/css-element-queries')
 
 
 def replaceAssetPaths(f, r):
     global s
-    txt = open('dist/mstke-web/' + f).read()
+    txt = open('dist/bmr/' + f).read()
     print('---', f)
     for root, _, files in os.walk('src/assets'):
         for _f in files:
             d = root.replace('\\', '/')[4:] + '/' + _f
             if d in txt:
-                print('replaced', d, 'with', 'dist/mstke-web/' + d)
-                txt = txt.replace(d, 'dist/mstke-web/' + d)
+                print('replaced', d, 'with', 'dist/bmr/' + d)
+                txt = txt.replace(d, 'dist/bmr/' + d)
     s = s.replace(f, r)
-    open('dist/mstke-web/' + r, 'w').write(txt)
-    os.remove('dist/mstke-web/' + f)
-    
+    open('dist/bmr/' + r, 'w').write(txt)
+    os.remove('dist/bmr/' + f)
 
-dirs = os.listdir('dist/mstke-web')
+
+dirs = os.listdir('dist/bmr')
 print('Replacing asset paths')
 for d in dirs:
     if d.startswith('main.'):
