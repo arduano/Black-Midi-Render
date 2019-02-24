@@ -98,23 +98,28 @@ namespace Black_Midi_Render
                         " -f rawvideo -s " + settings.width + "x" + settings.height +
                         " -pix_fmt rgb32 -r " + settings.fps + " -i -" +
                         " -itsoffset 0.21 -i \"" + settings.audioPath + "\"" +
-                        " -vf vflip -vcodec libx264 -acodec aac" +
-                        " -b:v " + settings.bitrate + "k" +
-                        " -maxrate " + settings.bitrate + "k" +
-                        " -minrate " + settings.bitrate + "k" +
-                        " -y \"" + settings.ffPath + "\"";
+                        " -vf vflip -vcodec libx264 -acodec aac";
+
+
                 }
                 else
                 {
                     args = "" +
                         " -f rawvideo -s " + settings.width + "x" + settings.height +
                         " -pix_fmt rgb32 -r " + settings.fps + " -i -" +
-                        " -vf vflip -vcodec libx264" +
-                        " -b:v " + settings.bitrate + "k" +
-                        " -maxrate " + settings.bitrate + "k" +
-                        " -minrate " + settings.bitrate + "k" +
-                        " -y \"" + settings.ffPath + "\"";
+                        " -vf vflip -vcodec libx264";
                 }
+                if (settings.useBitrate)
+                {
+                    args += " -b:v " + settings.bitrate + "k" +
+                        " -maxrate " + settings.bitrate + "k" +
+                        " -minrate " + settings.bitrate + "k";
+                }
+                else
+                {
+                    args += " -preset " + settings.crfPreset + " -crf " + settings.crf;
+                }
+                args += " -y \"" + settings.ffPath + "\"";
                 ffmpeg.StartInfo = new ProcessStartInfo("ffmpeg", args);
                 ffmpeg.StartInfo.RedirectStandardInput = true;
                 ffmpeg.StartInfo.UseShellExecute = false;
@@ -303,7 +308,8 @@ namespace Black_Midi_Render
                 //GL.ClearColor(1, 1, 1, 1);
                 DrawScreenQuad();
                 GLPostbuffer.UnbindTextures();
-                if (settings.vsync) VSync = VSyncMode.On;
+                if(settings.ffRender) VSync = VSyncMode.Off;
+                else if (settings.vsync) VSync = VSyncMode.On;
                 else VSync = VSyncMode.Off;
 
                 try

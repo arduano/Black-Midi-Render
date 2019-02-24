@@ -199,6 +199,12 @@ namespace Black_Midi_Render
 
         private void StartRenderButton_Click(object sender, RoutedEventArgs e)
         {
+            if(videoPath.Text == "")
+            {
+                MessageBox.Show("Please specify a destination path");
+                return;
+            }
+
             settings.running = true;
             settings.width = (int)viewWidth.Value;
             settings.height = (int)viewHeight.Value;
@@ -209,12 +215,21 @@ namespace Black_Midi_Render
             settings.paused = false;
             previewPaused.IsChecked = false;
             settings.tempoMultiplier = 1;
-            tempoSlider.Value = 1;
+            tempoSlider.Value = 0;
+
+            settings.useBitrate = (bool)bitrateOption.IsChecked;
+            if (settings.useBitrate) settings.bitrate = (int)bitrate.Value;
+            else
+            {
+                settings.crf = (int)crfFactor.Value;
+                settings.crfPreset = (string)((ListBoxItem)crfPreset.SelectedItem).Content;
+            }
 
             settings.includeAudio = (bool)includeAudio.IsChecked;
             settings.audioPath = audioPath.Text;
             renderThread = Task.Factory.StartNew(RunRenderWindow);
             Resources["notPreviewing"] = false;
+            Resources["notRendering"] = false;
         }
 
         private void BrowseVideoSaveButton_Click(object sender, RoutedEventArgs e)
@@ -286,6 +301,30 @@ namespace Black_Midi_Render
             {
                 previewPaused.IsChecked = !settings.paused;
                 settings.paused = (bool)previewPaused.IsChecked;
+            }
+        }
+
+        private void PianoStyle_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
+                settings.kbrender = (KeyboardRenderers)pianoStyle.SelectedIndex;
+            }
+            catch (NullReferenceException)
+            {
+
+            }
+        }
+
+        private void NoteStyle_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
+                settings.ntrender = (NoteRenderers)noteStyle.SelectedIndex;
+            }
+            catch (NullReferenceException)
+            {
+
             }
         }
     }
