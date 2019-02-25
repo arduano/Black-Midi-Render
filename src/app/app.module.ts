@@ -8,7 +8,6 @@ import { StartPageComponent } from './pages/start-page/start-page.component';
 import { AboutPageComponent } from './pages/about-page/about-page.component';
 import { MainComponent } from './core/main/main.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { InfoBoxComponent } from './misc/info-box/info-box.component';
 import { WorksPageComponent } from './pages/works-page/works-page.component';
 import { SetupPageComponent } from './pages/setup-page/setup-page.component';
 import { PageScrollerComponent } from './core/page-scroller/page-scroller.component';
@@ -28,7 +27,6 @@ import { BenchmarkComponent } from './misc/benchmark/benchmark.component';
     StartPageComponent,
     AboutPageComponent,
     MainComponent,
-    InfoBoxComponent,
     WorksPageComponent,
     SetupPageComponent,
     PageScrollerComponent,
