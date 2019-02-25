@@ -59,25 +59,5 @@ namespace Black_Midi_Render.Properties {
                 resourceCulture = value;
             }
         }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        internal static byte[] notes_frag {
-            get {
-                object obj = ResourceManager.GetObject("notes_frag", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        internal static byte[] notes_vert {
-            get {
-                object obj = ResourceManager.GetObject("notes_vert", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
     }
 }

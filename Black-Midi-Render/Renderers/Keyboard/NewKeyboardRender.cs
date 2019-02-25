@@ -11,8 +11,7 @@ namespace Black_Midi_Render
     class NewKeyboardRender : IKeyboardRender
     {
         RenderSettings settings;
-
-
+        
         int noteShader;
 
         int vertexBufferID;
@@ -27,6 +26,11 @@ namespace Black_Midi_Render
 
         int indexBufferId;
         uint[] indexes = new uint[2048 * 4 * 6];
+
+        public void Dispose()
+        {
+            GL.DeleteBuffers(3, new int[] { vertexBufferID, colorBufferID, attrib1BufferID });
+        }
 
         public NewKeyboardRender(RenderSettings rendersettings)
         {

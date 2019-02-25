@@ -18,12 +18,12 @@ using OpenTK.Input;
 
 namespace Black_Midi_Render
 {
-    interface INoteRender
+    interface INoteRender : IDisposable
     {
         long Render(FastList<Note> notes, double midiTime);
     }
 
-    interface IKeyboardRender
+    interface IKeyboardRender : IDisposable
     {
         void Render();
     }
@@ -63,6 +63,9 @@ namespace Black_Midi_Render
         int glowStrength_var;
         int glowPass_var;
 
+        KeyboardRenderers kbrender;
+        NoteRenderers ntrender;
+
         void BindUniforms()
         {
             glowTextureSize_var = GL.GetUniformLocation(glowShader, "u_textureSize");
@@ -82,6 +85,9 @@ namespace Black_Midi_Render
             this.settings = settings;
             midiTime = -settings.deltaTimeOnScreen;
             pixels = new byte[settings.width * settings.height * 4];
+
+            kbrender = settings.kbrender;
+            ntrender = settings.ntrender;
 
             //WindowBorder = WindowBorder.Hidden;
             globalDisplayNotes = midi.globalDisplayNotes;
@@ -171,6 +177,19 @@ namespace Black_Midi_Render
                 SpinWait.SpinUntil(() => midi.currentSyncTime > midiTime + tempoFrameStep || midi.unendedTracks == 0 || !settings.running);
                 if (!settings.running) break;
 
+                if(ntrender != settings.ntrender)
+                {
+                    noteRender.Dispose();
+                    noteRender = settings.GetNoteRenderer();
+                    ntrender = settings.ntrender;
+                }
+                if(kbrender != settings.kbrender)
+                {
+                    keyboardRender.Dispose();
+                    keyboardRender = settings.GetKeyboardRenderer();
+                    kbrender = settings.kbrender;
+                }
+
                 GL.Enable(EnableCap.LineSmooth);
                 GL.Enable(EnableCap.Blend);
                 GL.EnableClientState(ArrayCap.VertexArray);
@@ -242,13 +261,16 @@ namespace Black_Midi_Render
                     }
                 }
                 double mv = 1;
-                while (globalTempoEvents.First != null && midiTime + (tempoFrameStep * mv * settings.tempoMultiplier) - settings.deltaTimeOnScreen > globalTempoEvents.First.pos)
+                lock (globalTempoEvents)
                 {
-                    var t = globalTempoEvents.Pop();
-                    var _t = ((t.pos + settings.deltaTimeOnScreen) - midiTime) / (tempoFrameStep * mv * settings.tempoMultiplier);
-                    mv *= 1 - _t;
-                    tempoFrameStep = ((double)midi.division / t.tempo) * (1000000.0 / settings.fps);
-                    midiTime = t.pos + settings.deltaTimeOnScreen;
+                    while (globalTempoEvents.First != null && midiTime + (tempoFrameStep * mv * settings.tempoMultiplier) - settings.deltaTimeOnScreen > globalTempoEvents.First.pos)
+                    {
+                        var t = globalTempoEvents.Pop();
+                        var _t = ((t.pos + settings.deltaTimeOnScreen) - midiTime) / (tempoFrameStep * mv * settings.tempoMultiplier);
+                        mv *= 1 - _t;
+                        tempoFrameStep = ((double)midi.division / t.tempo) * (1000000.0 / settings.fps);
+                        midiTime = t.pos + settings.deltaTimeOnScreen;
+                    }
                 }
                 if (!settings.paused)
                 {

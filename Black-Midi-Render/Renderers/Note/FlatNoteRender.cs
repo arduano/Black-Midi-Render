@@ -26,6 +26,11 @@ namespace Black_Midi_Render
         int indexBufferId;
         uint[] indexes = new uint[2048 * 4 * 6];
 
+        public void Dispose()
+        {
+            GL.DeleteBuffers(2, new int[] { vertexBufferID, colorBufferID });
+        }
+
         public FlatNoteRender(RenderSettings rendersettings)
         {
             settings = rendersettings;

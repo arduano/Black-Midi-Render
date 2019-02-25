@@ -478,7 +478,10 @@ namespace Black_Midi_Render
                         {
                             if (!readOnly)
                             {
-                                globalTempoEvents.Add(t);
+                                lock (globalTempoEvents)
+                                {
+                                    globalTempoEvents.Add(t);
+                                }
                             }
                         }
                     }
@@ -529,10 +532,11 @@ namespace Black_Midi_Render
                     throw new Exception("Corrupt Track");
                 }
             }
-            catch
+            catch(IndexOutOfRangeException)
             {
                 EndTrack();
             }
+            catch { }
         }
 
         public void ParseNextEventFast()
@@ -716,10 +720,11 @@ namespace Black_Midi_Render
                     throw new Exception("Corrupt Track");
                 }
             }
-            catch
+            catch (IndexOutOfRangeException)
             {
                 EndTrack();
             }
+            catch { }
         }
 
         public void Dispose()

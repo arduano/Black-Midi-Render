@@ -172,6 +172,7 @@ namespace Black_Midi_Render
             settings.width = (int)viewWidth.Value;
             settings.height = (int)viewHeight.Value;
             settings.fps = (int)viewFps.Value;
+            settings.ffRender = false;
             renderThread = Task.Factory.StartNew(RunRenderWindow);
             Resources["notPreviewing"] = false;
         }
@@ -222,7 +223,7 @@ namespace Black_Midi_Render
             else
             {
                 settings.crf = (int)crfFactor.Value;
-                settings.crfPreset = (string)((ListBoxItem)crfPreset.SelectedItem).Content;
+                settings.crfPreset = (string)((ComboBoxItem)crfPreset.SelectedItem).Content;
             }
 
             settings.includeAudio = (bool)includeAudio.IsChecked;
@@ -321,6 +322,18 @@ namespace Black_Midi_Render
             try
             {
                 settings.ntrender = (NoteRenderers)noteStyle.SelectedIndex;
+            }
+            catch (NullReferenceException)
+            {
+
+            }
+        }
+
+        private void NoteDeltaScreenTime_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            try
+            {
+                settings.deltaTimeOnScreen = (int)noteDeltaScreenTime.Value;
             }
             catch (NullReferenceException)
             {
