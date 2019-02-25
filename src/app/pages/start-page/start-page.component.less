@@ -1,25 +1,37 @@
-.content{
+.content {
   text-align: center;
+  display: flex;
+  justify-content: center;
+  flex-basis: 100%;
+  flex-direction: column;
 }
 
-.screenshot{
-  max-width: 600px;
+.screenshot {
+  max-width: 800px;
   box-shadow: 0px 0px 20px -3px black;
   z-index: 10;
   transform: scaleX(1);
+  margin-bottom: 200px;
 }
 
-.subheading{
-  font-family: 'Open-Sans-Light' !important;
+.heading {
+  margin-top: 40px;
+  font-size: 60px;
 }
 
-.title{
+.subheading {
+  font-family: "Open-Sans-Light" !important;
+  margin-top: 10px;
+  font-size: 30px;
+}
+
+.title {
   margin-bottom: 30px;
 }
 
-.download-button{
+.download-button {
   border-radius: 10px;
-  background-color: #673AB7;
+  background-color: #673ab7;
   border: 0px solid transparent;
   color: white;
   font-family: Roboto;
@@ -32,23 +44,101 @@
   margin: 30px 30px 00px 60px;
 }
 
-.download-button:hover{
+.ffmpeg-note {
+  margin-top: 20px;
+}
+
+.download-button:hover {
   background-color: rgb(111, 54, 211);
   transform: translate(0, -2px);
 }
 
-.download-button:active{
+.download-button:active {
   background-color: rgb(88, 47, 160);
   transform: translate(0, 3px);
 }
 
-#streaks-left{
+#streaks-left {
   margin-bottom: -270px;
-  margin-right: 300px;
+  margin-top: -130px;
+  margin-right: 400px;
+  user-select: none;
+  width: 400px;
 }
 
-#streaks-right{
+#streaks-right {
   transform: scaleX(-1);
   margin-bottom: -270px;
+  margin-top: -130px;
+  user-select: none;
   z-index: -1;
+  width: 400px;
+}
+
+@media (max-width: 1200px) {
+  #streaks-left {
+    display: none;
+  }
+
+  #streaks-right {
+    display: none;
+  }
+
+  .screenshot{
+    margin-top:20px;
+  }
+}
+
+.content2 {
+  padding: 50px;
+  background-color: rgb(232, 227, 233);
+  box-shadow: 0 0 200px 0px rgba(173, 216, 230, 0.753);
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+a {
+  text-decoration: none;
+  color: rgb(120, 82, 185);
+}
+
+a:hover {
+  color: rgb(149, 112, 214);
+}
+
+.git-logo-d {
+  width: 20px;
+}
+
+.other-releases {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+#git-icon-left {
+  padding-right: 10px;
+  width: 150px;
+  text-align: right;
+}
+
+#git-icon-right {
+  padding-left: 10px;
+  width: 150px;
+  text-align: left;
+}
+
+.features-box {
+  margin-left: 100px;
+  h1 {
+    color: rgb(88, 88, 88);
+  }
+  div {
+    font-family: "Open-Sans-Light" !important;
+    font-size: 20px;
+    max-width: 700px;
+    margin-top: 30px;
+  }
 }

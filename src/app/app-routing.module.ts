@@ -10,6 +10,7 @@ import { BenchmarksPageComponent } from './pages/benchmarks-page/benchmarks-page
 
 const routes: Routes = [
   { path: 'Black-Midi-Render', redirectTo: 'Black-Midi-Render/start', pathMatch: 'full' },
+  { path: '', redirectTo: 'Black-Midi-Render/start', pathMatch: 'full' },
   {
     path: 'Black-Midi-Render', component: MainComponent, children: [
       { path: 'start', component: StartPageComponent },
