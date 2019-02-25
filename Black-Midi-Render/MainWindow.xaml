@@ -7,7 +7,7 @@
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         xmlns:local="clr-namespace:Black_Midi_Render"
         mc:Ignorable="d"
-        Title="Black Midi Render" Height="434.389" Width="658.056">
+        Title="Black Midi Render" Height="434.389" Width="658.056" MinWidth="658.056" MinHeight="434.389">
     <Window.Resources>
         <!--<Style TargetType="{x:Type Window}">
             <Setter Property="FontFamily" Value="Microsoft Sans Serif" />
@@ -176,8 +176,9 @@
                         <ComboBoxItem Content="Shaded"/>
                         <ComboBoxItem Content="Flat"/>
                     </ComboBox>
-                    <Slider x:Name="noteDeltaScreenTime" IsSnapToTickEnabled="True" TickPlacement="BottomRight" HorizontalAlignment="Left" Margin="126,104,0,0" VerticalAlignment="Top" Width="236" Maximum="1500" Minimum="1" Value="300" TickFrequency="50" ValueChanged="NoteDeltaScreenTime_ValueChanged"/>
+                    <Slider x:Name="noteDeltaScreenTime" IsSnapToTickEnabled="True" TickPlacement="BottomRight" HorizontalAlignment="Left" Margin="126,104,0,0" VerticalAlignment="Top" Width="236" Maximum="1500" Minimum="50" Value="300" TickFrequency="50" ValueChanged="NoteDeltaScreenTime_ValueChanged"/>
                     <Label Content="Hint: These can be changed during preview" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
+                    <Label x:Name="screenTime" Content="Label" HorizontalAlignment="Left" Margin="368,103,0,0" VerticalAlignment="Top"/>
 
                 </Grid>
             </TabItem>

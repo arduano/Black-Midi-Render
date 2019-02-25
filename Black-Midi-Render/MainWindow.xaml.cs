@@ -46,6 +46,7 @@ namespace Black_Midi_Render
             pianoHeight.Value = (int)(settings.pianoHeight * 100);
             noteBrightness.Value = (decimal)settings.noteBrightness;
             noteDeltaScreenTime.Value = settings.deltaTimeOnScreen;
+            screenTime.Content = settings.deltaTimeOnScreen;
             vsyncEnabled.IsChecked = settings.vsync;
             tempoSlider.Value = Math.Log(settings.tempoMultiplier, 2);
         }
@@ -334,6 +335,7 @@ namespace Black_Midi_Render
             try
             {
                 settings.deltaTimeOnScreen = (int)noteDeltaScreenTime.Value;
+                screenTime.Content = settings.deltaTimeOnScreen;
             }
             catch (NullReferenceException)
             {
