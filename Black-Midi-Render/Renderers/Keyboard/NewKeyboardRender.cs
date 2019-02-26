@@ -124,7 +124,7 @@ namespace Black_Midi_Render
             double y1 = pianoHeight;
             double y2 = 0;
             quadBufferPos = 0;
-            float r, g, b, a, r2, g2, b2, a2;
+            float r, g, b, a, r2, g2, b2, a2, r3, g3, b3, a3;
             double xx1, xx2, yy1, yy2;
             double ys1, ys2;
 
@@ -319,6 +319,16 @@ namespace Black_Midi_Render
                 g2 = colr.G;
                 b2 = colr.B;
                 a2 = colr.A;
+                var colm = new Color4(
+                    (coll.R + colr.R) / 2,
+                    (coll.G + colr.G) / 2,
+                    (coll.B + colr.B) / 2,
+                    (coll.A + colr.A) / 2
+                    );
+                r3 = colm.R;
+                g3 = colm.G;
+                b3 = colm.B;
+                a3 = colm.A;
 
                 xx1 = x1 + wdth / 6;
                 xx2 = x2 - wdth / 6;
@@ -350,14 +360,14 @@ namespace Black_Midi_Render
                 quadAttribbuff[pos++] = 0;
 
                 pos = quadBufferPos * 16;
-                quadColorbuff[pos++] = r;
-                quadColorbuff[pos++] = g;
-                quadColorbuff[pos++] = b;
-                quadColorbuff[pos++] = a;
-                quadColorbuff[pos++] = r;
-                quadColorbuff[pos++] = g;
-                quadColorbuff[pos++] = b;
-                quadColorbuff[pos++] = a;
+                quadColorbuff[pos++] = r3;
+                quadColorbuff[pos++] = g3;
+                quadColorbuff[pos++] = b3;
+                quadColorbuff[pos++] = a3;
+                quadColorbuff[pos++] = r3;
+                quadColorbuff[pos++] = g3;
+                quadColorbuff[pos++] = b3;
+                quadColorbuff[pos++] = a3;
                 quadColorbuff[pos++] = r2;
                 quadColorbuff[pos++] = g2;
                 quadColorbuff[pos++] = b2;
@@ -399,14 +409,14 @@ namespace Black_Midi_Render
                 quadColorbuff[pos++] = g;
                 quadColorbuff[pos++] = b;
                 quadColorbuff[pos++] = a;
-                quadColorbuff[pos++] = r2;
-                quadColorbuff[pos++] = g2;
-                quadColorbuff[pos++] = b2;
-                quadColorbuff[pos++] = a2;
-                quadColorbuff[pos++] = r2;
-                quadColorbuff[pos++] = g2;
-                quadColorbuff[pos++] = b2;
-                quadColorbuff[pos++] = a2;
+                quadColorbuff[pos++] = r3;
+                quadColorbuff[pos++] = g3;
+                quadColorbuff[pos++] = b3;
+                quadColorbuff[pos++] = a3;
+                quadColorbuff[pos++] = r3;
+                quadColorbuff[pos++] = g3;
+                quadColorbuff[pos++] = b3;
+                quadColorbuff[pos++] = a3;
                 quadBufferPos++;
                 FlushQuadBuffer();
 

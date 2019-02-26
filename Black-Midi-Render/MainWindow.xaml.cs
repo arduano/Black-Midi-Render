@@ -147,13 +147,13 @@ namespace Black_Midi_Render
                 GC.Collect();
                 GC.WaitForFullGCComplete();
                 midifile = new MidiFile(midipath, settings);
+                Resources["midiLoaded"] = true;
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message + "\n" + ex.StackTrace);
                 MessageBox.Show(ex.Message + "\n" + ex.StackTrace);
             }
-            Resources["midiLoaded"] = true;
         }
 
         private void UnloadButton_Click(object sender, RoutedEventArgs e)

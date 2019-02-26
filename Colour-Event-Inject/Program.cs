@@ -40,11 +40,11 @@ namespace Colour_Event_Inject
                 writer.InitTrack();
                 long prevtime = 0;
                 double hue = i * 60;
-                int d = 40;
+                int d = 3;
                 filter.MidiEventFilter = (byte[] dtimeb, int dtime, byte[] data, long time) =>
                 {
-                    //byte[] e = new byte[] { 0xFF, 0x7F, 0x08, 0x00, 0x0F, 0x7F, 0x00, 0x00, 0x00, 0x00, 0xFF };
-                    byte[] e = new byte[] { 0xFF, 0x0A, 0x0C, 0x00, 0x0F, 0x7F, 0x00, 0x00, 0x00, 0x00, 0xFF, 0x00, 0x00, 0x00, 0xFF };
+                    byte[] e = new byte[] { 0xFF, 0x0A, 0x08, 0x00, 0x0F, 0x7F, 0x00, 0x00, 0x00, 0x00, 0xFF };
+                    //byte[] e = new byte[] { 0xFF, 0x0A, 0x0C, 0x00, 0x0F, 0x7F, 0x00, 0x00, 0x00, 0x00, 0xFF, 0x00, 0x00, 0x00, 0xFF };
                     if (time - prevtime > d)
                     {
                         List<byte> o = new List<byte>();
@@ -60,12 +60,12 @@ namespace Colour_Event_Inject
                             e[7] = (byte)r;
                             e[8] = (byte)g;
                             e[9] = (byte)b;
-                            HsvToRgb(hue + 60, 1, 1, out r, out g, out b);
-                            hue += 1;
-                            hue = hue % 360;
-                            e[11] = (byte)r;
-                            e[12] = (byte)g;
-                            e[13] = (byte)b;
+                            //HsvToRgb(hue + 60, 1, 1, out r, out g, out b);
+                            //hue += 1;
+                            //hue = hue % 360;
+                            //e[11] = (byte)r;
+                            //e[12] = (byte)g;
+                            //e[13] = (byte)b;
                             o.AddRange(filter.MakeVariableLen(delta));
                             o.AddRange(e);
                             start += delta;
