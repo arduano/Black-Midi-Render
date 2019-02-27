@@ -16,18 +16,9 @@ namespace Black_Midi_Render
         [STAThread]
         static void Main(string[] args)
         {
-            //var DLL = Assembly.LoadFile(Path.GetFullPath("Plugins\\ClassicRender.dll"));
-            //foreach (Type type in DLL.GetExportedTypes())
-            //{
-            //    dynamic c = Activator.CreateInstance(type);
-            //    c.HelloWorld("asdf");
-            //}
             Console.Title = "Black Midi Render";
             Application app = new Application();
             app.Run(new MainWindow());
-            //Application.EnableVisualStyles();
-            //Application.SetCompatibleTextRenderingDefault(false);
-            //Application.Run(new SettingsForm());
         }
     }
 }

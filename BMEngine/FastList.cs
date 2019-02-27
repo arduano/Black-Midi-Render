@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Black_Midi_Render
+namespace BMEngine
 {
     public class FastList<T> : IEnumerable
     {

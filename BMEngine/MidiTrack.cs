@@ -6,9 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 using MidiUtils;
 
-namespace Black_Midi_Render
+namespace BMEngine
 {
-    class Note
+    public class Note
     {
         public long start;
         public long end;
@@ -19,13 +19,13 @@ namespace Black_Midi_Render
         public MidiTrack track;
     }
 
-    class Tempo
+    public class Tempo
     {
         public long pos;
         public int tempo;
     }
 
-    class ColorChange
+    public class ColorChange
     {
         public long pos;
         public Color4 col1;
@@ -34,7 +34,7 @@ namespace Black_Midi_Render
         public MidiTrack track;
     }
 
-    class MidiTrack : IDisposable
+    public class MidiTrack : IDisposable
     {
         public int trackID;
 

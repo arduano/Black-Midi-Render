@@ -197,6 +197,11 @@
                     <Label Content="Right click slider or press space to toggle pause" HorizontalAlignment="Left" Margin="10,56,0,0" VerticalAlignment="Top"/>
                 </Grid>
             </TabItem>
+            <TabItem Header="Plugins">
+                <Grid Background="#FFE5E5E5" Name="pluginsSettings">
+                    
+                </Grid>
+            </TabItem>
         </TabControl>
 
     </Grid>

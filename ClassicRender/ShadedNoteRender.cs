@@ -8,9 +8,9 @@ using BMEngine;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 
-namespace Black_Midi_Render
+namespace ClassicRender
 {
-    class ShadedNoteRender : INoteRender
+    class ShadedNoteRender
     {
         RenderSettings settings;
 

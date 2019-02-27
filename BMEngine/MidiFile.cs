@@ -5,12 +5,11 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 using MidiUtils;
 
-namespace Black_Midi_Render
+namespace BMEngine
 {
-    class MidiFile : IDisposable
+    public class MidiFile : IDisposable
     {
         Stream MidiFileReader;
         public ushort division;

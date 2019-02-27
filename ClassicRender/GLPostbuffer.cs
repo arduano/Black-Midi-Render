@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using BMEngine;
 using OpenTK.Graphics.OpenGL;
 
-namespace Black_Midi_Render
+namespace ClassicRender
 {
     class GLPostbuffer
     {

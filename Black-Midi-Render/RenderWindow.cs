@@ -6,11 +6,13 @@ using System.Drawing;
 using System.IO;
 using System.IO.Pipes;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using BMEngine;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
@@ -79,9 +81,29 @@ namespace Black_Midi_Render
         {
             base.OnResize(e);
         }
-
+        
+        dynamic render;
         public RenderWindow(MidiFile midi, RenderSettings settings) : base((int)(DisplayDevice.Default.Width / 1.5), (int)(DisplayDevice.Default.Height / 1.5), new GraphicsMode(new ColorFormat(8, 8, 8, 8)), "Render", GameWindowFlags.Default, DisplayDevice.Default)
         {
+            var DLL = Assembly.LoadFile(System.IO.Path.GetFullPath("Plugins\\ClassicRender.dll"));
+            foreach (Type type in DLL.GetExportedTypes())
+            {
+                if(type.Name == "Render")
+                {
+                    render = Activator.CreateInstance(type, new object[] { settings });
+                }
+                //if (type.Name == "Settings")
+                //{
+                    //Control c = (Control)Activator.CreateInstance(type);
+                    //pluginsSettings.Children.Add(c);
+                    //c.Margin = new Thickness(0);
+                    //c.VerticalAlignment = VerticalAlignment.Top;
+                    //c.HorizontalAlignment = HorizontalAlignment.Left;
+                //}
+                //dynamic c = Activator.CreateInstance(type);
+                //c.HelloWorld();
+            }
+
             this.settings = settings;
             midiTime = -settings.deltaTimeOnScreen;
             pixels = new byte[settings.width * settings.height * 4];
@@ -161,8 +183,8 @@ namespace Black_Midi_Render
             glowShader = GLUtils.MakePostShaderProgram("glow");
             BindUniforms();
 
-            noteRender = settings.GetNoteRenderer();
-            keyboardRender = settings.GetKeyboardRenderer();
+            noteRender = new ShadedNoteRender(settings);
+            keyboardRender = new NewKeyboardRender(settings);
         }
         INoteRender noteRender;
         IKeyboardRender keyboardRender;
@@ -176,89 +198,10 @@ namespace Black_Midi_Render
             {
                 SpinWait.SpinUntil(() => midi.currentSyncTime > midiTime + tempoFrameStep || midi.unendedTracks == 0 || !settings.running);
                 if (!settings.running) break;
-
-                if(ntrender != settings.ntrender)
-                {
-                    noteRender.Dispose();
-                    noteRender = settings.GetNoteRenderer();
-                    ntrender = settings.ntrender;
-                }
-                if(kbrender != settings.kbrender)
-                {
-                    keyboardRender.Dispose();
-                    keyboardRender = settings.GetKeyboardRenderer();
-                    kbrender = settings.kbrender;
-                }
-
-                GL.Enable(EnableCap.LineSmooth);
-                GL.Enable(EnableCap.Blend);
-                GL.EnableClientState(ArrayCap.VertexArray);
-                GL.EnableClientState(ArrayCap.ColorArray);
-                GL.Enable(EnableCap.Texture2D);
-
-                GL.EnableVertexAttribArray(0);
-                GL.EnableVertexAttribArray(1);
-                GL.EnableVertexAttribArray(2);
-
-                GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
-                GL.LineWidth(1);
-
+                
                 if (!settings.paused || settings.forceReRender)
                 {
-                    baseRenderBuff.BindBuffer();
-                    GL.Viewport(0, 0, settings.width, settings.height);
-                    GL.Clear(ClearBufferMask.ColorBufferBit);
-
-
-                    settings.ResetVariableState();
-                    nc = noteRender.Render(globalDisplayNotes, midiTime);
-                    keyboardRender.Render();
-
-                    if (settings.glowEnabled)
-                    {
-                        GL.UseProgram(glowShader);
-                        glowMaskFirstPassBuff.BindBuffer();
-                        GL.Viewport(0, 0, settings.width, settings.height);
-                        GL.Clear(ClearBufferMask.ColorBufferBit);
-
-                        GL.Uniform1(glowTextureSize_var, (float)settings.width);
-                        GL.Uniform1(glowStrength_var, 10f);
-                        GL.Uniform1(glowSigma_var, 1f);
-                        GL.Uniform1(glowWidth_var, settings.glowRadius);
-                        GL.Uniform1(glowPass_var, 0);
-
-                        baseRenderBuff.BindTexture();
-                        DrawScreenQuad();
-
-                        glowMaskSecondPassBuff.BindBuffer();
-                        GL.Viewport(0, 0, settings.width, settings.height);
-                        GL.Clear(ClearBufferMask.ColorBufferBit);
-                        GL.Uniform1(glowPass_var, 1);
-                        GL.Uniform1(glowTextureSize_var, (float)settings.height);
-
-                        glowMaskFirstPassBuff.BindTexture();
-                        DrawScreenQuad();
-
-                        finalCompositeBuff.BindBuffer();
-                        GL.Viewport(0, 0, settings.width, settings.height);
-                        GL.Clear(ClearBufferMask.ColorBufferBit);
-
-                        GL.UseProgram(postShader);
-                        glowMaskSecondPassBuff.BindTexture();
-                        DrawScreenQuad();
-                        baseRenderBuff.BindTexture();
-                        DrawScreenQuad();
-                    }
-                    else
-                    {
-                        finalCompositeBuff.BindBuffer();
-                        GL.Viewport(0, 0, settings.width, settings.height);
-                        GL.Clear(ClearBufferMask.ColorBufferBit);
-
-                        GL.UseProgram(postShader);
-                        baseRenderBuff.BindTexture();
-                        DrawScreenQuad();
-                    }
+                    render.RenderFrame(globalDisplayNotes, midiTime, finalCompositeBuff.BufferID);
                 }
                 double mv = 1;
                 lock (globalTempoEvents)
