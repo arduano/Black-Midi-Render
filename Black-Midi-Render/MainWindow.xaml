@@ -134,8 +134,8 @@
             <TabItem Header="Plugins" IsEnabled="{DynamicResource notRendering}">
                 <Grid Background="#FFE5E5E5">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="229*"/>
-                        <RowDefinition Height="146*"/>
+                        <RowDefinition Height="56*"/>
+                        <RowDefinition Height="19*"/>
                     </Grid.RowDefinitions>
                     <ListBox Name="pluginsList" HorizontalAlignment="Left" Margin="10,35,0,10" Width="174" Grid.RowSpan="2" SelectionChanged="PluginsList_SelectionChanged"/>
                     <Button Name="reloadButton" Content="Reload" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="174" Height="20" Click="ReloadButton_Click"/>

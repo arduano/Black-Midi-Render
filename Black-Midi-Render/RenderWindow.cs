@@ -230,7 +230,6 @@ namespace Black_Midi_Render
                 if(settings.ffRender) VSync = VSyncMode.Off;
                 else if (settings.vsync) VSync = VSyncMode.On;
                 else VSync = VSyncMode.Off;
-
                 try
                 {
                     SwapBuffers();

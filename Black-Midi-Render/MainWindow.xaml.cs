@@ -204,6 +204,7 @@ namespace Black_Midi_Render
 
         void SelectRenderer(int id)
         {
+            if (id == -1) return;
             pluginsList.SelectedIndex = id;
             renderer.renderer = RenderPlugins[id];
             previewImage.Source = renderer.renderer.PreviewImage;
