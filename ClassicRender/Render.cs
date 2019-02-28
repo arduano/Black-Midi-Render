@@ -76,10 +76,6 @@ void main()
         RenderSettings settings;
         
         public long LastNoteCount { get; private set; }
-        
-        GLPostbuffer baseRenderBuff;
-
-        int postShader;
 
         int noteShader;
 
@@ -111,10 +107,6 @@ void main()
         
         public void Init()
         {
-            postShader = GLUtils.MakePostShaderProgram("post");
-
-            baseRenderBuff = new GLPostbuffer(settings);
-
             int _vertexObj = GL.CreateShader(ShaderType.VertexShader);
             int _fragObj = GL.CreateShader(ShaderType.FragmentShader);
             int statusCode;
@@ -196,7 +188,7 @@ void main()
             GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
             GL.LineWidth(1);
 
-            baseRenderBuff.BindBuffer();
+            GL.BindFramebuffer(FramebufferTarget.Framebuffer, finalCompositeBuff);
             GL.Viewport(0, 0, settings.width, settings.height);
             GL.Clear(ClearBufferMask.ColorBufferBit);
 
@@ -730,24 +722,6 @@ void main()
             }
             FlushQuadBuffer(false);
             #endregion
-
-            GL.BindFramebuffer(FramebufferTarget.Framebuffer, finalCompositeBuff);
-            GL.Viewport(0, 0, settings.width, settings.height);
-            GL.Clear(ClearBufferMask.ColorBufferBit);
-
-            GL.UseProgram(postShader);
-            baseRenderBuff.BindTexture();
-            DrawScreenQuad();
-        }
-
-        void DrawScreenQuad()
-        {
-            GL.Begin(PrimitiveType.Quads);
-            GL.Vertex2(0, 0);
-            GL.Vertex2(1, 0);
-            GL.Vertex2(1, 1);
-            GL.Vertex2(0, 1);
-            GL.End();
         }
 
         void FlushQuadBuffer(bool check = true)
