@@ -43,6 +43,35 @@ namespace ClassicRender
         public ImageSource PreviewImage { get; private set; }
         #endregion
 
+        #region Shaders
+        string noteShaderVert = @"#version 330 core
+
+layout(location = 0) in vec3 position;
+layout(location = 1) in vec4 glColor;
+layout(location = 2) in vec2 attrib;
+
+out vec4 color;
+
+void main()
+{
+    gl_Position = vec4(position.x * 2 - 1, position.y * 2 - 1, 1.0f, 1.0f);
+    color = vec4(glColor.xyz + attrib.x, glColor.w);
+}
+";
+        string noteShaderFrag = @"#version 330
+ 
+in vec4 color;
+ 
+out vec4 outputF;
+layout(location = 0) out vec4 texOut;
+
+void main()
+{
+    outputF = color;
+	texOut = outputF;
+}
+";
+        #endregion
 
         RenderSettings settings;
         
@@ -86,7 +115,27 @@ namespace ClassicRender
 
             baseRenderBuff = new GLPostbuffer(settings);
 
-            noteShader = GLUtils.MakeShaderProgram("notes");
+            int _vertexObj = GL.CreateShader(ShaderType.VertexShader);
+            int _fragObj = GL.CreateShader(ShaderType.FragmentShader);
+            int statusCode;
+            string info;
+
+            GL.ShaderSource(_vertexObj, noteShaderVert);
+            GL.CompileShader(_vertexObj);
+            info = GL.GetShaderInfoLog(_vertexObj);
+            GL.GetShader(_vertexObj, ShaderParameter.CompileStatus, out statusCode);
+            if (statusCode != 1) throw new ApplicationException(info);
+
+            GL.ShaderSource(_fragObj, noteShaderFrag);
+            GL.CompileShader(_fragObj);
+            info = GL.GetShaderInfoLog(_fragObj);
+            GL.GetShader(_fragObj, ShaderParameter.CompileStatus, out statusCode);
+            if (statusCode != 1) throw new ApplicationException(info);
+
+            noteShader = GL.CreateProgram();
+            GL.AttachShader(noteShader, _fragObj);
+            GL.AttachShader(noteShader, _vertexObj);
+            GL.LinkProgram(noteShader);
 
             quadVertexbuff = new double[quadBufferLength * 8];
             quadColorbuff = new float[quadBufferLength * 16];
