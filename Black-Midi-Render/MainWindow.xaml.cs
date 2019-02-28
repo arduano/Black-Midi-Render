@@ -204,8 +204,8 @@ namespace Black_Midi_Render
 
         void SelectRenderer(int id)
         {
-            pluginsList.SelectedIndex = 0;
-            renderer.renderer = RenderPlugins[0];
+            pluginsList.SelectedIndex = id;
+            renderer.renderer = RenderPlugins[id];
             previewImage.Source = renderer.renderer.PreviewImage;
             pluginDescription.Text = renderer.renderer.Description;
         }
@@ -436,6 +436,15 @@ namespace Black_Midi_Render
         private void ReloadButton_Click(object sender, RoutedEventArgs e)
         {
             ReloadPlugins();
+        }
+
+        private void PluginsList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            foreach (var p in RenderPlugins)
+            {
+                if (p.Initialized) renderer.disposeQueue.Enqueue(p);
+            }
+            SelectRenderer(pluginsList.SelectedIndex);
         }
     }
 

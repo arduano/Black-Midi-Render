@@ -54,14 +54,14 @@
     <Compile Include="RenderSettings.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="OpenTK.dll.config" />
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\MidiUtils\MidiUtils.csproj">
       <Project>{1a849712-b3e2-4ac5-b899-3a5aa3018f7a}</Project>
       <Name>MidiUtils</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="OpenTK.dll.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

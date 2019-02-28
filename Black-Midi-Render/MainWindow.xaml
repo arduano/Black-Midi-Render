@@ -137,7 +137,7 @@
                         <RowDefinition Height="229*"/>
                         <RowDefinition Height="146*"/>
                     </Grid.RowDefinitions>
-                    <ListBox Name="pluginsList" HorizontalAlignment="Left" Margin="10,35,0,10" Width="174" Grid.RowSpan="2"/>
+                    <ListBox Name="pluginsList" HorizontalAlignment="Left" Margin="10,35,0,10" Width="174" Grid.RowSpan="2" SelectionChanged="PluginsList_SelectionChanged"/>
                     <Button Name="reloadButton" Content="Reload" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="174" Height="20" Click="ReloadButton_Click"/>
                     <Image Name="previewImage" Margin="189,10,0,10" Stretch="Uniform"/>
                     <TextBox Name="pluginDescription" Margin="189,0,10,10" Grid.Row="1" TextWrapping="Wrap" IsEnabled="False"/>
