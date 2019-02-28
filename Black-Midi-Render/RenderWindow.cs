@@ -42,74 +42,28 @@ namespace Black_Midi_Render
         public double midiTime = 0;
         public double tempoFrameStep = 10;
 
-        Color4[] keyColors = new Color4[256];
-
         Process ffmpeg = new Process();
         long imgnumber = 0;
         Task lastRenderPush = null;
 
         GLPostbuffer finalCompositeBuff;
-        GLPostbuffer baseRenderBuff;
-        GLPostbuffer glowMaskFirstPassBuff;
-        GLPostbuffer glowMaskSecondPassBuff;
 
         int postShader;
-        int glowShader;
-        int defaultShader;
 
         byte[] pixels;
-
-        int glowTextureSize_var;
-        int glowWidth_var;
-        int glowSigma_var;
-        int glowStrength_var;
-        int glowPass_var;
-
-        KeyboardRenderers kbrender;
-        NoteRenderers ntrender;
-
-        void BindUniforms()
-        {
-            glowTextureSize_var = GL.GetUniformLocation(glowShader, "u_textureSize");
-            glowSigma_var = GL.GetUniformLocation(glowShader, "u_sigma");
-            glowWidth_var = GL.GetUniformLocation(glowShader, "u_width");
-            glowPass_var = GL.GetUniformLocation(glowShader, "u_pass");
-            glowStrength_var = GL.GetUniformLocation(glowShader, "u_strength");
-        }
 
         protected override void OnResize(EventArgs e)
         {
             base.OnResize(e);
         }
         
-        dynamic render;
-        public RenderWindow(MidiFile midi, RenderSettings settings) : base((int)(DisplayDevice.Default.Width / 1.5), (int)(DisplayDevice.Default.Height / 1.5), new GraphicsMode(new ColorFormat(8, 8, 8, 8)), "Render", GameWindowFlags.Default, DisplayDevice.Default)
+        CurrentRendererPointer render;
+        public RenderWindow(CurrentRendererPointer renderer, MidiFile midi, RenderSettings settings) : base((int)(DisplayDevice.Default.Width / 1.5), (int)(DisplayDevice.Default.Height / 1.5), new GraphicsMode(new ColorFormat(8, 8, 8, 8)), "Render", GameWindowFlags.Default, DisplayDevice.Default)
         {
-            var DLL = Assembly.LoadFile(System.IO.Path.GetFullPath("Plugins\\ClassicRender.dll"));
-            foreach (Type type in DLL.GetExportedTypes())
-            {
-                if(type.Name == "Render")
-                {
-                    render = Activator.CreateInstance(type, new object[] { settings });
-                }
-                //if (type.Name == "Settings")
-                //{
-                    //Control c = (Control)Activator.CreateInstance(type);
-                    //pluginsSettings.Children.Add(c);
-                    //c.Margin = new Thickness(0);
-                    //c.VerticalAlignment = VerticalAlignment.Top;
-                    //c.HorizontalAlignment = HorizontalAlignment.Left;
-                //}
-                //dynamic c = Activator.CreateInstance(type);
-                //c.HelloWorld();
-            }
-
+            render = renderer;
             this.settings = settings;
             midiTime = -settings.deltaTimeOnScreen;
             pixels = new byte[settings.width * settings.height * 4];
-
-            kbrender = settings.kbrender;
-            ntrender = settings.ntrender;
 
             //WindowBorder = WindowBorder.Hidden;
             globalDisplayNotes = midi.globalDisplayNotes;
@@ -174,20 +128,8 @@ namespace Black_Midi_Render
             }
 
             finalCompositeBuff = new GLPostbuffer(settings);
-            baseRenderBuff = new GLPostbuffer(settings);
-            glowMaskFirstPassBuff = new GLPostbuffer(settings);
-            glowMaskSecondPassBuff = new GLPostbuffer(settings);
-
-            defaultShader = GLUtils.MakeShaderProgram("default");
             postShader = GLUtils.MakePostShaderProgram("post");
-            glowShader = GLUtils.MakePostShaderProgram("glow");
-            BindUniforms();
-
-            noteRender = new ShadedNoteRender(settings);
-            keyboardRender = new NewKeyboardRender(settings);
         }
-        INoteRender noteRender;
-        IKeyboardRender keyboardRender;
 
         protected override void OnRenderFrame(FrameEventArgs e)
         {
@@ -198,10 +140,23 @@ namespace Black_Midi_Render
             {
                 SpinWait.SpinUntil(() => midi.currentSyncTime > midiTime + tempoFrameStep || midi.unendedTracks == 0 || !settings.running);
                 if (!settings.running) break;
-                
+
                 if (!settings.paused || settings.forceReRender)
                 {
-                    render.RenderFrame(globalDisplayNotes, midiTime, finalCompositeBuff.BufferID);
+                    lock (render)
+                    {
+                        try
+                        {
+                            while (true)
+                            {
+                                var r = render.disposeQueue.Dequeue();
+                                if(!r.Initialized) r.Dispose();
+                            }
+                        }
+                        catch (InvalidOperationException) { }
+                        if (!render.renderer.Initialized) render.renderer.Init();
+                        render.renderer.RenderFrame(globalDisplayNotes, midiTime, finalCompositeBuff.BufferID);
+                    }
                 }
                 double mv = 1;
                 lock (globalTempoEvents)
@@ -270,7 +225,6 @@ namespace Black_Midi_Render
                 GL.Clear(ClearBufferMask.ColorBufferBit);
                 GL.Viewport(0, 0, Width, Height);
                 finalCompositeBuff.BindTexture();
-                //GL.ClearColor(1, 1, 1, 1);
                 DrawScreenQuad();
                 GLPostbuffer.UnbindTextures();
                 if(settings.ffRender) VSync = VSyncMode.Off;
@@ -299,6 +253,16 @@ namespace Black_Midi_Render
                 ffmpeg.StandardInput.Close();
                 ffmpeg.Close();
             }
+            try
+            {
+                while (true)
+                {
+                    var r = render.disposeQueue.Dequeue();
+                    if (!r.Initialized) r.Dispose();
+                }
+            }
+            catch (InvalidOperationException) { }
+            render.renderer.Dispose();
             this.Close();
         }
 

@@ -1,4 +1,5 @@
 ﻿using BMEngine;
+using Microsoft.CSharp.RuntimeBinder;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
@@ -21,14 +22,21 @@ using System.Windows.Shapes;
 
 namespace Black_Midi_Render
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
+    class CurrentRendererPointer
+    {
+        public Queue<IPluginRender> disposeQueue = new Queue<IPluginRender>();
+        public IPluginRender renderer = null;
+    }
+
     public partial class MainWindow : Window
     {
         RenderSettings settings;
         MidiFile midifile = null;
         string midipath = "";
+
+        List<IPluginRender> RenderPlugins = new List<IPluginRender>();
+
+        CurrentRendererPointer renderer = new CurrentRendererPointer();
 
         public MainWindow()
         {
@@ -51,6 +59,7 @@ namespace Black_Midi_Render
             screenTime.Content = settings.deltaTimeOnScreen;
             vsyncEnabled.IsChecked = settings.vsync;
             tempoSlider.Value = Math.Log(settings.tempoMultiplier, 2);
+            ReloadPlugins();
         }
 
         Task renderThread = null;
@@ -60,7 +69,7 @@ namespace Black_Midi_Render
             bool winStarted = false;
             Task winthread = new Task(() =>
             {
-                win = new RenderWindow(midifile, settings);
+                win = new RenderWindow(renderer, midifile, settings);
                 winStarted = true;
                 win.Run();
             });
@@ -120,6 +129,85 @@ namespace Black_Midi_Render
                 Resources["notRendering"] = true;
                 Resources["notPreviewing"] = true;
             });
+        }
+
+        void ReloadPlugins()
+        {
+            previewImage.Source = null;
+            pluginDescription.Text = "";
+            lock (renderer)
+            {
+                foreach (var p in RenderPlugins)
+                {
+                    if (p.Initialized) renderer.disposeQueue.Enqueue(p);
+                }
+                RenderPlugins.Clear();
+                var files = Directory.GetFiles("Plugins");
+                var dlls = files.Where((s) => s.EndsWith(".dll"));
+                foreach (var d in dlls)
+                {
+                    var DLL = Assembly.LoadFile(System.IO.Path.GetFullPath(d));
+                    bool hasClass = false;
+                    var name = System.IO.Path.GetFileName(d);
+                    try
+                    {
+                        foreach (Type type in DLL.GetExportedTypes())
+                        {
+                            if (type.Name == "Render")
+                            {
+                                hasClass = true;
+                                var instance = (IPluginRender)Activator.CreateInstance(type, new object[] { settings });
+                                RenderPlugins.Add(instance);
+                                Console.WriteLine("Loaded " + name);
+                            }
+                            //if (type.Name == "Settings")
+                            //{
+                            //Control c = (Control)Activator.CreateInstance(type);
+                            //pluginsSettings.Children.Add(c);
+                            //c.Margin = new Thickness(0);
+                            //c.VerticalAlignment = VerticalAlignment.Top;
+                            //c.HorizontalAlignment = HorizontalAlignment.Left;
+                            //}
+                            //dynamic c = Activator.CreateInstance(type);
+                            //c.HelloWorld();
+                        }
+                        if (!hasClass)
+                        {
+                            MessageBox.Show("Could not load " + name + "\nDoesn't have render class");
+                        }
+                    }
+                    catch (RuntimeBinderException)
+                    {
+                        MessageBox.Show("Could not load " + name + "\nA binding error occured");
+                    }
+                    catch (InvalidCastException)
+                    {
+                        MessageBox.Show("Could not load " + name + "\nThe Render class was not a compatible with the interface");
+                    }
+                    catch (Exception e)
+                    {
+                        MessageBox.Show("An error occured while binfing " + name + "\n" + e.Message);
+                    }
+                }
+
+                pluginsList.Items.Clear();
+                for (int i = 0; i < RenderPlugins.Count; i++)
+                {
+                    pluginsList.Items.Add(new ListBoxItem() { Content = RenderPlugins[i].Name });
+                }
+                if (RenderPlugins.Count != 0)
+                {
+                    SelectRenderer(0);
+                }
+            }
+        }
+
+        void SelectRenderer(int id)
+        {
+            pluginsList.SelectedIndex = 0;
+            renderer.renderer = RenderPlugins[0];
+            previewImage.Source = renderer.renderer.PreviewImage;
+            pluginDescription.Text = renderer.renderer.Description;
         }
 
         private void BrowseMidiButton_Click(object sender, RoutedEventArgs e)
@@ -203,7 +291,7 @@ namespace Black_Midi_Render
 
         private void StartRenderButton_Click(object sender, RoutedEventArgs e)
         {
-            if(videoPath.Text == "")
+            if (videoPath.Text == "")
             {
                 MessageBox.Show("Please specify a destination path");
                 return;
@@ -282,7 +370,7 @@ namespace Black_Midi_Render
 
         private void ForceReRender_Checked(object sender, RoutedEventArgs e)
         {
-            settings.forceReRender= (bool)forceReRender.IsChecked;
+            settings.forceReRender = (bool)forceReRender.IsChecked;
         }
 
         private void ClickDebug_Checked(object sender, RoutedEventArgs e)
@@ -292,7 +380,7 @@ namespace Black_Midi_Render
 
         private void TempoSlider_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            if(e.RightButton == MouseButtonState.Pressed)
+            if (e.RightButton == MouseButtonState.Pressed)
             {
                 previewPaused.IsChecked = !settings.paused;
                 settings.paused = (bool)previewPaused.IsChecked;
@@ -301,7 +389,7 @@ namespace Black_Midi_Render
 
         private void Grid_KeyDown(object sender, KeyEventArgs e)
         {
-            if(e.Key == Key.Space)
+            if (e.Key == Key.Space)
             {
                 previewPaused.IsChecked = !settings.paused;
                 settings.paused = (bool)previewPaused.IsChecked;
@@ -343,6 +431,11 @@ namespace Black_Midi_Render
             {
 
             }
+        }
+
+        private void ReloadButton_Click(object sender, RoutedEventArgs e)
+        {
+            ReloadPlugins();
         }
     }
 

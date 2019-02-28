@@ -18,7 +18,6 @@ namespace Black_Midi_Render
 
         int vertexBufferID;
         int colorBufferID;
-        int attrib1BufferID;
 
         int quadBufferLength = 2048 * 2;
         double[] quadVertexbuff;
@@ -30,7 +29,7 @@ namespace Black_Midi_Render
 
         public void Dispose()
         {
-            GL.DeleteBuffers(3, new int[] { vertexBufferID, colorBufferID, attrib1BufferID });
+            GL.DeleteBuffers(3, new int[] { vertexBufferID, colorBufferID });
         }
 
         public FlatKeyboardRender(RenderSettings rendersettings)

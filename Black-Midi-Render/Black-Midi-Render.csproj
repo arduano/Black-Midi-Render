@@ -95,9 +95,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="App.xaml.cs">
-      <DependentUpon>App.xaml</DependentUpon>
-    </Compile>
     <Compile Include="GLPostbuffer.cs" />
     <Compile Include="GLUtils.cs" />
     <Compile Include="MainWindow.xaml.cs">
@@ -172,12 +169,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ApplicationDefinition Include="App.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </ApplicationDefinition>
-  </ItemGroup>
-  <ItemGroup>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -216,4 +207,9 @@
     <Move SourceFiles="@(MoveToLibFolder)" DestinationFolder="$(OutputPath)lib" OverwriteReadOnlyFiles="true" />
     <Move SourceFiles="@(PluginPdbs)" DestinationFolder="$(OutputPath)debug" OverwriteReadOnlyFiles="true" />
   </Target>
+  <PropertyGroup>
+    <PostBuildEvent>del Plugins\OpenTK.dll
+del Plugins\BMEngine.dll
+del Plugins\MidiUtils.dll</PostBuildEvent>
+  </PropertyGroup>
 </Project>

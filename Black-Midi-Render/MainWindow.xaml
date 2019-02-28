@@ -71,7 +71,7 @@
             </Grid.IsEnabled>
         </Grid>
         <TabControl>
-            <TabItem Header="Midi I/O">
+            <TabItem Header="Midi I/O" IsEnabled="{DynamicResource notRendering}">
                 <Grid Background="#FFE5E5E5">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition/>
@@ -99,57 +99,6 @@
                     <Button Content="Start Preview" HorizontalAlignment="Left" Margin="10,0,0,10" Width="98" IsEnabled="{Binding ElementName=previewStartEnabled, Path=IsEnabled}" Height="20" VerticalAlignment="Bottom" Click="StartButton_Click" />
                     <Button Content="Stop" HorizontalAlignment="Left" Margin="113,0,0,10" Width="75" IsEnabled="{Binding ElementName=stopEnabled, Path=IsEnabled}" Height="20" VerticalAlignment="Bottom" Click="StopButton_Click" />
                     <Label Content="Render" HorizontalAlignment="Left" Margin="10,158,0,0" VerticalAlignment="Top"/>
-                    <Button x:Name="browseVideoSaveButton" Content="Browse" HorizontalAlignment="Left" Margin="76,187,0,0" VerticalAlignment="Top" Width="75" IsEnabled="{DynamicResource notRendering}" Click="BrowseVideoSaveButton_Click"/>
-                    <Label Content="Save Path" HorizontalAlignment="Left" Margin="10,184,0,0" VerticalAlignment="Top"/>
-                    <TextBox x:Name="videoPath" Height="19" Margin="156,188,10,0" IsEnabled="False" TextWrapping="Wrap" Text="" VerticalAlignment="Top"/>
-                    <CheckBox x:Name="includeAudio" Content="Include Audio" HorizontalAlignment="Left" Margin="10,215,0,0" VerticalAlignment="Top" IsEnabled="{DynamicResource notRendering}"/>
-                    <Button x:Name="browseAudioButton" Content="Browse" HorizontalAlignment="Left" Margin="108,212,0,0" VerticalAlignment="Top" Width="75" Click="BrowseAudioButton_Click" >
-                        <Button.IsEnabled>
-                            <MultiBinding Converter="{StaticResource AndValueConverter}">
-                                <Binding ElementName="includeAudio" Path="IsChecked" />
-                                <Binding ElementName="notRendering" Path="IsEnabled"/>
-                            </MultiBinding>
-                        </Button.IsEnabled>
-                    </Button>
-                    <TextBox x:Name="audioPath" Height="19" Margin="188,212,10,0" IsEnabled="False" TextWrapping="Wrap" Text="" VerticalAlignment="Top"/>
-                    <Button x:Name="startRenderButton" Content="Start Render" HorizontalAlignment="Left" Margin="10,304,0,0" VerticalAlignment="Top" Width="94" Click="StartRenderButton_Click"  IsEnabled="{Binding ElementName=previewStartEnabled, Path=IsEnabled}"/>
-                    <RadioButton Name="bitrateOption" Content="Bitrate" HorizontalAlignment="Left" Margin="10,242,0,0" VerticalAlignment="Top" IsChecked="True"/>
-                    <RadioButton Name="crfOption" Content="crf" HorizontalAlignment="Left" Margin="10,274,0,0" VerticalAlignment="Top"/>
-                    <xctk:DecimalUpDown x:Name="bitrate" FormatString="F0" Value="20000" Increment="1"  Maximum="1000000" Minimum="1" Margin="68,237,0,0" HorizontalAlignment="Left" Width="118" Height="26" VerticalAlignment="Top" >
-                        <xctk:DecimalUpDown.IsEnabled>
-                            <MultiBinding Converter="{StaticResource AndValueConverter}">
-                                <Binding ElementName="bitrateOption" Path="IsChecked" />
-                                <Binding ElementName="notRendering" Path="IsEnabled"/>
-                            </MultiBinding>
-                        </xctk:DecimalUpDown.IsEnabled>
-                    </xctk:DecimalUpDown>
-                    <xctk:DecimalUpDown x:Name="crfFactor" FormatString="F0" Value="17" Increment="1"  Maximum="51" Minimum="0" Margin="47,268,0,0" HorizontalAlignment="Left" Width="64" Height="26" VerticalAlignment="Top" >
-                        <xctk:DecimalUpDown.IsEnabled>
-                            <MultiBinding Converter="{StaticResource AndValueConverter}">
-                                <Binding ElementName="crfOption" Path="IsChecked" />
-                                <Binding ElementName="notRendering" Path="IsEnabled"/>
-                            </MultiBinding>
-                        </xctk:DecimalUpDown.IsEnabled>
-                    </xctk:DecimalUpDown>
-                    <ComboBox x:Name="crfPreset" HorizontalAlignment="Left" Margin="116,268,0,0" VerticalAlignment="Top" Width="122" Height="26" SelectedIndex="5">
-                        <ComboBox.IsEnabled>
-                            <MultiBinding Converter="{StaticResource AndValueConverter}">
-                                <Binding ElementName="crfOption" Path="IsChecked" />
-                                <Binding ElementName="notRendering" Path="IsEnabled"/>
-                            </MultiBinding>
-                        </ComboBox.IsEnabled>
-                        <ComboBoxItem Content="ultrafast"/>
-                        <ComboBoxItem Content="superfast"/>
-                        <ComboBoxItem Content="veryfast"/>
-                        <ComboBoxItem Content="faster"/>
-                        <ComboBoxItem Content="fast"/>
-                        <ComboBoxItem Content="medium"/>
-                        <ComboBoxItem Content="slow"/>
-                        <ComboBoxItem Content="slower"/>
-                        <ComboBoxItem Content="veryslow"/>
-                    </ComboBox>
-                    <Label Content="FFMPEG crf: 0 = lossless, 51 = worst quality possible" HorizontalAlignment="Left" Margin="243,268,0,0" VerticalAlignment="Top"/>
-                    <Label Content="kbps" HorizontalAlignment="Left" Margin="191,237,0,0" VerticalAlignment="Top"/>
                 </Grid>
             </TabItem>
             <TabItem Header="Graphics" IsEnabled="{DynamicResource notRendering}">
@@ -182,7 +131,25 @@
 
                 </Grid>
             </TabItem>
-            <TabItem Header="Debug" IsEnabled="{DynamicResource notRendering}">
+            <TabItem Header="Plugins" IsEnabled="{DynamicResource notRendering}">
+                <Grid Background="#FFE5E5E5">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="229*"/>
+                        <RowDefinition Height="146*"/>
+                    </Grid.RowDefinitions>
+                    <ListBox Name="pluginsList" HorizontalAlignment="Left" Margin="10,35,0,10" Width="174" Grid.RowSpan="2"/>
+                    <Button Name="reloadButton" Content="Reload" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="174" Height="20" Click="ReloadButton_Click"/>
+                    <Image Name="previewImage" Margin="189,10,0,10" Stretch="Uniform"/>
+                    <TextBox Name="pluginDescription" Margin="189,0,10,10" Grid.Row="1" TextWrapping="Wrap" IsEnabled="False"/>
+
+                </Grid>
+            </TabItem>
+            <TabItem Header="Plugin Settings" IsEnabled="{DynamicResource notRendering}">
+                <Grid Background="#FFE5E5E5" Name="pluginsSettings">
+
+                </Grid>
+            </TabItem>
+            <TabItem Header="Preview" IsEnabled="{DynamicResource notRendering}">
                 <Grid Background="#FFE5E5E5" KeyDown="Grid_KeyDown">
                     <CheckBox x:Name="vsyncEnabled" Content="V-Sync Enabled" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Checked="VsyncEnabled_Checked" Unchecked="VsyncEnabled_Checked" Focusable="False"/>
                     <CheckBox x:Name="previewPaused" Content="Preview Paused" HorizontalAlignment="Left" Margin="10,87,0,0" VerticalAlignment="Top" Checked="Paused_Checked" Unchecked="Paused_Checked"/>
@@ -197,12 +164,64 @@
                     <Label Content="Right click slider or press space to toggle pause" HorizontalAlignment="Left" Margin="10,56,0,0" VerticalAlignment="Top"/>
                 </Grid>
             </TabItem>
-            <TabItem Header="Plugins">
-                <Grid Background="#FFE5E5E5" Name="pluginsSettings">
-                    
+            <TabItem Header="Render">
+                <Grid Background="#FFE5E5E5">
+                    <Button x:Name="browseVideoSaveButton" Content="Browse" HorizontalAlignment="Left" Margin="78,13,0,0" VerticalAlignment="Top" Width="74" IsEnabled="{DynamicResource notRendering}" Click="BrowseVideoSaveButton_Click"/>
+                    <Label Content="Save Path" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
+                    <TextBox x:Name="videoPath" Height="18" Margin="158,15,8,0" IsEnabled="False" TextWrapping="Wrap" Text="" VerticalAlignment="Top"/>
+                    <CheckBox x:Name="includeAudio" Content="Include Audio" HorizontalAlignment="Left" Margin="10,41,0,0" VerticalAlignment="Top" IsEnabled="{DynamicResource notRendering}"/>
+                    <Button x:Name="browseAudioButton" Content="Browse" HorizontalAlignment="Left" Margin="110,39,0,0" VerticalAlignment="Top" Width="74" Click="BrowseAudioButton_Click" >
+                        <Button.IsEnabled>
+                            <MultiBinding Converter="{StaticResource AndValueConverter}">
+                                <Binding ElementName="includeAudio" Path="IsChecked" />
+                                <Binding ElementName="notRendering" Path="IsEnabled"/>
+                            </MultiBinding>
+                        </Button.IsEnabled>
+                    </Button>
+                    <TextBox x:Name="audioPath" Height="18" Margin="190,39,8,0" IsEnabled="False" TextWrapping="Wrap" Text="" VerticalAlignment="Top"/>
+                    <Button x:Name="startRenderButton" Content="Start Render" HorizontalAlignment="Left" Margin="10,126,0,0" VerticalAlignment="Top" Width="94" Click="StartRenderButton_Click"  IsEnabled="{Binding IsEnabled, ElementName=previewStartEnabled}"/>
+                    <RadioButton x:Name="bitrateOption" Content="Bitrate" HorizontalAlignment="Left" Margin="10,69,0,0" VerticalAlignment="Top" IsChecked="True"/>
+                    <RadioButton x:Name="crfOption" Content="crf" HorizontalAlignment="Left" Margin="10,101,0,0" VerticalAlignment="Top"/>
+                    <xctk:DecimalUpDown x:Name="bitrate" FormatString="F0" Value="20000" Increment="1"  Maximum="1000000" Minimum="1" Margin="70,63,0,0" HorizontalAlignment="Left" Width="118" Height="26" VerticalAlignment="Top" >
+                        <xctk:DecimalUpDown.IsEnabled>
+                            <MultiBinding Converter="{StaticResource AndValueConverter}">
+                                <Binding ElementName="bitrateOption" Path="IsChecked" />
+                                <Binding ElementName="notRendering" Path="IsEnabled"/>
+                            </MultiBinding>
+                        </xctk:DecimalUpDown.IsEnabled>
+                    </xctk:DecimalUpDown>
+                    <xctk:DecimalUpDown x:Name="crfFactor" FormatString="F0" Value="17" Increment="1"  Maximum="51" Minimum="0" Margin="48,95,0,0" HorizontalAlignment="Left" Width="64" Height="26" VerticalAlignment="Top" >
+                        <xctk:DecimalUpDown.IsEnabled>
+                            <MultiBinding Converter="{StaticResource AndValueConverter}">
+                                <Binding ElementName="crfOption" Path="IsChecked" />
+                                <Binding ElementName="notRendering" Path="IsEnabled"/>
+                            </MultiBinding>
+                        </xctk:DecimalUpDown.IsEnabled>
+                    </xctk:DecimalUpDown>
+                    <ComboBox x:Name="crfPreset" HorizontalAlignment="Left" Margin="118,95,0,0" VerticalAlignment="Top" Width="122" Height="26" SelectedIndex="5">
+                        <ComboBox.IsEnabled>
+                            <MultiBinding Converter="{StaticResource AndValueConverter}">
+                                <Binding ElementName="crfOption" Path="IsChecked" />
+                                <Binding ElementName="notRendering" Path="IsEnabled"/>
+                            </MultiBinding>
+                        </ComboBox.IsEnabled>
+                        <ComboBoxItem Content="ultrafast"/>
+                        <ComboBoxItem Content="superfast"/>
+                        <ComboBoxItem Content="veryfast"/>
+                        <ComboBoxItem Content="faster"/>
+                        <ComboBoxItem Content="fast"/>
+                        <ComboBoxItem Content="medium"/>
+                        <ComboBoxItem Content="slow"/>
+                        <ComboBoxItem Content="slower"/>
+                        <ComboBoxItem Content="veryslow"/>
+                    </ComboBox>
+                    <Label Content="FFMPEG crf: 0 = lossless, 51 = worst quality possible" HorizontalAlignment="Left" Margin="244,95,0,0" VerticalAlignment="Top"/>
+                    <Label Content="kbps" HorizontalAlignment="Left" Margin="192,63,0,0" VerticalAlignment="Top"/>
+
                 </Grid>
             </TabItem>
         </TabControl>
+
 
     </Grid>
 </Window>
