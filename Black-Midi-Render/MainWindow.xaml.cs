@@ -51,12 +51,6 @@ namespace Black_Midi_Render
             viewWidth.Value = settings.width;
             viewHeight.Value = settings.height;
             viewFps.Value = settings.fps;
-            firstNote.Value = settings.firstNote;
-            lastNote.Value = settings.lastNote - 1;
-            pianoHeight.Value = (int)(settings.pianoHeight * 100);
-            noteBrightness.Value = (decimal)settings.noteBrightness;
-            noteDeltaScreenTime.Value = settings.deltaTimeOnScreen;
-            screenTime.Content = settings.deltaTimeOnScreen;
             vsyncEnabled.IsChecked = settings.vsync;
             tempoSlider.Value = Math.Log(settings.tempoMultiplier, 2);
             ReloadPlugins();
@@ -93,7 +87,8 @@ namespace Black_Midi_Render
                     lock (midifile.globalDisplayNotes)
                     {
                         var i = midifile.globalDisplayNotes.Iterate();
-                        double cutoffTime = win.midiTime - settings.deltaTimeOnScreen;
+                        double cutoffTime = 0;
+                        cutoffTime = win.midiTime - win.lastDeltaTimeOnScreen;
                         while (i.MoveNext(out n))
                         {
                             if (n.hasEnded && n.end < cutoffTime)
@@ -101,11 +96,14 @@ namespace Black_Midi_Render
                             else nc++;
                         }
                     }
-                    Console.WriteLine(
-                        Math.Round((double)time / midifile.maxTrackTime * 10000) / 100 + "%\tNotes loaded: " + nc +
-                        "\tNotes drawn: " + settings.notesOnScreen +
-                        "\tRender FPS: " + Math.Round(settings.liveFps) + "        "
-                        );
+                    lock (renderer)
+                    {
+                        Console.WriteLine(
+                            Math.Round((double)time / midifile.maxTrackTime * 10000) / 100 + "%\tNotes loaded: " + nc +
+                            "\tNotes drawn: " + renderer.renderer.LastNoteCount +
+                            "\tRender FPS: " + Math.Round(settings.liveFps) + "        "
+                            );
+                    }
                     long ram = Process.GetCurrentProcess().PrivateMemorySize64;
                     if (maxRam < ram) maxRam = ram;
                     avgRam = (long)((double)avgRam * ramSample + ram) / (ramSample + 1);
@@ -160,16 +158,6 @@ namespace Black_Midi_Render
                                 RenderPlugins.Add(instance);
                                 Console.WriteLine("Loaded " + name);
                             }
-                            //if (type.Name == "Settings")
-                            //{
-                            //Control c = (Control)Activator.CreateInstance(type);
-                            //pluginsSettings.Children.Add(c);
-                            //c.Margin = new Thickness(0);
-                            //c.VerticalAlignment = VerticalAlignment.Top;
-                            //c.HorizontalAlignment = HorizontalAlignment.Left;
-                            //}
-                            //dynamic c = Activator.CreateInstance(type);
-                            //c.HelloWorld();
                         }
                         if (!hasClass)
                         {
@@ -204,11 +192,25 @@ namespace Black_Midi_Render
 
         void SelectRenderer(int id)
         {
-            if (id == -1) return;
+            (pluginsSettings as Panel).Children.Clear();
+            if (id == -1)
+            {
+                renderer.renderer = null;
+                return;
+            }
             pluginsList.SelectedIndex = id;
             renderer.renderer = RenderPlugins[id];
             previewImage.Source = renderer.renderer.PreviewImage;
             pluginDescription.Text = renderer.renderer.Description;
+
+            var c = renderer.renderer.SettingsControl;
+            if (c == null) return;
+            if (c.Parent != null)
+                (c.Parent as Panel).Children.Clear();
+            pluginsSettings.Children.Add(c);
+            c.Margin = new Thickness(0);
+            c.VerticalAlignment = VerticalAlignment.Top;
+            c.HorizontalAlignment = HorizontalAlignment.Left;
         }
 
         private void BrowseMidiButton_Click(object sender, RoutedEventArgs e)
@@ -272,22 +274,6 @@ namespace Black_Midi_Render
         private void StopButton_Click(object sender, RoutedEventArgs e)
         {
             settings.running = false;
-        }
-
-        private void Nud_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
-        {
-            try
-            {
-                if (sender == firstNote) settings.firstNote = (int)firstNote.Value;
-                if (sender == lastNote) settings.lastNote = (int)lastNote.Value + 1;
-                if (sender == pianoHeight) settings.pianoHeight = (double)pianoHeight.Value / 100;
-                if (sender == noteBrightness) settings.noteBrightness = (float)noteBrightness.Value;
-                if (sender == noteDeltaScreenTime) settings.deltaTimeOnScreen = (int)noteDeltaScreenTime.Value;
-            }
-            catch (NullReferenceException)
-            {
-
-            }
         }
 
         private void StartRenderButton_Click(object sender, RoutedEventArgs e)
@@ -394,43 +380,6 @@ namespace Black_Midi_Render
             {
                 previewPaused.IsChecked = !settings.paused;
                 settings.paused = (bool)previewPaused.IsChecked;
-            }
-        }
-
-        private void PianoStyle_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            try
-            {
-                settings.kbrender = (KeyboardRenderers)pianoStyle.SelectedIndex;
-            }
-            catch (NullReferenceException)
-            {
-
-            }
-        }
-
-        private void NoteStyle_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            try
-            {
-                settings.ntrender = (NoteRenderers)noteStyle.SelectedIndex;
-            }
-            catch (NullReferenceException)
-            {
-
-            }
-        }
-
-        private void NoteDeltaScreenTime_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            try
-            {
-                settings.deltaTimeOnScreen = (int)noteDeltaScreenTime.Value;
-                screenTime.Content = settings.deltaTimeOnScreen;
-            }
-            catch (NullReferenceException)
-            {
-
             }
         }
 

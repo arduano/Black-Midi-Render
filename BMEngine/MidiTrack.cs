@@ -76,8 +76,8 @@ namespace BMEngine
             trkColor = new Color4[32];
             for (int i = 0; i < 16; i++)
             {
-                trkColor[i * 2] = Color4.FromHsv(new OpenTK.Vector4((trackID * 16 + i) * 1.36271f % 1, 1.0f, settings.noteBrightness, 1f));
-                trkColor[i * 2 + 1] = Color4.FromHsv(new OpenTK.Vector4((trackID * 16 + i) * 1.36271f % 1, 1.0f, settings.noteBrightness, 1f));
+                trkColor[i * 2] = Color4.Gray;//Color4.FromHsv(new OpenTK.Vector4((trackID * 16 + i) * 1.36271f % 1, 1.0f, 1, 1f));
+                trkColor[i * 2 + 1] = Color4.Gray;//Color4.FromHsv(new OpenTK.Vector4((trackID * 16 + i) * 1.36271f % 1, 1.0f, 1, 1f));
             }
         }
 

@@ -13,6 +13,8 @@ using System.Drawing;
 using System.Windows.Interop;
 using System.Windows;
 using System.IO;
+using System.Windows.Controls;
+using System.Diagnostics;
 
 namespace ClassicRender
 {
@@ -41,6 +43,8 @@ namespace ClassicRender
         public string Description { get; } = "The original graphics renderer with full rendering functionality and vibrant colours";
         public bool Initialized { get; private set; } = false;
         public ImageSource PreviewImage { get; private set; }
+
+        public int NoteScreenTime { get { return settings.deltaTimeOnScreen; } }
         #endregion
 
         #region Shaders
@@ -73,9 +77,12 @@ void main()
 ";
         #endregion
 
-        RenderSettings settings;
-        
+        RenderSettings renderSettings;
+        Settings settings;
+
         public long LastNoteCount { get; private set; }
+
+        public Control SettingsControl { get; private set; }
 
         int noteShader;
 
@@ -101,10 +108,12 @@ void main()
 
         public Render(RenderSettings settings)
         {
-            this.settings = settings;
+            this.settings = new Settings();
+            this.renderSettings = settings;
+            SettingsControl = new SettingsCtrl(this.settings);
             PreviewImage = BitmapToImageSource(Properties.Resources.preview);
         }
-        
+
         public void Init()
         {
             int _vertexObj = GL.CreateShader(ShaderType.VertexShader);
@@ -173,6 +182,18 @@ void main()
             Initialized = true;
         }
 
+        public void SetTrackColors(Color4[][] trakcs)
+        {
+            for (int i = 0; i < trakcs.Length; i++)
+            {
+                for (int j = 0; j < trakcs[i].Length / 2; j++)
+                {
+                    trakcs[i][j * 2] = Color4.FromHsv(new OpenTK.Vector4((i * 16 + i) * 1.36271f % 1, 1.0f, settings.noteBrightness, 1f));
+                    trakcs[i][j * 2 + 1] = Color4.FromHsv(new OpenTK.Vector4((i * 16 + i) * 1.36271f % 1, 1.0f, settings.noteBrightness, 1f));
+                }
+            }
+        }
+
         public void RenderFrame(FastList<Note> notes, double midiTime, int finalCompositeBuff)
         {
             GL.Enable(EnableCap.LineSmooth);
@@ -186,14 +207,14 @@ void main()
             GL.EnableVertexAttribArray(2);
 
             GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
-            GL.LineWidth(1);
+            GL.LineWidth(2);
 
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, finalCompositeBuff);
-            GL.Viewport(0, 0, settings.width, settings.height);
+            GL.Viewport(0, 0, renderSettings.width, renderSettings.height);
             GL.Clear(ClearBufferMask.ColorBufferBit);
 
 
-            settings.ResetVariableState();
+            renderSettings.ResetVariableState();
             GL.UseProgram(noteShader);
 
             #region Vars
@@ -202,7 +223,8 @@ void main()
             int lastNote = settings.lastNote;
             int deltaTimeOnScreen = settings.deltaTimeOnScreen;
             double pianoHeight = settings.pianoHeight;
-            Color4[] keyColors = settings.keyColors;
+            bool sameWidth = settings.sameWidthNotes;
+            Color4[] keyColors = renderSettings.keyColors;
             double wdth;
             float r, g, b, a, r2, g2, b2, a2, r3, g3, b3, a3;
             double y1;
@@ -213,94 +235,94 @@ void main()
             #endregion
 
             #region Notes
-            lock (notes)
+            quadBufferPos = 0;
+            foreach (Note n in notes)
             {
-                quadBufferPos = 0;
-                foreach (Note n in notes)
-                {
-                    double renderCutoff = midiTime - deltaTimeOnScreen;
-                    if (n.end >= renderCutoff || !n.hasEnded)
-                        if (n.start < midiTime)
+                double renderCutoff = midiTime - deltaTimeOnScreen;
+                if (n.end >= renderCutoff || !n.hasEnded)
+                    if (n.start < midiTime)
+                    {
+                        if (n.note >= firstNote && n.note < lastNote)
                         {
-                            if (n.note >= firstNote && n.note < lastNote)
+                            nc++;
+                            Color4 coll = n.track.trkColor[n.channel * 2];
+                            Color4 colr = n.track.trkColor[n.channel * 2 + 1];
+                            int k = n.note;
+                            if (n.start < renderCutoff)
                             {
-                                nc++;
-                                Color4 coll = n.track.trkColor[n.channel * 2];
-                                Color4 colr = n.track.trkColor[n.channel * 2 + 1];
-                                int k = n.note;
-                                if (n.start < renderCutoff)
-                                {
-                                    keyColors[k * 2] = coll;
-                                    keyColors[k * 2 + 1] = colr;
-                                }
-
-                                double x1;
-                                x1 = (float)(k - firstNote) / (lastNote - firstNote);
-                                wdth = 1.0f / (lastNote - firstNote);
-                                double x2 = x1 + wdth;
-
-                                y1 = 1 - (midiTime - n.end) / deltaTimeOnScreen * (1 - pianoHeight);
-                                y2 = 1 - (midiTime - n.start) / deltaTimeOnScreen * (1 - pianoHeight);
-                                if (!n.hasEnded)
-                                    y1 = 1;
-
-                                int pos = quadBufferPos * 8;
-                                quadVertexbuff[pos++] = x2;
-                                quadVertexbuff[pos++] = y2;
-                                quadVertexbuff[pos++] = x2;
-                                quadVertexbuff[pos++] = y1;
-                                quadVertexbuff[pos++] = x1;
-                                quadVertexbuff[pos++] = y1;
-                                quadVertexbuff[pos++] = x1;
-                                quadVertexbuff[pos++] = y2;
-
-                                pos = quadBufferPos * 16;
-                                r = coll.R;
-                                g = coll.G;
-                                b = coll.B;
-                                a = coll.A;
-                                quadColorbuff[pos++] = r;
-                                quadColorbuff[pos++] = g;
-                                quadColorbuff[pos++] = b;
-                                quadColorbuff[pos++] = a;
-                                quadColorbuff[pos++] = r;
-                                quadColorbuff[pos++] = g;
-                                quadColorbuff[pos++] = b;
-                                quadColorbuff[pos++] = a;
-                                r = colr.R;
-                                g = colr.G;
-                                b = colr.B;
-                                a = colr.A;
-                                quadColorbuff[pos++] = r;
-                                quadColorbuff[pos++] = g;
-                                quadColorbuff[pos++] = b;
-                                quadColorbuff[pos++] = a;
-                                quadColorbuff[pos++] = r;
-                                quadColorbuff[pos++] = g;
-                                quadColorbuff[pos++] = b;
-                                quadColorbuff[pos++] = a;
-
-                                pos = quadBufferPos * 8;
-                                quadAttribbuff[pos++] = -0.1;
-                                quadAttribbuff[pos++] = 0;
-                                quadAttribbuff[pos++] = 0.3;
-                                quadAttribbuff[pos++] = 0;
-                                quadAttribbuff[pos++] = -0.3;
-                                quadAttribbuff[pos++] = 0;
-                                quadAttribbuff[pos++] = 0.3;
-                                quadAttribbuff[pos++] = 0;
-
-                                quadBufferPos++;
-                                FlushQuadBuffer();
+                                keyColors[k * 2] = coll;
+                                keyColors[k * 2 + 1] = colr;
                             }
-                        }
-                        else break;
-                }
 
-                FlushQuadBuffer(false);
-                quadBufferPos = 0;
+                            double x1;
+                            x1 = (float)(k - firstNote) / (lastNote - firstNote);
+                            wdth = 1.0f / (lastNote - firstNote);
+                            double x2 = x1 + wdth;
+                            y1 = 1 - (midiTime - n.end) / deltaTimeOnScreen * (1 - pianoHeight);
+                            y2 = 1 - (midiTime - n.start) / deltaTimeOnScreen * (1 - pianoHeight);
+                            if (!n.hasEnded)
+                                y1 = 1;
+
+                            int pos = quadBufferPos * 8;
+                            quadVertexbuff[pos++] = x2;
+                            quadVertexbuff[pos++] = y2;
+                            quadVertexbuff[pos++] = x2;
+                            quadVertexbuff[pos++] = y1;
+                            quadVertexbuff[pos++] = x1;
+                            quadVertexbuff[pos++] = y1;
+                            quadVertexbuff[pos++] = x1;
+                            quadVertexbuff[pos++] = y2;
+
+                            pos = quadBufferPos * 16;
+                            r = coll.R;
+                            g = coll.G;
+                            b = coll.B;
+                            a = coll.A;
+                            quadColorbuff[pos++] = r;
+                            quadColorbuff[pos++] = g;
+                            quadColorbuff[pos++] = b;
+                            quadColorbuff[pos++] = a;
+                            quadColorbuff[pos++] = r;
+                            quadColorbuff[pos++] = g;
+                            quadColorbuff[pos++] = b;
+                            quadColorbuff[pos++] = a;
+                            r = colr.R;
+                            g = colr.G;
+                            b = colr.B;
+                            a = colr.A;
+                            quadColorbuff[pos++] = r;
+                            quadColorbuff[pos++] = g;
+                            quadColorbuff[pos++] = b;
+                            quadColorbuff[pos++] = a;
+                            quadColorbuff[pos++] = r;
+                            quadColorbuff[pos++] = g;
+                            quadColorbuff[pos++] = b;
+                            quadColorbuff[pos++] = a;
+
+                            pos = quadBufferPos * 8;
+                            quadAttribbuff[pos++] = -0.1;
+                            quadAttribbuff[pos++] = 0;
+                            quadAttribbuff[pos++] = 0.3;
+                            quadAttribbuff[pos++] = 0;
+                            quadAttribbuff[pos++] = -0.3;
+                            quadAttribbuff[pos++] = 0;
+                            quadAttribbuff[pos++] = 0.3;
+                            quadAttribbuff[pos++] = 0;
+
+                            quadBufferPos++;
+                            FlushQuadBuffer();
+                        }
+                    }
+                    else break;
+
             }
+
+            FlushQuadBuffer(false);
+            quadBufferPos = 0;
+
+            LastNoteCount = nc;
             #endregion
+
             #region Keyboard
             y1 = pianoHeight;
             y2 = 0;
@@ -555,7 +577,7 @@ void main()
                 quadBufferPos++;
                 FlushQuadBuffer();
 
-                ////Middle Bottom
+                //Middle Bottom
                 pos = quadBufferPos * 8;
                 quadVertexbuff[pos++] = xx1;
                 quadVertexbuff[pos++] = yy2;
@@ -722,6 +744,7 @@ void main()
             }
             FlushQuadBuffer(false);
             #endregion
+
         }
 
         void FlushQuadBuffer(bool check = true)

@@ -1,8 +1,10 @@
-﻿using System;
+﻿using OpenTK.Graphics;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 using System.Windows.Media;
 
 namespace BMEngine
@@ -14,7 +16,12 @@ namespace BMEngine
         bool Initialized { get; }
         ImageSource PreviewImage { get; }
 
+        int NoteScreenTime { get; }
+        long LastNoteCount { get; }
+        Control SettingsControl { get; }
+
         void Init();
         void RenderFrame(FastList<Note> notes, double midiTime, int finalCompositeBuff);
+        void SetTrackColors(Color4[][] trakcs);
     }
 }

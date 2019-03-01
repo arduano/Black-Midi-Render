@@ -72,6 +72,9 @@
     <ApplicationIcon>icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.12.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="OpenTK, Version=3.0.1.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
       <HintPath>..\packages\OpenTK.3.0.1\lib\net20\OpenTK.dll</HintPath>
     </Reference>
@@ -100,11 +103,6 @@
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Renderers\Keyboard\FlatKeyboardRender.cs" />
-    <Compile Include="Renderers\Keyboard\NewKeyboardRender.cs" />
-    <Compile Include="Renderers\Keyboard\BaseKeyboardRender.cs" />
-    <Compile Include="Renderers\Note\FlatNoteRender.cs" />
-    <Compile Include="Renderers\Note\ShadedNoteRender.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -120,33 +118,15 @@
     </None>
     <None Include="OpenTK.dll.config" />
     <None Include="packages.config" />
-    <None Include="Shaders\notes_flat.frag">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Shaders\notes_flat.vert">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Shaders\notes.frag">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Shaders\notes.vert">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Shaders\default.frag">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Shaders\default.vert">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Shaders\Post\glow.frag">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Shaders\Post\post.frag">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Shaders\Post\post.vert">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    <None Include="Shaders\notes_flat.frag" />
+    <None Include="Shaders\notes_flat.vert" />
+    <None Include="Shaders\notes.frag" />
+    <None Include="Shaders\notes.vert" />
+    <None Include="Shaders\default.frag" />
+    <None Include="Shaders\default.vert" />
+    <None Include="Shaders\Post\glow.frag" />
+    <None Include="Shaders\Post\post.frag" />
+    <None Include="Shaders\Post\post.vert" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -158,6 +138,10 @@
     <ProjectReference Include="..\BMEngine\BMEngine.csproj">
       <Project>{60f2212a-d56c-4776-836f-6a49453cdbc4}</Project>
       <Name>BMEngine</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ClassicRender\ClassicRender.csproj">
+      <Project>{b733d6f1-78a8-43ca-91a3-28fa3e7025d4}</Project>
+      <Name>ClassicRender</Name>
     </ProjectReference>
     <ProjectReference Include="..\FlatRender\FlatRender.csproj">
       <Project>{ae59479c-9d0d-464c-a4d3-8fdd7e1f3786}</Project>
@@ -210,6 +194,8 @@
   <PropertyGroup>
     <PostBuildEvent>del Plugins\OpenTK.dll
 del Plugins\BMEngine.dll
-del Plugins\MidiUtils.dll</PostBuildEvent>
+del Plugins\MidiUtils.dll
+del Plugins\Newtonsoft.Json.dll
+del Plugins\Xceed.Wpf.Toolkit.dll</PostBuildEvent>
   </PropertyGroup>
 </Project>

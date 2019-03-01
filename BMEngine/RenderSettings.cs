@@ -22,12 +22,6 @@ namespace BMEngine
 
     public class RenderSettings
     {
-
-        public int firstNote = 0;
-        public int lastNote = 128;
-        public double pianoHeight = 0.2;
-        public int deltaTimeOnScreen = 300;
-        
         public int fps = 60;
 
         public int width = 1920;
@@ -58,16 +52,13 @@ namespace BMEngine
         public bool glowEnabled = false;
         public int glowRadius = 200;
 
-        public float noteBrightness = 1;
-
         public KeyboardRenderers kbrender = KeyboardRenderers.New;
         public NoteRenderers ntrender = NoteRenderers.Shaded;
 
         public Color4[] keyColors;
 
         public bool running = false;
-
-        public long notesOnScreen = 0;
+        
         public double liveFps = 0;
 
         public void ResetVariableState()
