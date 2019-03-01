@@ -99,6 +99,9 @@ void main()
         int indexBufferId;
         uint[] indexes = new uint[2048 * 4 * 6];
 
+        bool[] blackKeys = new bool[256];
+        int[] keynum = new int[256];
+
         public void Dispose()
         {
             GL.DeleteBuffers(3, new int[] { vertexBufferID, colorBufferID, attribBufferID });
@@ -112,6 +115,14 @@ void main()
             this.renderSettings = settings;
             SettingsControl = new SettingsCtrl(this.settings);
             PreviewImage = BitmapToImageSource(Properties.Resources.preview);
+            for (int i = 0; i < blackKeys.Length; i++) blackKeys[i] = isBlackNote(i);
+            int b = 0;
+            int w = 0;
+            for (int i = 0; i < keynum.Length; i++)
+            {
+                if (blackKeys[i]) keynum[i] = b++;
+                else keynum[i] = w++;
+            }
         }
 
         public void Init()
@@ -221,17 +232,63 @@ void main()
             long nc = 0;
             int firstNote = settings.firstNote;
             int lastNote = settings.lastNote;
+            
+            if (blackKeys[firstNote]) firstNote--;
+            if (blackKeys[lastNote - 1]) lastNote++;
+
             int deltaTimeOnScreen = settings.deltaTimeOnScreen;
             double pianoHeight = settings.pianoHeight;
             bool sameWidth = settings.sameWidthNotes;
             Color4[] keyColors = renderSettings.keyColors;
             double wdth;
             float r, g, b, a, r2, g2, b2, a2, r3, g3, b3, a3;
+            double x1;
+            double x2;
             double y1;
             double y2;
             quadBufferPos = 0;
             double xx1, xx2, yy1, yy2;
             double ys1, ys2;
+
+            double[] x1array = new double[lastNote - firstNote];
+            double[] wdtharray = new double[lastNote - firstNote];
+            if (settings.sameWidthNotes)
+            {
+                for (int i = 0; i < lastNote - firstNote; i++)
+                {
+                    x1array[i] = (float)i / (lastNote - firstNote);
+                    wdtharray[i] = 1.0f / (lastNote - firstNote);
+                }
+            }
+            else
+            {
+                for (int i = 0; i < lastNote - firstNote; i++)
+                {
+                    if (!blackKeys[i + firstNote])
+                    {
+                        x1array[i] = (float)(keynum[firstNote + i] - keynum[firstNote]) / (keynum[lastNote - 1] - keynum[firstNote] + 1);
+                        wdtharray[i] = 1.0f / (keynum[lastNote - 1] - keynum[firstNote] + 1);
+                    }
+                    else
+                    {
+                        int _i = i + 1;
+                        wdth = 0.6f / (keynum[lastNote - 1] - keynum[firstNote] + 1);
+                        int bknum = keynum[i] % 5;
+                        double offset = wdth / 2;
+                        if (bknum == 0 || bknum == 2)
+                        {
+                            offset *= 1.3;
+                        }
+                        else if (bknum == 1 || bknum == 4)
+                        {
+                            offset *= 0.7;
+                        }
+                        x1array[i] = (float)(keynum[firstNote + _i] - keynum[firstNote]) / (keynum[lastNote - 1] - keynum[firstNote] + 1) - offset;
+                        wdtharray[i] = wdth;
+                    }
+                }
+            }
+
             #endregion
 
             #region Notes
@@ -253,11 +310,9 @@ void main()
                                 keyColors[k * 2] = coll;
                                 keyColors[k * 2 + 1] = colr;
                             }
-
-                            double x1;
-                            x1 = (float)(k - firstNote) / (lastNote - firstNote);
-                            wdth = 1.0f / (lastNote - firstNote);
-                            double x2 = x1 + wdth;
+                            x1 = x1array[k - firstNote];
+                            wdth = wdtharray[k - firstNote];
+                            x2 = x1 + wdth;
                             y1 = 1 - (midiTime - n.end) / deltaTimeOnScreen * (1 - pianoHeight);
                             y2 = 1 - (midiTime - n.start) / deltaTimeOnScreen * (1 - pianoHeight);
                             if (!n.hasEnded)
@@ -337,38 +392,40 @@ void main()
 
             for (int n = firstNote; n < lastNote; n++)
             {
-                double x1;
-                x1 = (float)(n - firstNote) / (lastNote - firstNote);
-                wdth = 1.0f / (lastNote - firstNote);
-                double x2 = x1 + wdth;
+                x1 = x1array[n - firstNote];
+                wdth = wdtharray[n - firstNote];
+                x2 = x1 + wdth;
 
-                if (!isBlackNote(n))
+                if (!blackKeys[n])
                 {
                     y2 = 0;
-                    int _n = n % 12;
-                    if (_n == 0)
-                        x2 += wdth * 0.666;
-                    else if (_n == 2)
+                    if (settings.sameWidthNotes)
                     {
-                        x1 -= wdth / 3;
-                        x2 += wdth / 3;
+                        int _n = n % 12;
+                        if (_n == 0)
+                            x2 += wdth * 0.666;
+                        else if (_n == 2)
+                        {
+                            x1 -= wdth / 3;
+                            x2 += wdth / 3;
+                        }
+                        else if (_n == 4)
+                            x1 -= wdth / 3 * 2;
+                        else if (_n == 5)
+                            x2 += wdth * 0.75;
+                        else if (_n == 7)
+                        {
+                            x1 -= wdth / 4;
+                            x2 += wdth / 2;
+                        }
+                        else if (_n == 9)
+                        {
+                            x1 -= wdth / 2;
+                            x2 += wdth / 4;
+                        }
+                        else if (_n == 11)
+                            x1 -= wdth * 0.75;
                     }
-                    else if (_n == 4)
-                        x1 -= wdth / 3 * 2;
-                    else if (_n == 5)
-                        x2 += wdth * 0.75;
-                    else if (_n == 7)
-                    {
-                        x1 -= wdth / 4;
-                        x2 += wdth / 2;
-                    }
-                    else if (_n == 9)
-                    {
-                        x1 -= wdth / 2;
-                        x2 += wdth / 4;
-                    }
-                    else if (_n == 11)
-                        x1 -= wdth * 0.75;
                 }
                 else continue;
 
@@ -439,7 +496,8 @@ void main()
                 FlushQuadBuffer();
 
                 pos = quadBufferPos * 8;
-                x2 = x1 + wdth / 15;
+                x2 = x1 + wdth / 30;
+                x1 -= wdth / 30;
                 quadVertexbuff[pos++] = x1;
                 quadVertexbuff[pos++] = y2;
                 quadVertexbuff[pos++] = x2;
@@ -481,12 +539,11 @@ void main()
             }
             for (int n = firstNote; n < lastNote; n++)
             {
-                double x1;
-                x1 = (float)(n - firstNote) / (lastNote - firstNote);
-                wdth = 1.0f / (lastNote - firstNote);
-                double x2 = x1 + wdth;
+                x1 = x1array[n - firstNote];
+                wdth = wdtharray[n - firstNote];
+                x2 = x1 + wdth;
 
-                if (isBlackNote(n))
+                if (blackKeys[n])
                 {
                     y2 = pianoHeight / 5 * 2;
                 }

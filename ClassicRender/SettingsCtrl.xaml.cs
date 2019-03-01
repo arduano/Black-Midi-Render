@@ -32,6 +32,7 @@ namespace ClassicRender
             noteBrightness.Value = (decimal)settings.noteBrightness;
             noteDeltaScreenTime.Value = settings.deltaTimeOnScreen;
             screenTime.Content = settings.deltaTimeOnScreen;
+            sameWidth.IsChecked = settings.sameWidthNotes;
         }
 
         public SettingsCtrl(Settings settings) : base()
@@ -118,6 +119,15 @@ namespace ClassicRender
         private void DefaultsButton_Click(object sender, RoutedEventArgs e)
         {
             injectSettings(new Settings());
+        }
+
+        private void SameWidth_Checked(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                settings.sameWidthNotes = (bool)sameWidth.IsChecked;
+            }
+            catch (NullReferenceException) { }
         }
     }
 }
