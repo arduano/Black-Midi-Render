@@ -12,6 +12,7 @@ namespace FlatRender
         public int lastNote = 128;
         public double pianoHeight = 0.2;
         public int deltaTimeOnScreen = 300;
+        public bool sameWidthNotes = true;
 
         public float noteBrightness = 1;
     }

@@ -32,12 +32,14 @@ namespace FlatRender
             noteBrightness.Value = (decimal)settings.noteBrightness;
             noteDeltaScreenTime.Value = settings.deltaTimeOnScreen;
             screenTime.Content = settings.deltaTimeOnScreen;
+            sameWidth.IsChecked = settings.sameWidthNotes;
         }
 
         public SettingsCtrl(Settings settings) : base()
         {
             InitializeComponent();
             this.settings = settings;
+            LoadSettings();
             SetValues();
         }
 
@@ -84,19 +86,24 @@ namespace FlatRender
             }
         }
 
-        private void LoadButton_Click(object sender, RoutedEventArgs e)
+        void LoadSettings()
         {
             try
             {
-                string s = File.ReadAllText("Plugins/FlatRender.json");
+                string s = File.ReadAllText("Plugins/ClassicRender.json");
                 var sett = JsonConvert.DeserializeObject<Settings>(s);
                 injectSettings(sett);
-                Console.WriteLine("Loaded settings from FlatRender.json");
+                Console.WriteLine("Loaded settings from ClassicRender.json");
             }
             catch
             {
-                Console.WriteLine("Could not load settings");
+                Console.WriteLine("Could not load saved plugin settings");
             }
+        }
+
+        private void LoadButton_Click(object sender, RoutedEventArgs e)
+        {
+            LoadSettings();
         }
 
         void injectSettings(Settings sett)
@@ -118,6 +125,15 @@ namespace FlatRender
         private void DefaultsButton_Click(object sender, RoutedEventArgs e)
         {
             injectSettings(new Settings());
+        }
+
+        private void SameWidth_Checked(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                settings.sameWidthNotes = (bool)sameWidth.IsChecked;
+            }
+            catch (NullReferenceException) { }
         }
     }
 }

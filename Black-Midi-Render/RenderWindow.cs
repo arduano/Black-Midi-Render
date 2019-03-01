@@ -211,7 +211,7 @@ void main()
                                 while (true)
                                 {
                                     var r = render.disposeQueue.Dequeue();
-                                    if (!r.Initialized) r.Dispose();
+                                    if (r.Initialized) r.Dispose();
                                 }
                             }
                             catch (InvalidOperationException) { }

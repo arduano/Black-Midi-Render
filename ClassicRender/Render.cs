@@ -107,6 +107,7 @@ void main()
             GL.DeleteBuffers(3, new int[] { vertexBufferID, colorBufferID, attribBufferID });
             GL.DeleteProgram(noteShader);
             Initialized = false;
+            Console.WriteLine("Disposed of ClassicRender");
         }
 
         public Render(RenderSettings settings)
@@ -191,6 +192,7 @@ void main()
                 indexes,
                 BufferUsageHint.StaticDraw);
             Initialized = true;
+            Console.WriteLine("Initialised ClassicRender");
         }
 
         public void SetTrackColors(Color4[][] trakcs)

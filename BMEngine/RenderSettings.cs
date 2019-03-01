@@ -37,8 +37,6 @@ namespace BMEngine
         public bool forceReRender = false;
         public double tempoMultiplier = 1;
 
-        public bool clickDebug = true;
-
         public bool includeAudio = false;
         public string audioPath = "";
 

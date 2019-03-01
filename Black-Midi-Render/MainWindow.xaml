@@ -98,7 +98,6 @@
                     <Label Content="Warning: BMR Preview renders in the resolution above, then downscales to the window size" HorizontalAlignment="Left" Margin="10,127,0,0" VerticalAlignment="Top"/>
                     <Button Content="Start Preview" HorizontalAlignment="Left" Margin="10,0,0,10" Width="98" IsEnabled="{Binding ElementName=previewStartEnabled, Path=IsEnabled}" Height="20" VerticalAlignment="Bottom" Click="StartButton_Click" />
                     <Button Content="Stop" HorizontalAlignment="Left" Margin="113,0,0,10" Width="75" IsEnabled="{Binding ElementName=stopEnabled, Path=IsEnabled}" Height="20" VerticalAlignment="Bottom" Click="StopButton_Click" />
-                    <Label Content="Render" HorizontalAlignment="Left" Margin="10,158,0,0" VerticalAlignment="Top"/>
                 </Grid>
             </TabItem>
             <TabItem Header="Plugins" IsEnabled="{DynamicResource notRendering}">
@@ -129,8 +128,6 @@
                     <Button Content="Start Preview" HorizontalAlignment="Left" Margin="10,0,0,10" Width="98" IsEnabled="{Binding IsEnabled, ElementName=previewStartEnabled}" Height="20" VerticalAlignment="Bottom" Click="StartButton_Click" />
                     <Button Content="Stop" HorizontalAlignment="Left" Margin="113,0,0,10" Width="75" IsEnabled="{Binding IsEnabled, ElementName=stopEnabled}" Height="20" VerticalAlignment="Bottom" Click="StopButton_Click" />
                     <CheckBox x:Name="forceReRender" Content="Force re-render each frame" HorizontalAlignment="Left" Margin="10,108,0,0" VerticalAlignment="Top" Checked="ForceReRender_Checked" Unchecked="ForceReRender_Checked" IsEnabled="{Binding ElementName=previewPaused, Path=IsChecked}"/>
-                    <CheckBox x:Name="clickDebug" Content="Also print note data" HorizontalAlignment="Left" Margin="10,167,0,0" VerticalAlignment="Top" IsEnabled="{Binding ElementName=previewPaused, Path=IsChecked}" Checked="ClickDebug_Checked" Unchecked="ClickDebug_Checked"/>
-                    <Label Content="When paused, click the window to get debug information" HorizontalAlignment="Left" Margin="10,141,0,0" VerticalAlignment="Top"/>
                     <Label Content="Right click slider or press space to toggle pause" HorizontalAlignment="Left" Margin="10,56,0,0" VerticalAlignment="Top"/>
                 </Grid>
             </TabItem>

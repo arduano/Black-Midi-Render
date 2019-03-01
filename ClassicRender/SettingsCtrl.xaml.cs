@@ -39,6 +39,7 @@ namespace ClassicRender
         {
             InitializeComponent();
             this.settings = settings;
+            LoadSettings();
             SetValues();
         }
 
@@ -85,8 +86,9 @@ namespace ClassicRender
             }
         }
 
-        private void LoadButton_Click(object sender, RoutedEventArgs e)
+        void LoadSettings()
         {
+
             try
             {
                 string s = File.ReadAllText("Plugins/ClassicRender.json");
@@ -96,8 +98,13 @@ namespace ClassicRender
             }
             catch
             {
-                Console.WriteLine("Could not load settings");
+                Console.WriteLine("Could not load saved plugin settings");
             }
+        }
+
+        private void LoadButton_Click(object sender, RoutedEventArgs e)
+        {
+            LoadSettings();
         }
 
         void injectSettings(Settings sett)

@@ -262,6 +262,12 @@ namespace Black_Midi_Render
 
         private void StartButton_Click(object sender, RoutedEventArgs e)
         {
+            if(renderer.renderer == null)
+            {
+                MessageBox.Show("No renderer is selected");
+                return;
+            }
+
             settings.running = true;
             settings.width = (int)viewWidth.Value;
             settings.height = (int)viewHeight.Value;
@@ -281,6 +287,12 @@ namespace Black_Midi_Render
             if (videoPath.Text == "")
             {
                 MessageBox.Show("Please specify a destination path");
+                return;
+            }
+
+            if (renderer.renderer == null)
+            {
+                MessageBox.Show("No renderer is selected");
                 return;
             }
 
@@ -358,11 +370,6 @@ namespace Black_Midi_Render
         private void ForceReRender_Checked(object sender, RoutedEventArgs e)
         {
             settings.forceReRender = (bool)forceReRender.IsChecked;
-        }
-
-        private void ClickDebug_Checked(object sender, RoutedEventArgs e)
-        {
-            settings.clickDebug = (bool)clickDebug.IsChecked;
         }
 
         private void TempoSlider_MouseDown(object sender, MouseButtonEventArgs e)
