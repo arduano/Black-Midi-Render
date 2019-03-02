@@ -17,7 +17,7 @@ namespace PFARender
     {
         public int firstNote = 0;
         public int lastNote = 128;
-        public double pianoHeight = 0.15;
+        public double pianoHeight = 0.155;
         public int deltaTimeOnScreen = 300;
         public bool sameWidthNotes = false;
         public TopColor topColor = TopColor.Red;

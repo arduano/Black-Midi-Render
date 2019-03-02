@@ -144,7 +144,7 @@ namespace Black_Midi_Render
                 var dlls = files.Where((s) => s.EndsWith(".dll"));
                 foreach (var d in dlls)
                 {
-                    var DLL = Assembly.LoadFile(System.IO.Path.GetFullPath(d));
+                    var DLL = Assembly.UnsafeLoadFrom(System.IO.Path.GetFullPath(d));
                     bool hasClass = false;
                     var name = System.IO.Path.GetFileName(d);
                     try
