@@ -185,7 +185,7 @@
                     </ComboBox>
                     <Label Content="FFMPEG crf: 0 = lossless, 51 = worst quality possible" HorizontalAlignment="Left" Margin="244,95,0,0" VerticalAlignment="Top"/>
                     <Label Content="kbps" HorizontalAlignment="Left" Margin="192,63,0,0" VerticalAlignment="Top"/>
-
+                    <Button Content="Stop" HorizontalAlignment="Left" Margin="109,126,0,0" Width="75" IsEnabled="{Binding IsEnabled, ElementName=stopEnabled}" Click="StopButton_Click" Height="20" VerticalAlignment="Top" />
                 </Grid>
             </TabItem>
         </TabControl>

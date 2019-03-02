@@ -192,9 +192,7 @@ void main()
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, finalCompositeBuff);
             GL.Viewport(0, 0, renderSettings.width, renderSettings.height);
             GL.Clear(ClearBufferMask.ColorBufferBit);
-
-
-            renderSettings.ResetVariableState();
+            
             GL.UseProgram(noteShader);
 
             #region Vars
@@ -208,7 +206,8 @@ void main()
             int deltaTimeOnScreen = settings.deltaTimeOnScreen;
             double pianoHeight = settings.pianoHeight;
             bool sameWidth = settings.sameWidthNotes;
-            Color4[] keyColors = renderSettings.keyColors;
+            Color4[] keyColors = new Color4[512];
+            for (int i = 0; i < 512; i++) keyColors[i] = Color4.Transparent;
             double wdth;
             float r, g, b, a;
             float r2, g2, b2, a2;

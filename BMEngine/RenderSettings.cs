@@ -53,16 +53,8 @@ namespace BMEngine
         public KeyboardRenderers kbrender = KeyboardRenderers.New;
         public NoteRenderers ntrender = NoteRenderers.Shaded;
 
-        public Color4[] keyColors;
-
         public bool running = false;
         
         public double liveFps = 0;
-
-        public void ResetVariableState()
-        {
-            keyColors = new Color4[512];
-            for (int i = 0; i < 512; i++) keyColors[i] = Color4.Transparent;
-        }
     }
 }
