@@ -556,8 +556,8 @@ void main()
             {
                 for (int j = 0; j < trakcs[i].Length / 2; j++)
                 {
-                    trakcs[i][j * 2] = Color4.FromHsv(new OpenTK.Vector4((i * 16 + i) * 1.36271f % 1, 1.0f, settings.noteBrightness, 1f));
-                    trakcs[i][j * 2 + 1] = Color4.FromHsv(new OpenTK.Vector4((i * 16 + i) * 1.36271f % 1, 1.0f, settings.noteBrightness, 1f));
+                    trakcs[i][j * 2] = Color4.FromHsv(new OpenTK.Vector4((i * 16 + j) * 1.36271f % 1, 1.0f, settings.noteBrightness, 1f));
+                    trakcs[i][j * 2 + 1] = Color4.FromHsv(new OpenTK.Vector4((i * 16 + j) * 1.36271f % 1, 1.0f, settings.noteBrightness, 1f));
                 }
             }
         }
