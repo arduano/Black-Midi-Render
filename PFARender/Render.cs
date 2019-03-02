@@ -194,7 +194,6 @@ void main()
 
         public void RenderFrame(FastList<Note> notes, double midiTime, int finalCompositeBuff)
         {
-            GL.Enable(EnableCap.LineSmooth);
             GL.Enable(EnableCap.Blend);
             GL.EnableClientState(ArrayCap.VertexArray);
             GL.EnableClientState(ArrayCap.ColorArray);
@@ -205,7 +204,6 @@ void main()
             GL.EnableVertexAttribArray(2);
 
             GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
-            GL.LineWidth(2);
 
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, finalCompositeBuff);
             GL.Viewport(0, 0, renderSettings.width, renderSettings.height);
@@ -1589,15 +1587,21 @@ void main()
                     FlushQuadBuffer();
                     #endregion
                 }
-
-
-
-
             }
             #endregion
 
             FlushQuadBuffer(false);
             #endregion
+
+
+            GL.Disable(EnableCap.Blend);
+            GL.DisableClientState(ArrayCap.VertexArray);
+            GL.DisableClientState(ArrayCap.ColorArray);
+            GL.Disable(EnableCap.Texture2D);
+
+            GL.DisableVertexAttribArray(0);
+            GL.DisableVertexAttribArray(1);
+            GL.DisableVertexAttribArray(2);
         }
 
         void FlushQuadBuffer(bool check = true)
@@ -1637,8 +1641,8 @@ void main()
             {
                 for (int j = 0; j < trakcs[i].Length / 2; j++)
                 {
-                    trakcs[i][j * 2] = Color4.FromHsv(new OpenTK.Vector4((i * 16 + i) * 1.36271f % 1, 0.8f, 1.0f, 0.8f));
-                    trakcs[i][j * 2 + 1] = Color4.FromHsv(new OpenTK.Vector4((i * 16 + i) * 1.36271f % 1, 0.8f, 1.0f, 0.8f));
+                    trakcs[i][j * 2] = Color4.FromHsv(new OpenTK.Vector4((i * 16 + i) * 1.36271f % 1, 0.8f, 1.0f, 1f));
+                    trakcs[i][j * 2 + 1] = Color4.FromHsv(new OpenTK.Vector4((i * 16 + i) * 1.36271f % 1, 0.8f, 1.0f, 1f));
                 }
             }
         }

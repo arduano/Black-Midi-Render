@@ -209,7 +209,6 @@ void main()
 
         public void RenderFrame(FastList<Note> notes, double midiTime, int finalCompositeBuff)
         {
-            GL.Enable(EnableCap.LineSmooth);
             GL.Enable(EnableCap.Blend);
             GL.EnableClientState(ArrayCap.VertexArray);
             GL.EnableClientState(ArrayCap.ColorArray);
@@ -220,7 +219,6 @@ void main()
             GL.EnableVertexAttribArray(2);
 
             GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
-            GL.LineWidth(2);
 
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, finalCompositeBuff);
             GL.Viewport(0, 0, renderSettings.width, renderSettings.height);
@@ -802,6 +800,14 @@ void main()
             FlushQuadBuffer(false);
             #endregion
 
+            GL.Disable(EnableCap.Blend);
+            GL.DisableClientState(ArrayCap.VertexArray);
+            GL.DisableClientState(ArrayCap.ColorArray);
+            GL.Disable(EnableCap.Texture2D);
+
+            GL.DisableVertexAttribArray(0);
+            GL.DisableVertexAttribArray(1);
+            GL.DisableVertexAttribArray(2);
         }
 
         void FlushQuadBuffer(bool check = true)

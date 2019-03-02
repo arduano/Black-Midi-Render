@@ -177,7 +177,6 @@ void main()
 
         public void RenderFrame(FastList<Note> notes, double midiTime, int finalCompositeBuff)
         {
-            GL.Enable(EnableCap.LineSmooth);
             GL.Enable(EnableCap.Blend);
             GL.EnableClientState(ArrayCap.VertexArray);
             GL.EnableClientState(ArrayCap.ColorArray);
@@ -187,7 +186,6 @@ void main()
             GL.EnableVertexAttribArray(1);
 
             GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
-            GL.LineWidth(1);
 
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, finalCompositeBuff);
             GL.Viewport(0, 0, renderSettings.width, renderSettings.height);
@@ -334,6 +332,7 @@ void main()
 
             LastNoteCount = nc;
             #endregion
+
             #region Keyboard
             y1 = pianoHeight;
             y2 = 0;
@@ -511,6 +510,14 @@ void main()
             }
             FlushQuadBuffer(false);
             #endregion
+            
+            GL.Disable(EnableCap.Blend);
+            GL.DisableClientState(ArrayCap.VertexArray);
+            GL.DisableClientState(ArrayCap.ColorArray);
+            GL.Disable(EnableCap.Texture2D);
+
+            GL.DisableVertexAttribArray(0);
+            GL.DisableVertexAttribArray(1);
         }
 
         void FlushQuadBuffer(bool check = true)
