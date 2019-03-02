@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using BMEngine;
 using OpenTK;
@@ -35,7 +36,7 @@ namespace PFARender
 
         public string Name => "PFA+";
         public string Description => "A replica of PFA with some special extra features";
-        public System.Windows.Media.ImageSource PreviewImage => null;//throw new NotImplementedException();
+        public ImageSource PreviewImage { get; private set; }
 
         #region Shaders
         string noteShaderVert = @"#version 330 core
@@ -111,8 +112,7 @@ void main()
             this.settings = new Settings();
             this.renderSettings = settings;
             settingsControl = new SettingsCtrl(this.settings);
-            //SettingsControl = new SettingsCtrl(this.settings);
-            //PreviewImage = BitmapToImageSource(Properties.Resources.preview);
+            PreviewImage = BitmapToImageSource(Properties.Resources.preview);
             for (int i = 0; i < blackKeys.Length; i++) blackKeys[i] = isBlackNote(i);
             int b = 0;
             int w = 0;
@@ -713,9 +713,9 @@ void main()
                     quadAttribbuff[pos++] = 0;
                     quadAttribbuff[pos++] = 1;
                     quadAttribbuff[pos++] = 0;
-                    quadAttribbuff[pos++] = 0.6;
+                    quadAttribbuff[pos++] = 0.5;
                     quadAttribbuff[pos++] = 0;
-                    quadAttribbuff[pos++] = 0.6;
+                    quadAttribbuff[pos++] = 0.5;
 
                     pos = quadBufferPos * 16;
                     quadColorbuff[pos++] = r;

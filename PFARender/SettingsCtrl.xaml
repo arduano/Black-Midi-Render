@@ -16,10 +16,10 @@
         <Label Content="Note screen time" HorizontalAlignment="Left" Margin="10,41,0,0" VerticalAlignment="Top"/>
         <Slider x:Name="noteDeltaScreenTime" IsSnapToTickEnabled="True" TickPlacement="BottomRight" HorizontalAlignment="Left" Margin="116,46,0,0" VerticalAlignment="Top" Width="236" Maximum="1500" Minimum="50" Value="300" TickFrequency="50" ValueChanged="NoteDeltaScreenTime_ValueChanged"/>
         <Label x:Name="screenTime" Content="Label" HorizontalAlignment="Left" Margin="357,41,0,0" VerticalAlignment="Top"/>
-        <Button x:Name="saveButton" Content="Save" HorizontalAlignment="Left" Margin="10,146,0,0" VerticalAlignment="Top" Width="74" Click="SaveButton_Click" RenderTransformOrigin="0.234,0.75" />
-        <Button x:Name="loadButton" Content="Load Saved" HorizontalAlignment="Left" Margin="89,146,0,0" VerticalAlignment="Top" Width="88" Click="LoadButton_Click" />
-        <Button x:Name="defaultsButton" Content="Defaults" HorizontalAlignment="Left" Margin="182,146,0,0" VerticalAlignment="Top" Width="74" Click="DefaultsButton_Click"/>
-        <CheckBox x:Name="sameWidth" Content="Same Width Notes" HorizontalAlignment="Left" Margin="10,75,0,0" VerticalAlignment="Top" IsChecked="True" Checked="SameWidth_Checked" Unchecked="SameWidth_Checked" />
+        <Button x:Name="saveButton" Content="Save" HorizontalAlignment="Left" Margin="10,157,0,0" VerticalAlignment="Top" Width="74" Click="SaveButton_Click" RenderTransformOrigin="0.234,0.75" />
+        <Button x:Name="loadButton" Content="Load Saved" HorizontalAlignment="Left" Margin="89,157,0,0" VerticalAlignment="Top" Width="88" Click="LoadButton_Click" />
+        <Button x:Name="defaultsButton" Content="Defaults" HorizontalAlignment="Left" Margin="182,157,0,0" VerticalAlignment="Top" Width="74" Click="DefaultsButton_Click"/>
+        <CheckBox x:Name="sameWidth" Content="Same Width Notes" HorizontalAlignment="Left" Margin="13,75,0,0" VerticalAlignment="Top" IsChecked="True" Checked="SameWidth_Checked" Unchecked="SameWidth_Checked" />
         <Label Content="Last Note" HorizontalAlignment="Left" Margin="162,10,0,0" VerticalAlignment="Top"/>
         <xctk:DecimalUpDown x:Name="pianoHeight" FormatString="F1" Value="1" Increment="0.5"  Maximum="100" Minimum="1" Margin="410,10,0,0" HorizontalAlignment="Left" Width="80" Height="26" VerticalAlignment="Top"  ValueChanged="Nud_ValueChanged"  />
         <ComboBox Padding="5px" Name="topColorSelect" HorizontalAlignment="Left" Margin="76,95,0,0" VerticalAlignment="Top" Width="95" Height="26" SelectedIndex="1" SelectionChanged="TopColorSelect_SelectionChanged">
