@@ -17,6 +17,11 @@ using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
+using System.Drawing.Drawing2D;
+using System.Drawing.Text;
+using Poly2Tri;
+using Poly2Tri.Triangulation.Polygon;
+using Poly2Tri.Triangulation;
 
 namespace Black_Midi_Render
 {
@@ -62,6 +67,58 @@ void main()
     color = texture( myTextureSampler, UV );
 }
 ";
+        string textShaderVert = @"#version 330 compatibility
+
+layout(location = 0) in vec3 position;
+layout(location = 1) in vec4 glColor;
+
+out vec4 color;
+
+void main()
+{
+    gl_Position = vec4(position.x * 2 - 1, position.y * 2 - 1, 1.0f, 1.0f);
+    color = glColor;
+}
+";
+        string textShaderFrag = @"#version 330 compatibility
+ 
+in vec4 color;
+ 
+out vec4 outputF;
+layout(location = 0) out vec4 texOut;
+
+void main()
+{
+    outputF = color;
+	texOut = outputF;
+}
+";
+
+        int MakeShader(string vert, string frag)
+        {
+            int _vertexObj = GL.CreateShader(ShaderType.VertexShader);
+            int _fragObj = GL.CreateShader(ShaderType.FragmentShader);
+            int statusCode;
+            string info;
+
+            GL.ShaderSource(_vertexObj, vert);
+            GL.CompileShader(_vertexObj);
+            info = GL.GetShaderInfoLog(_vertexObj);
+            GL.GetShader(_vertexObj, ShaderParameter.CompileStatus, out statusCode);
+            if (statusCode != 1) throw new ApplicationException(info);
+
+            GL.ShaderSource(_fragObj, frag);
+            GL.CompileShader(_fragObj);
+            info = GL.GetShaderInfoLog(_fragObj);
+            GL.GetShader(_fragObj, ShaderParameter.CompileStatus, out statusCode);
+            if (statusCode != 1) throw new ApplicationException(info);
+
+            int shader = GL.CreateProgram();
+            GL.AttachShader(shader, _fragObj);
+            GL.AttachShader(shader, _vertexObj);
+            GL.LinkProgram(shader);
+            return shader;
+        }
         #endregion
 
         FastList<Note> globalDisplayNotes;
@@ -81,6 +138,7 @@ void main()
         GLPostbuffer finalCompositeBuff;
 
         int postShader;
+        int textShader;
 
         byte[] pixels;
 
@@ -165,27 +223,9 @@ void main()
             }
 
             finalCompositeBuff = new GLPostbuffer(settings);
-            int _vertexObj = GL.CreateShader(ShaderType.VertexShader);
-            int _fragObj = GL.CreateShader(ShaderType.FragmentShader);
-            int statusCode;
-            string info;
 
-            GL.ShaderSource(_vertexObj, postShaderVert);
-            GL.CompileShader(_vertexObj);
-            info = GL.GetShaderInfoLog(_vertexObj);
-            GL.GetShader(_vertexObj, ShaderParameter.CompileStatus, out statusCode);
-            if (statusCode != 1) throw new ApplicationException(info);
-
-            GL.ShaderSource(_fragObj, postShaderFrag);
-            GL.CompileShader(_fragObj);
-            info = GL.GetShaderInfoLog(_fragObj);
-            GL.GetShader(_fragObj, ShaderParameter.CompileStatus, out statusCode);
-            if (statusCode != 1) throw new ApplicationException(info);
-
-            postShader = GL.CreateProgram();
-            GL.AttachShader(postShader, _fragObj);
-            GL.AttachShader(postShader, _vertexObj);
-            GL.LinkProgram(postShader);
+            postShader = MakeShader(postShaderVert, postShaderFrag);
+            textShader = MakeShader(textShaderVert, textShaderFrag);
         }
 
         double lastTempo;
@@ -304,6 +344,26 @@ void main()
                     });
                 }
 
+                GL.UseProgram(textShader);
+
+                var polygons = GLTextEngine.GetTextPolygons();
+
+                P2T.Triangulate(polygons);
+
+                GL.Begin(PrimitiveType.Triangles);
+                GL.Color3(0f, 1f, 0f);
+                foreach (var p in polygons)
+                {
+                    foreach (var t in p.Triangles)
+                    {
+                        foreach (var pt in t.Points)
+                        {
+                            GL.Vertex2(pt.X / settings.width, 1 - pt.Y / settings.height);
+                        }
+                    }
+                }
+                GL.End();
+
                 GL.UseProgram(postShader);
                 GLPostbuffer.UnbindBuffers();
                 GL.Clear(ClearBufferMask.ColorBufferBit);
@@ -347,7 +407,7 @@ void main()
             render.renderer.Dispose();
             this.Close();
         }
-
+        
         protected override void OnClosing(CancelEventArgs e)
         {
             base.OnClosing(e);

@@ -15,7 +15,7 @@ namespace Black_Midi_Render
         [STAThread]
         static void Main(string[] args)
         {
-            Console.Title = "Black Midi Render";
+            Console.Title = "Zenith";
             Application app = new Application();
             app.Run(new MainWindow());
         }
