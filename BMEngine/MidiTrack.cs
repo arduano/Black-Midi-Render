@@ -41,6 +41,7 @@ namespace BMEngine
         public bool trackEnded = false;
 
         public long trackTime = 0;
+        public long prevTrackTime = 0;
         public long noteCount = 0;
         public int zerothTempo = -1;
 
@@ -65,6 +66,7 @@ namespace BMEngine
             reader.Reset();
             ResetColors();
             trackTime = 0;
+            prevTrackTime = 0;
             trackEnded = false;
             readDelta = false;
             channelPrefix = 0;
@@ -549,9 +551,12 @@ namespace BMEngine
 
         public void ParseNextEventFast()
         {
+            long _t = 0;
             try
             {
+                _t = trackTime;
                 trackTime += ReadVariableLen();
+                prevTrackTime = _t;
                 byte command = reader.Read();
                 if(command < 0x80)
                 {

@@ -199,7 +199,8 @@ void main()
             {
                 lastDeltaTimeOnScreen = render.renderer.NoteScreenTime;
             }
-            while (settings.running && (midiTime < midi.maxTrackTime + lastDeltaTimeOnScreen + settings.fps * tempoFrameStep * 5 || midi.unendedTracks != 0))
+            int noNoteFrames = 0;
+            while (settings.running && noNoteFrames > settings.fps * 5 || midi.unendedTracks != 0)
             {
                 if (!settings.paused || settings.forceReRender)
                 {
@@ -227,9 +228,11 @@ void main()
                             render.renderer.LastMidiTimePerTick = lastTempo / midi.division;
                             lastDeltaTimeOnScreen = render.renderer.NoteScreenTime;
                             SpinWait.SpinUntil(() => midi.currentSyncTime > midiTime + lastDeltaTimeOnScreen + tempoFrameStep || midi.unendedTracks == 0 || !settings.running);
-                            if (!settings.running || midi.unendedTracks == 0) break;
+                            if (!settings.running) break;
 
                             render.renderer.RenderFrame(globalDisplayNotes, midiTime, finalCompositeBuff.BufferID);
+                            if (render.renderer.LastNoteCount == 0 && midi.unendedTracks == 0) noNoteFrames++;
+                            else noNoteFrames = 0;
                         }
                         catch (Exception ex)
                         {
@@ -279,7 +282,7 @@ void main()
                 {
                     finalCompositeBuff.BindBuffer();
                     IntPtr unmanagedPointer = Marshal.AllocHGlobal(pixels.Length);
-                    GL.ReadPixels(0, 0, settings.width, settings.height, PixelFormat.Bgr, PixelType.UnsignedByte, unmanagedPointer);
+                    GL.ReadPixels(0, 0, settings.width, settings.height, PixelFormat.Rgb, PixelType.UnsignedByte, unmanagedPointer);
                     Marshal.Copy(unmanagedPointer, pixels, 0, pixels.Length);
                     if (lastRenderPush != null) lastRenderPush.GetAwaiter().GetResult();
                     lastRenderPush = Task.Run(() => ffmpeg.StandardInput.BaseStream.Write(pixels, 0, pixels.Length));

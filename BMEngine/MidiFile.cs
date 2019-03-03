@@ -141,18 +141,18 @@ namespace BMEngine
                 var t = tracks[i];
                 while (!t.trackEnded)
                 {
-                    //try
-                    //{
-                    t.ParseNextEventFast();
-                    //}
-                    //catch
-                    //{
-                    //    break;
-                    //}
+                    try
+                    {
+                        t.ParseNextEventFast();
+                    }
+                    catch
+                    {
+                        break;
+                    }
                 }
                 noteCount += t.noteCount;
                 tracklens[i] = t.trackTime;
-                if(t.zerothTempo != -1)
+                if (t.zerothTempo != -1)
                 {
                     zerothTempo = t.zerothTempo;
                 }
