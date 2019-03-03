@@ -33,7 +33,7 @@ namespace Black_Midi_Render
     class RenderWindow : GameWindow
     {
         #region Shaders
-        string postShaderVert = @"#version 330 core
+        string postShaderVert = @"#version 330 compatibility
 
 in vec3 position;
 in vec4 glColor;
@@ -49,7 +49,7 @@ void main()
     UV = vec2(position.x, position.y);
 }
 ";
-        string postShaderFrag = @"#version 330 core
+        string postShaderFrag = @"#version 330 compatibility
 
 in vec2 UV;
 
@@ -100,7 +100,7 @@ void main()
                 render.renderer.LastMidiTimePerTick = (double)midi.zerothTempo / midi.division;
                 midiTime = -render.renderer.NoteScreenTime;
             }
-            pixels = new byte[settings.width * settings.height * 4];
+            pixels = new byte[settings.width * settings.height * 3];
 
             //WindowBorder = WindowBorder.Hidden;
             globalDisplayNotes = midi.globalDisplayNotes;
@@ -116,18 +116,17 @@ void main()
                     double offset = -midiTime / fstep / settings.fps;
                     args = "" +
                         " -f rawvideo -s " + settings.width + "x" + settings.height +
-                        " -pix_fmt rgb32 -r " + settings.fps + " -i -" +
+                        " -pix_fmt rgb24 -r " + settings.fps + " -i -" +
                         " -itsoffset " + offset + " -i \"" + settings.audioPath + "\"" +
-                        " -vf vflip -vcodec libx264 -acodec aac";
-
-
+                        " -vf vflip -vcodec libx264 -pix_fmt yuv420p -acodec aac";
                 }
                 else
                 {
                     args = "" +
                         " -f rawvideo -s " + settings.width + "x" + settings.height +
-                        " -pix_fmt rgb32 -r " + settings.fps + " -i -" +
-                        " -vf vflip -vcodec libx264";
+                        " -strict -2" +
+                        " -pix_fmt rgb24 -r " + settings.fps + " -i -" +
+                        " -vf vflip -vcodec libx264 -pix_fmt yuv420p";
                 }
                 if (settings.useBitrate)
                 {
@@ -280,7 +279,7 @@ void main()
                 {
                     finalCompositeBuff.BindBuffer();
                     IntPtr unmanagedPointer = Marshal.AllocHGlobal(pixels.Length);
-                    GL.ReadPixels(0, 0, settings.width, settings.height, PixelFormat.Bgra, PixelType.UnsignedByte, unmanagedPointer);
+                    GL.ReadPixels(0, 0, settings.width, settings.height, PixelFormat.Bgr, PixelType.UnsignedByte, unmanagedPointer);
                     Marshal.Copy(unmanagedPointer, pixels, 0, pixels.Length);
                     if (lastRenderPush != null) lastRenderPush.GetAwaiter().GetResult();
                     lastRenderPush = Task.Run(() => ffmpeg.StandardInput.BaseStream.Write(pixels, 0, pixels.Length));

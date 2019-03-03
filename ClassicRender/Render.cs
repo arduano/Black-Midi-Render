@@ -55,7 +55,7 @@ namespace ClassicRender
         #endregion
 
         #region Shaders
-        string noteShaderVert = @"#version 330 core
+        string noteShaderVert = @"#version 330 compatibility
 
 layout(location = 0) in vec3 position;
 layout(location = 1) in vec4 glColor;
@@ -69,7 +69,7 @@ void main()
     color = vec4(glColor.xyz + attrib.x, glColor.w);
 }
 ";
-        string noteShaderFrag = @"#version 330
+        string noteShaderFrag = @"#version 330 compatibility
  
 in vec4 color;
  

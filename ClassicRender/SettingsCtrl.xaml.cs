@@ -35,6 +35,7 @@ namespace ClassicRender
             sameWidth.IsChecked = settings.sameWidthNotes;
             if (settings.tickBased) tickBase.SelectedIndex = 0;
             else tickBase.SelectedIndex = 1;
+            screenTime.Content = (Math.Round(settings.deltaTimeOnScreen * 100) / 100).ToString();
         }
 
         public SettingsCtrl(Settings settings) : base()

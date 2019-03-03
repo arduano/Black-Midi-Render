@@ -39,7 +39,7 @@ namespace PFARender
         public ImageSource PreviewImage { get; private set; }
 
         #region Shaders
-        string noteShaderVert = @"#version 330 core
+        string noteShaderVert = @"#version 330 compatibility
 
 layout(location = 0) in vec3 position;
 layout(location = 1) in vec4 glColor;
@@ -53,7 +53,7 @@ void main()
     color = vec4(glColor.xyz * attrib.y + attrib.x, glColor.w);
 }
 ";
-        string noteShaderFrag = @"#version 330
+        string noteShaderFrag = @"#version 330 compatibility
  
 in vec4 color;
  
@@ -93,13 +93,20 @@ void main()
 
         public bool Initialized { get; private set; } = false;
 
-        public double NoteScreenTime => settings.deltaTimeOnScreen;
-
         public long LastNoteCount { get; private set; }
+
+        public double NoteScreenTime
+        {
+            get
+            {
+                if (settings.tickBased) return settings.deltaTimeOnScreen;
+                return (double)settings.deltaTimeOnScreen * (500000 / 96.0) / LastMidiTimePerTick / 10;
+            }
+        }
 
         public System.Windows.Controls.Control SettingsControl => settingsControl;
 
-        public double LastMidiTimePerTick { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public double LastMidiTimePerTick { get; set; } = 500000 / 96.0;
 
         public void Dispose()
         {
@@ -221,7 +228,7 @@ void main()
             if (blackKeys[firstNote]) firstNote--;
             if (blackKeys[lastNote - 1]) lastNote++;
 
-            int deltaTimeOnScreen = settings.deltaTimeOnScreen;
+            double deltaTimeOnScreen = NoteScreenTime;
             double pianoHeight = settings.pianoHeight;
             bool sameWidth = settings.sameWidthNotes;
             double scwidth = renderSettings.width;
@@ -284,29 +291,28 @@ void main()
 
             #region Notes
             quadBufferPos = 0;
+            double notePosFactor = 1 / deltaTimeOnScreen * (1 - pianoHeight);
             foreach (Note n in notes)
             {
-
-                double renderCutoff = midiTime - deltaTimeOnScreen;
-                if (n.end >= renderCutoff || !n.hasEnded)
-                    if (n.start < midiTime)
+                double renderCutoff = midiTime + deltaTimeOnScreen;
+                if (n.end >= midiTime || !n.hasEnded)
+                    if (n.start < renderCutoff)
                     {
                         nc++;
                         int k = n.note;
                         if (!(k >= firstNote && k < lastNote)) continue;
                         Color4 coll = n.track.trkColor[n.channel * 2];
                         Color4 colr = n.track.trkColor[n.channel * 2 + 1];
-                        if (n.start < renderCutoff)
+                        if (n.start < midiTime)
                         {
                             keyColors[k * 2] = coll;
                             keyColors[k * 2 + 1] = colr;
-                            keyPressed[k] = true;
                         }
                         x1 = x1array[k - firstNote];
                         wdth = wdtharray[k - firstNote];
                         x2 = x1 + wdth;
-                        y1 = 1 - (midiTime - n.end) / deltaTimeOnScreen * (1 - pianoHeight);
-                        y2 = 1 - (midiTime - n.start) / deltaTimeOnScreen * (1 - pianoHeight);
+                        y1 = 1 - (renderCutoff - n.end) * notePosFactor;
+                        y2 = 1 - (renderCutoff - n.start) * notePosFactor;
                         if (!n.hasEnded)
                             y1 = 1;
 

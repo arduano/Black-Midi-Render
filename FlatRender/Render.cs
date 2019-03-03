@@ -45,7 +45,7 @@ namespace FlatRender
         #endregion
 
         #region Shaders
-        string noteShaderVert = @"#version 330 core
+        string noteShaderVert = @"#version 330 compatibility
 
 layout(location = 0) in vec3 position;
 layout(location = 1) in vec4 glColor;
@@ -58,7 +58,7 @@ void main()
     color = glColor;
 }
 ";
-        string noteShaderFrag = @"#version 330
+        string noteShaderFrag = @"#version 330 compatibility
  
 in vec4 color;
  
@@ -82,9 +82,16 @@ void main()
 
         public Control SettingsControl { get { return settingsControl; } }
 
-        public double NoteScreenTime { get { return settings.deltaTimeOnScreen; } }
+        public double NoteScreenTime
+        {
+            get
+            {
+                if (settings.tickBased) return settings.deltaTimeOnScreen;
+                return (double)settings.deltaTimeOnScreen * (500000 / 96.0) / LastMidiTimePerTick / 10;
+            }
+        }
 
-        public double LastMidiTimePerTick { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public double LastMidiTimePerTick { get; set; } = 500000 / 96.0;
 
         int noteShader;
 
@@ -203,7 +210,7 @@ void main()
             if (blackKeys[firstNote]) firstNote--;
             if (blackKeys[lastNote - 1]) lastNote++;
 
-            int deltaTimeOnScreen = settings.deltaTimeOnScreen;
+            double deltaTimeOnScreen = NoteScreenTime;
             double pianoHeight = settings.pianoHeight;
             bool sameWidth = settings.sameWidthNotes;
             Color4[] keyColors = new Color4[512];
@@ -259,30 +266,30 @@ void main()
 
             #region Notes
             quadBufferPos = 0;
+            double notePosFactor = 1 / deltaTimeOnScreen * (1 - pianoHeight);
             foreach (Note n in notes)
             {
-                double renderCutoff = midiTime - deltaTimeOnScreen;
-                if (n.end >= renderCutoff || !n.hasEnded)
-                    if (n.start < midiTime)
+                double renderCutoff = midiTime + deltaTimeOnScreen;
+                if (n.end >= midiTime || !n.hasEnded)
+                    if (n.start < renderCutoff)
                     {
                         if (n.note >= firstNote && n.note < lastNote)
                         {
                             nc++;
+                            int k = n.note;
+                            if (!(k >= firstNote && k < lastNote)) continue;
                             Color4 coll = n.track.trkColor[n.channel * 2];
                             Color4 colr = n.track.trkColor[n.channel * 2 + 1];
-                            int k = n.note;
-                            if (n.start < renderCutoff)
+                            if (n.start < midiTime)
                             {
                                 keyColors[k * 2] = coll;
                                 keyColors[k * 2 + 1] = colr;
                             }
-
                             x1 = x1array[k - firstNote];
                             wdth = wdtharray[k - firstNote];
                             x2 = x1 + wdth;
-
-                            y1 = 1 - (midiTime - n.end) / deltaTimeOnScreen * (1 - pianoHeight);
-                            y2 = 1 - (midiTime - n.start) / deltaTimeOnScreen * (1 - pianoHeight);
+                            y1 = 1 - (renderCutoff - n.end) * notePosFactor;
+                            y2 = 1 - (renderCutoff - n.start) * notePosFactor;
                             if (!n.hasEnded)
                                 y1 = 1;
 

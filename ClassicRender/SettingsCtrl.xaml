@@ -23,7 +23,7 @@
         <Button Name="saveButton" Content="Save" HorizontalAlignment="Left" Margin="10,227,0,0" VerticalAlignment="Top" Width="75" Click="SaveButton_Click" />
         <Button Name="loadButton" Content="Load Saved" HorizontalAlignment="Left" Margin="90,227,0,0" VerticalAlignment="Top" Width="89" Click="LoadButton_Click" />
         <Button Name="defaultsButton" Content="Defaults" HorizontalAlignment="Left" Margin="184,227,0,0" VerticalAlignment="Top" Width="75" Click="DefaultsButton_Click"/>
-        <CheckBox x:Name="sameWidth" Content="Same Width Notes" HorizontalAlignment="Left" Margin="14,207,0,0" VerticalAlignment="Top" IsChecked="True" Checked="SameWidth_Checked" Unchecked="SameWidth_Checked" />
+        <CheckBox x:Name="sameWidth" Content="Same Width Notes" HorizontalAlignment="Left" Margin="14,193,0,0" VerticalAlignment="Top" IsChecked="True" Checked="SameWidth_Checked" Unchecked="SameWidth_Checked" />
         <Label Content="Note Tempo" HorizontalAlignment="Left" Margin="14,162,0,0" VerticalAlignment="Top"/>
         <ComboBox Name="tickBase" HorizontalAlignment="Left" Margin="94,162,0,0" VerticalAlignment="Top" Width="113" Height="26" SelectedIndex="0" SelectionChanged="TickBase_SelectionChanged">
             <ComboBoxItem Content="Change Speed"/>
