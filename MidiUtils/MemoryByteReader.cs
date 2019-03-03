@@ -18,12 +18,24 @@ namespace MidiUtils
 
         public long Location => pos;
 
+        public int Pushback { get; set; } = -1;
+
         public void Dispose()
         {
             bytes = null;
         }
 
-        public byte Read() => bytes[pos++];
+        public byte Read()
+        {
+            if (Pushback != -1)
+            {
+                byte _b = (byte)Pushback;
+                Pushback = -1;
+                return _b;
+            }
+            return bytes[pos++];
+        }
+
 
         public void Reset()
         {

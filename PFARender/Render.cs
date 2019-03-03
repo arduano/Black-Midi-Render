@@ -93,11 +93,13 @@ void main()
 
         public bool Initialized { get; private set; } = false;
 
-        public int NoteScreenTime => settings.deltaTimeOnScreen;
+        public double NoteScreenTime => settings.deltaTimeOnScreen;
 
         public long LastNoteCount { get; private set; }
 
         public System.Windows.Controls.Control SettingsControl => settingsControl;
+
+        public double LastMidiTimePerTick { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         public void Dispose()
         {

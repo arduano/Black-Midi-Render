@@ -16,6 +16,8 @@ namespace BMEngine
         public ushort trackcount;
         public ushort format;
 
+        public int zerothTempo = 500000;
+
         List<long> trackBeginnings = new List<long>();
         List<uint> trackLengths = new List<uint>();
 
@@ -39,65 +41,10 @@ namespace BMEngine
             this.settings = settings;
             MidiFileReader = new StreamReader(filename).BaseStream;
             ParseHeaderChunk();
-            //try
-            //{
-                while (MidiFileReader.Position < MidiFileReader.Length)
-                {
-                    ParseTrackChunk();
-                }
-            //}
-            //catch
-            //{
-                //var r = MessageBox.Show("This midi has corrupt track chunks.\nBMC can use what it has alreadt parsed, or it can attempt to recover all the tracks manually. However track recovery can take some time, depending on the midi size, and might not recover anything.\nPerform track recovery?", "Corrupt headers", MessageBoxButtons.YesNo);
-                //if (r == DialogResult.Yes)
-                //{
-                //    long start;
-                //    long end = MidiFileReader.Length;
-                //    long pos;
-                //    Stopwatch printtimer = new Stopwatch();
-                //    printtimer.Start();
-                //    if (trackBeginnings.Count == 0)
-                //    {
-                //        start = 4 + 4 + 6;
-                //    }
-                //    else start = trackBeginnings[trackBeginnings.Count - 1];
-                //    pos = start;
-
-                //    long prevstart = -1;
-                //    bool noerror = true;
-                //    while (pos < end)
-                //    {
-                //        MidiFileReader.Position = pos;
-                //        noerror = true;
-                //        try
-                //        {
-                //            AssertText("MTrk");
-                //        }
-                //        catch { noerror = false; }
-                //        if (noerror)
-                //        {
-                //            if (prevstart != -1)
-                //            {
-                //                trackBeginnings.Add(pos + 8);
-                //                trackLengths.Add((uint)(pos - prevstart));
-                //            }
-                //            prevstart = pos + 8;
-                //        }
-                //        pos++;
-                //        if (printtimer.ElapsedMilliseconds > 2000)
-                //        {
-                //            Console.WriteLine("Processed: " + Math.Round(((double)pos - start) / (end - start) * 10000) / 100 + "%");
-                //            printtimer.Reset();
-                //            printtimer.Start();
-                //        }
-                //    }
-                //    if (prevstart != -1)
-                //    {
-                //        trackBeginnings.Add(pos + 4);
-                //        trackLengths.Add((uint)(pos - prevstart));
-                //    }
-                //}
-            //}
+            while (MidiFileReader.Position < MidiFileReader.Length)
+            {
+                ParseTrackChunk();
+            }
             tracks = new MidiTrack[trackcount];
 
             Console.WriteLine("Loading tracks into memory");
@@ -194,21 +141,25 @@ namespace BMEngine
                 var t = tracks[i];
                 while (!t.trackEnded)
                 {
-                    try
-                    {
-                        t.ParseNextEventFast();
-                    }
-                    catch
-                    {
-                        break;
-                    }
+                    //try
+                    //{
+                    t.ParseNextEventFast();
+                    //}
+                    //catch
+                    //{
+                    //    break;
+                    //}
                 }
                 noteCount += t.noteCount;
                 tracklens[i] = t.trackTime;
+                if(t.zerothTempo != -1)
+                {
+                    zerothTempo = t.zerothTempo;
+                }
                 if (useBufferStream)
                 {
                     t.Dispose();
-                    tracks[i] = new MidiTrack(i, 
+                    tracks[i] = new MidiTrack(i,
                         new BufferByteReader(MidiFileReader, settings.maxTrackBufferSize, trackBeginnings[i], trackLengths[i]),
                         this, settings);
                 }

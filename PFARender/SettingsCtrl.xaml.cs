@@ -77,8 +77,8 @@ namespace PFARender
             try
             {
                 string s = JsonConvert.SerializeObject(settings, Formatting.Indented);
-                File.WriteAllText("Plugins/FlatRender.json", s);
-                Console.WriteLine("Saved settings to FlatRender.json");
+                File.WriteAllText("Plugins/PFARender.json", s);
+                Console.WriteLine("Saved settings to PFARender.json");
             }
             catch
             {
@@ -90,10 +90,10 @@ namespace PFARender
         {
             try
             {
-                string s = File.ReadAllText("Plugins/ClassicRender.json");
+                string s = File.ReadAllText("Plugins/PFARender.json");
                 var sett = JsonConvert.DeserializeObject<Settings>(s);
                 injectSettings(sett);
-                Console.WriteLine("Loaded settings from ClassicRender.json");
+                Console.WriteLine("Loaded settings from PFARender.json");
             }
             catch
             {

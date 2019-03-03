@@ -16,14 +16,19 @@
         <Label Content="Initial Note Brightness" HorizontalAlignment="Left" Margin="10,36,0,0" VerticalAlignment="Top"/>
         <xctk:DecimalUpDown x:Name="noteBrightness" FormatString="F2" Value="1" Increment="0.1"  Maximum="1" Minimum="0" Margin="142,36,0,0" HorizontalAlignment="Left" Width="80" Height="26" VerticalAlignment="Top" ValueChanged="Nud_ValueChanged"  />
         <Label Content="Note screen time" HorizontalAlignment="Left" Margin="10,129,0,0" VerticalAlignment="Top"/>
-        <Slider x:Name="noteDeltaScreenTime" IsSnapToTickEnabled="True" TickPlacement="BottomRight" HorizontalAlignment="Left" Margin="116,133,0,0" VerticalAlignment="Top" Width="236" Maximum="1500" Minimum="50" Value="300" TickFrequency="50" ValueChanged="NoteDeltaScreenTime_ValueChanged"/>
+        <Slider x:Name="noteDeltaScreenTime" IsSnapToTickEnabled="True" TickPlacement="BottomRight" HorizontalAlignment="Left" Margin="116,133,0,0" VerticalAlignment="Top" Width="236" Maximum="13" Minimum="2" Value="1" TickFrequency="0.2" ValueChanged="NoteDeltaScreenTime_ValueChanged"/>
         <Label x:Name="screenTime" Content="Label" HorizontalAlignment="Left" Margin="357,129,0,0" VerticalAlignment="Top"/>
         <Label Content="Initial" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
         <Label Content="Variable" HorizontalAlignment="Left" Margin="10,67,0,0" VerticalAlignment="Top"/>
-        <Button Name="saveButton" Content="Save" HorizontalAlignment="Left" Margin="10,192,0,0" VerticalAlignment="Top" Width="75" Click="SaveButton_Click" />
-        <Button Name="loadButton" Content="Load Saved" HorizontalAlignment="Left" Margin="90,192,0,0" VerticalAlignment="Top" Width="89" Click="LoadButton_Click" />
-        <Button Name="defaultsButton" Content="Defaults" HorizontalAlignment="Left" Margin="184,192,0,0" VerticalAlignment="Top" Width="75" Click="DefaultsButton_Click"/>
-        <CheckBox x:Name="sameWidth" Content="Same Width Notes" HorizontalAlignment="Left" Margin="14,167,0,0" VerticalAlignment="Top" IsChecked="True" Checked="SameWidth_Checked" Unchecked="SameWidth_Checked" />
+        <Button Name="saveButton" Content="Save" HorizontalAlignment="Left" Margin="10,227,0,0" VerticalAlignment="Top" Width="75" Click="SaveButton_Click" />
+        <Button Name="loadButton" Content="Load Saved" HorizontalAlignment="Left" Margin="90,227,0,0" VerticalAlignment="Top" Width="89" Click="LoadButton_Click" />
+        <Button Name="defaultsButton" Content="Defaults" HorizontalAlignment="Left" Margin="184,227,0,0" VerticalAlignment="Top" Width="75" Click="DefaultsButton_Click"/>
+        <CheckBox x:Name="sameWidth" Content="Same Width Notes" HorizontalAlignment="Left" Margin="14,207,0,0" VerticalAlignment="Top" IsChecked="True" Checked="SameWidth_Checked" Unchecked="SameWidth_Checked" />
+        <Label Content="Note Tempo" HorizontalAlignment="Left" Margin="14,162,0,0" VerticalAlignment="Top"/>
+        <ComboBox Name="tickBase" HorizontalAlignment="Left" Margin="94,162,0,0" VerticalAlignment="Top" Width="113" Height="26" SelectedIndex="0" SelectionChanged="TickBase_SelectionChanged">
+            <ComboBoxItem Content="Change Speed"/>
+            <ComboBoxItem Content="Change Size"/>
+        </ComboBox>
 
     </Grid>
 </UserControl>

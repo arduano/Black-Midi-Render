@@ -90,10 +90,10 @@ namespace FlatRender
         {
             try
             {
-                string s = File.ReadAllText("Plugins/ClassicRender.json");
+                string s = File.ReadAllText("Plugins/FlatRender.json");
                 var sett = JsonConvert.DeserializeObject<Settings>(s);
                 injectSettings(sett);
-                Console.WriteLine("Loaded settings from ClassicRender.json");
+                Console.WriteLine("Loaded settings from FlatRender.json");
             }
             catch
             {

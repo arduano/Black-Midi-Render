@@ -82,7 +82,9 @@ void main()
 
         public Control SettingsControl { get { return settingsControl; } }
 
-        public int NoteScreenTime { get { return settings.deltaTimeOnScreen; } }
+        public double NoteScreenTime { get { return settings.deltaTimeOnScreen; } }
+
+        public double LastMidiTimePerTick { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         int noteShader;
 

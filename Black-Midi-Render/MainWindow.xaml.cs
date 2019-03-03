@@ -80,7 +80,7 @@ namespace Black_Midi_Render
             {
                 while ((midifile.ParseUpTo(time += (long)(win.tempoFrameStep * 10)) || nc != 0) && settings.running)
                 {
-                    SpinWait.SpinUntil(() => midifile.currentSyncTime < win.midiTime + (long)(win.tempoFrameStep * 10) || !settings.running);
+                    SpinWait.SpinUntil(() => midifile.currentSyncTime < win.midiTime + win.lastDeltaTimeOnScreen + (long)(win.tempoFrameStep * 10) || !settings.running);
                     if (!settings.running) break;
                     nc = 0;
                     Note n;
@@ -88,7 +88,7 @@ namespace Black_Midi_Render
                     {
                         var i = midifile.globalDisplayNotes.Iterate();
                         double cutoffTime = 0;
-                        cutoffTime = win.midiTime - win.lastDeltaTimeOnScreen;
+                        cutoffTime = win.midiTime;
                         while (i.MoveNext(out n))
                         {
                             if (n.hasEnded && n.end < cutoffTime)
@@ -96,13 +96,16 @@ namespace Black_Midi_Render
                             else nc++;
                         }
                     }
-                    lock (renderer)
+                    try
                     {
                         Console.WriteLine(
                             Math.Round((double)time / midifile.maxTrackTime * 10000) / 100 + "%\tNotes loaded: " + nc +
                             "\tNotes drawn: " + renderer.renderer.LastNoteCount +
                             "\tRender FPS: " + Math.Round(settings.liveFps) + "        "
                             );
+                    }
+                    catch
+                    {
                     }
                     long ram = Process.GetCurrentProcess().PrivateMemorySize64;
                     if (maxRam < ram) maxRam = ram;
@@ -231,7 +234,7 @@ namespace Black_Midi_Render
                 MessageBox.Show("Midi file doesn't exist");
                 return;
             }
-            try
+            //try
             {
                 settings.maxTrackBufferSize = (int)maxBufferSize.Value;
 
@@ -242,11 +245,11 @@ namespace Black_Midi_Render
                 midifile = new MidiFile(midipath, settings);
                 Resources["midiLoaded"] = true;
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message + "\n" + ex.StackTrace);
-                MessageBox.Show(ex.Message + "\n" + ex.StackTrace);
-            }
+            //catch (Exception ex)
+            //{
+            //    Console.WriteLine(ex.Message + "\n" + ex.StackTrace);
+            //    MessageBox.Show(ex.Message + "\n" + ex.StackTrace);
+            //}
         }
 
         private void UnloadButton_Click(object sender, RoutedEventArgs e)

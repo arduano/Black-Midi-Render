@@ -30,9 +30,11 @@ namespace ClassicRender
             lastNote.Value = settings.lastNote - 1;
             pianoHeight.Value = (int)(settings.pianoHeight * 100);
             noteBrightness.Value = (decimal)settings.noteBrightness;
-            noteDeltaScreenTime.Value = settings.deltaTimeOnScreen;
+            noteDeltaScreenTime.Value = Math.Log(settings.deltaTimeOnScreen, 2);
             screenTime.Content = settings.deltaTimeOnScreen;
             sameWidth.IsChecked = settings.sameWidthNotes;
+            if (settings.tickBased) tickBase.SelectedIndex = 0;
+            else tickBase.SelectedIndex = 1;
         }
 
         public SettingsCtrl(Settings settings) : base()
@@ -63,8 +65,8 @@ namespace ClassicRender
         {
             try
             {
-                settings.deltaTimeOnScreen = (int)noteDeltaScreenTime.Value;
-                screenTime.Content = settings.deltaTimeOnScreen;
+                settings.deltaTimeOnScreen = Math.Pow(2, noteDeltaScreenTime.Value);
+                screenTime.Content = (Math.Round(settings.deltaTimeOnScreen * 100) / 100).ToString();
             }
             catch (NullReferenceException)
             {
@@ -133,6 +135,15 @@ namespace ClassicRender
             try
             {
                 settings.sameWidthNotes = (bool)sameWidth.IsChecked;
+            }
+            catch (NullReferenceException) { }
+        }
+
+        private void TickBase_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
+                settings.tickBased = tickBase.SelectedIndex == 0;
             }
             catch (NullReferenceException) { }
         }

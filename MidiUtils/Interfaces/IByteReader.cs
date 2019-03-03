@@ -11,6 +11,7 @@ namespace MidiUtils
         byte Read();
         void Reset();
         void Skip(int count);
+        int Pushback { set; get; }
         long Location
         {
             get;

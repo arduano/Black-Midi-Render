@@ -40,10 +40,18 @@ namespace MidiUtils
             maxbufferpos = (int)Math.Min(streamlen - pos, buffersize);
         }
 
-        public long Location => throw new NotImplementedException();
+        public long Location => pos;
+
+        public int Pushback { get; set; } = -1;
 
         public byte Read()
         {
+            if(Pushback != -1)
+            {
+                byte _b = (byte)Pushback;
+                Pushback = -1;
+                return _b;
+            }
             byte b = buffer[bufferpos++];
             if (bufferpos < maxbufferpos) return b;
             else if (bufferpos >= buffersize)

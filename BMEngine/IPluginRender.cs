@@ -16,12 +16,15 @@ namespace BMEngine
         bool Initialized { get; }
         ImageSource PreviewImage { get; }
 
-        int NoteScreenTime { get; }
+        double LastMidiTimePerTick { get; set; }
+
+        double NoteScreenTime { get; }
         long LastNoteCount { get; }
         Control SettingsControl { get; }
 
         void Init();
         void RenderFrame(FastList<Note> notes, double midiTime, int finalCompositeBuff);
         void SetTrackColors(Color4[][] trakcs);
+        
     }
 }

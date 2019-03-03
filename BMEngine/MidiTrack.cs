@@ -42,6 +42,7 @@ namespace BMEngine
 
         public long trackTime = 0;
         public long noteCount = 0;
+        public int zerothTempo = -1;
 
         byte channelPrefix = 0;
 
@@ -157,6 +158,7 @@ namespace BMEngine
             UnendedNotes = null;
         }
 
+        byte prevCommand = 0;
         public void ParseNextEvent(bool readOnly = false)
         {
             try
@@ -167,6 +169,12 @@ namespace BMEngine
                 }
                 readDelta = false;
                 byte command = reader.Read();
+                if (command < 0x80)
+                {
+                    reader.Pushback = command;
+                    command = prevCommand;
+                }
+                prevCommand = command;
                 byte comm = (byte)(command & 0b11110000);
                 if (comm == 0b10010000)
                 {
@@ -474,7 +482,7 @@ namespace BMEngine
                         t.pos = trackTime;
                         t.tempo = btempo;
 
-                        if (trackID <= 1)
+                        //if (trackID <= 1)
                         {
                             if (!readOnly)
                             {
@@ -545,6 +553,12 @@ namespace BMEngine
             {
                 trackTime += ReadVariableLen();
                 byte command = reader.Read();
+                if(command < 0x80)
+                {
+                    reader.Pushback = command;
+                    command = prevCommand;
+                }
+                prevCommand = command;
                 byte comm = (byte)(command & 0b11110000);
                 if (comm == 0b10010000)
                 {
@@ -675,7 +689,13 @@ namespace BMEngine
                         {
                             throw new Exception("Corrupt Track");
                         }
-                        reader.Skip(3);
+                        int btempo = 0;
+                        for (int i = 0; i != 3; i++)
+                            btempo = (int)((btempo << 8) | reader.Read());
+                        if(trackTime == 0)
+                        {
+                            zerothTempo = btempo;
+                        }
                     }
                     else if (command == 0x54)
                     {

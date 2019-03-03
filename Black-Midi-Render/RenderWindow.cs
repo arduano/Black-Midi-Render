@@ -94,8 +94,10 @@ void main()
         {
             render = renderer;
             this.settings = settings;
+            lastTempo = midi.zerothTempo;
             lock (render)
             {
+                render.renderer.LastMidiTimePerTick = (double)midi.zerothTempo / midi.division;
                 midiTime = -render.renderer.NoteScreenTime;
             }
             pixels = new byte[settings.width * settings.height * 4];
@@ -105,16 +107,17 @@ void main()
             globalTempoEvents = midi.globalTempoEvents;
             globalColorEvents = midi.globalColorEvents;
             this.midi = midi;
-            tempoFrameStep = ((double)96 / 50000) * (1000000 / settings.fps);
             if (settings.ffRender)
             {
                 string args = "";
                 if (settings.includeAudio)
                 {
+                    double fstep = ((double)midi.division / lastTempo) * (1000000 / settings.fps);
+                    double offset = -midiTime / fstep / settings.fps;
                     args = "" +
                         " -f rawvideo -s " + settings.width + "x" + settings.height +
                         " -pix_fmt rgb32 -r " + settings.fps + " -i -" +
-                        " -itsoffset 0.21 -i \"" + settings.audioPath + "\"" +
+                        " -itsoffset " + offset + " -i \"" + settings.audioPath + "\"" +
                         " -vf vflip -vcodec libx264 -acodec aac";
 
 
@@ -186,56 +189,67 @@ void main()
             GL.LinkProgram(postShader);
         }
 
-        public int lastDeltaTimeOnScreen = 0;
+        double lastTempo;
+        public double lastDeltaTimeOnScreen = 0;
         protected override void OnRenderFrame(FrameEventArgs e)
         {
             Stopwatch watch = new Stopwatch();
             watch.Start();
-
+            tempoFrameStep = ((double)midi.division / lastTempo) * (1000000 / settings.fps);
             lock (render)
             {
                 lastDeltaTimeOnScreen = render.renderer.NoteScreenTime;
             }
             while (settings.running && (midiTime < midi.maxTrackTime + lastDeltaTimeOnScreen + settings.fps * tempoFrameStep * 5 || midi.unendedTracks != 0))
             {
-                SpinWait.SpinUntil(() => midi.currentSyncTime > midiTime + tempoFrameStep || midi.unendedTracks == 0 || !settings.running);
-                if (!settings.running) break;
-
                 if (!settings.paused || settings.forceReRender)
                 {
                     lock (render)
                     {
-                        if (render.disposeQueue.Count != 0)
-                            try
-                            {
-                                while (true)
-                                {
-                                    var r = render.disposeQueue.Dequeue();
-                                    if (r.Initialized) r.Dispose();
-                                }
-                            }
-                            catch (InvalidOperationException) { }
-                        if (!render.renderer.Initialized)
+                        try
                         {
-                            render.renderer.Init();
-                            List<Color4[]> trkcolors = new List<Color4[]>();
-                            foreach (var t in midi.tracks) trkcolors.Add(t.trkColor);
-                            render.renderer.SetTrackColors(trkcolors.ToArray());
+                            if (render.disposeQueue.Count != 0)
+                                try
+                                {
+                                    while (true)
+                                    {
+                                        var r = render.disposeQueue.Dequeue();
+                                        if (r.Initialized) r.Dispose();
+                                    }
+                                }
+                                catch (InvalidOperationException) { }
+                            if (!render.renderer.Initialized)
+                            {
+                                render.renderer.Init();
+                                List<Color4[]> trkcolors = new List<Color4[]>();
+                                foreach (var t in midi.tracks) trkcolors.Add(t.trkColor);
+                                render.renderer.SetTrackColors(trkcolors.ToArray());
+                            }
+                            render.renderer.LastMidiTimePerTick = lastTempo / midi.division;
+                            lastDeltaTimeOnScreen = render.renderer.NoteScreenTime;
+                            SpinWait.SpinUntil(() => midi.currentSyncTime > midiTime + lastDeltaTimeOnScreen + tempoFrameStep || midi.unendedTracks == 0 || !settings.running);
+                            if (!settings.running || midi.unendedTracks == 0) break;
+
+                            render.renderer.RenderFrame(globalDisplayNotes, midiTime, finalCompositeBuff.BufferID);
                         }
-                        render.renderer.RenderFrame(globalDisplayNotes, midiTime, finalCompositeBuff.BufferID);
-                        lastDeltaTimeOnScreen = render.renderer.NoteScreenTime;
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show("The renderer has crashed\n" + ex.Message);
+                            break;
+                        }
                     }
                 }
                 double mv = 1;
                 lock (globalTempoEvents)
                 {
-                    while (globalTempoEvents.First != null && midiTime + (tempoFrameStep * mv * settings.tempoMultiplier) - lastDeltaTimeOnScreen > globalTempoEvents.First.pos)
+                    while (globalTempoEvents.First != null && midiTime + (tempoFrameStep * mv * settings.tempoMultiplier) > globalTempoEvents.First.pos)
                     {
                         var t = globalTempoEvents.Pop();
-                        var _t = ((t.pos + lastDeltaTimeOnScreen) - midiTime) / (tempoFrameStep * mv * settings.tempoMultiplier);
+                        var _t = ((t.pos) - midiTime) / (tempoFrameStep * mv * settings.tempoMultiplier);
                         mv *= 1 - _t;
                         tempoFrameStep = ((double)midi.division / t.tempo) * (1000000.0 / settings.fps);
-                        midiTime = t.pos + lastDeltaTimeOnScreen;
+                        lastTempo = t.tempo;
+                        midiTime = t.pos;
                     }
                 }
                 if (!settings.paused)
@@ -243,7 +257,7 @@ void main()
                     midiTime += mv * tempoFrameStep * settings.tempoMultiplier;
                 }
 
-                while (globalColorEvents.First != null && globalColorEvents.First.pos + lastDeltaTimeOnScreen < midiTime)
+                while (globalColorEvents.First != null && globalColorEvents.First.pos < midiTime)
                 {
                     var c = globalColorEvents.Pop();
                     var track = c.track;
