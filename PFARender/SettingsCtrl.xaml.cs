@@ -56,10 +56,8 @@ namespace PFARender
                 if (sender == pianoHeight) settings.pianoHeight = (double)pianoHeight.Value / 100;
                 if (sender == noteDeltaScreenTime) settings.deltaTimeOnScreen = (int)noteDeltaScreenTime.Value;
             }
-            catch (NullReferenceException)
-            {
-
-            }
+            catch (NullReferenceException) { }
+            catch (InvalidOperationException) { }
         }
 
         private void NoteDeltaScreenTime_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)

@@ -88,8 +88,8 @@ void main()
         int indexBufferId;
         uint[] indexes = new uint[2048 * 4 * 6];
 
-        bool[] blackKeys = new bool[256];
-        int[] keynum = new int[256];
+        bool[] blackKeys = new bool[257];
+        int[] keynum = new int[257];
 
         public bool Initialized { get; private set; } = false;
 
@@ -224,22 +224,20 @@ void main()
             long nc = 0;
             int firstNote = settings.firstNote;
             int lastNote = settings.lastNote;
-
-            if (blackKeys[firstNote]) firstNote--;
-            if (blackKeys[lastNote - 1]) lastNote++;
+            int kbfirstNote = settings.firstNote;
+            int kblastNote = settings.lastNote;
+            if (blackKeys[firstNote]) kbfirstNote--;
+            if (blackKeys[lastNote - 1]) kblastNote++;
 
             double deltaTimeOnScreen = NoteScreenTime;
             double pianoHeight = settings.pianoHeight;
             bool sameWidth = settings.sameWidthNotes;
             double scwidth = renderSettings.width;
-            Color4[] keyColors = new Color4[512];
-            bool[] keyPressed = new bool[256];
-            for (int i = 0; i < 512; i++) keyColors[i] = Color4.Transparent;
-            for (int i = 0; i < 256; i++) keyPressed[i] = false;
+            Color4[] keyColors = new Color4[514];
+            bool[] keyPressed = new bool[257];
+            for (int i = 0; i < 514; i++) keyColors[i] = Color4.Transparent;
+            for (int i = 0; i < 257; i++) keyPressed[i] = false;
             quadBufferPos = 0;
-
-            double[] x1array = new double[lastNote - firstNote];
-            double[] wdtharray = new double[lastNote - firstNote];
 
             int pos;
 
@@ -249,27 +247,33 @@ void main()
             double paddingx = 0.001;
             double paddingy = paddingx * renderSettings.width / renderSettings.height;
 
+            double[] x1array = new double[257];
+            double[] wdtharray = new double[257];
             if (settings.sameWidthNotes)
             {
-                for (int i = 0; i < lastNote - firstNote; i++)
+                for (int i = 0; i < 257; i++)
                 {
-                    x1array[i] = (float)i / (lastNote - firstNote);
+                    x1array[i] = (float)(i - firstNote) / (lastNote - firstNote);
                     wdtharray[i] = 1.0f / (lastNote - firstNote);
                 }
             }
             else
             {
-                for (int i = 0; i < lastNote - firstNote; i++)
+                double knmfn = keynum[firstNote];
+                double knmln = keynum[lastNote - 1];
+                if (blackKeys[firstNote]) knmfn = keynum[firstNote - 1] + 0.5;
+                if (blackKeys[lastNote - 1]) knmln = keynum[lastNote] - 0.5;
+                for (int i = 0; i < 257; i++)
                 {
-                    if (!blackKeys[i + firstNote])
+                    if (!blackKeys[i])
                     {
-                        x1array[i] = (float)(keynum[firstNote + i] - keynum[firstNote]) / (keynum[lastNote - 1] - keynum[firstNote] + 1);
-                        wdtharray[i] = 1.0f / (keynum[lastNote - 1] - keynum[firstNote] + 1);
+                        x1array[i] = (float)(keynum[i] - knmfn) / (knmln - knmfn + 1);
+                        wdtharray[i] = 1.0f / (knmln - knmfn + 1);
                     }
                     else
                     {
                         int _i = i + 1;
-                        wdth = 0.6f / (keynum[lastNote - 1] - keynum[firstNote] + 1);
+                        wdth = 0.6f / (knmln - knmfn + 1);
                         int bknum = keynum[i] % 5;
                         double offset = wdth / 2;
                         if (bknum == 0 || bknum == 2)
@@ -280,7 +284,7 @@ void main()
                         {
                             offset *= 0.7;
                         }
-                        x1array[i] = (float)(keynum[firstNote + _i] - keynum[firstNote]) / (keynum[lastNote - 1] - keynum[firstNote] + 1) - offset;
+                        x1array[i] = (float)(keynum[_i] - knmfn) / (knmln - knmfn + 1) - offset;
                         wdtharray[i] = wdth;
                     }
                 }
@@ -308,8 +312,8 @@ void main()
                             keyColors[k * 2] = coll;
                             keyColors[k * 2 + 1] = colr;
                         }
-                        x1 = x1array[k - firstNote];
-                        wdth = wdtharray[k - firstNote];
+                        x1 = x1array[k];
+                        wdth = wdtharray[k];
                         x2 = x1 + wdth;
                         y1 = 1 - (renderCutoff - n.end) * notePosFactor;
                         y2 = 1 - (renderCutoff - n.start) * notePosFactor;
@@ -627,8 +631,8 @@ void main()
 
             y2 = 0;
             y1 = topBarEnd;
-            Color4[] origColors = new Color4[256];
-            for (int k = firstNote; k < lastNote; k++)
+            Color4[] origColors = new Color4[257];
+            for (int k = kbfirstNote; k < kblastNote; k++)
             {
                 if (isBlackNote(k))
                     origColors[k] = Color4.Black;
@@ -637,10 +641,10 @@ void main()
             }
 
             #region White
-            for (int n = firstNote; n < lastNote; n++)
+            for (int n = kbfirstNote; n < kblastNote; n++)
             {
-                x1 = x1array[n - firstNote];
-                wdth = wdtharray[n - firstNote];
+                x1 = x1array[n];
+                wdth = wdtharray[n ];
                 x2 = x1 + wdth;
 
                 if (!blackKeys[n])
@@ -1046,15 +1050,15 @@ void main()
             #endregion
 
             #region Black
-            for (int n = firstNote; n < lastNote; n++)
+            for (int n = kbfirstNote; n < kblastNote; n++)
             {
                 if (!blackKeys[n])
                 {
                     continue;
                 }
 
-                ox1 = x1array[n - firstNote];
-                wdth = wdtharray[n - firstNote];
+                ox1 = x1array[n];
+                wdth = wdtharray[n];
                 ox2 = ox1 + wdth;
                 ix1 = ox1 + wdth / 8;
                 ix2 = ox2 - wdth / 8;

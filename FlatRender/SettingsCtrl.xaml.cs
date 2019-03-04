@@ -56,10 +56,8 @@ namespace FlatRender
                 if (sender == noteBrightness) settings.noteBrightness = (float)noteBrightness.Value;
                 if (sender == noteDeltaScreenTime) settings.deltaTimeOnScreen = (int)noteDeltaScreenTime.Value;
             }
-            catch (NullReferenceException)
-            {
-
-            }
+            catch (NullReferenceException) { }
+            catch (InvalidOperationException) { }
         }
 
         private void NoteDeltaScreenTime_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)

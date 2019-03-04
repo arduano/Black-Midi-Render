@@ -282,23 +282,23 @@ void main()
                         x1array[i] = (float)(keynum[i] - knmfn) / (knmln - knmfn + 1);
                         wdtharray[i] = 1.0f / (knmln - knmfn + 1);
                     }
-                    //else
-                    //{
-                    //    int _i = i + 1;
-                    //    wdth = 0.6f / (knmln - knmfn + 1);
-                    //    int bknum = keynum[i + firstNote] % 5;
-                    //    double offset = wdth / 2;
-                    //    if (bknum == 0 || bknum == 2)
-                    //    {
-                    //        offset *= 1.3;
-                    //    }
-                    //    else if (bknum == 1 || bknum == 4)
-                    //    {
-                    //        offset *= 0.7;
-                    //    }
-                    //    x1array[i] = (float)(keynum[firstNote + _i] - knmfn) / (knmln - knmfn + 1) - offset;
-                    //    wdtharray[i] = wdth;
-                    //}
+                    else
+                    {
+                        int _i = i + 1;
+                        wdth = 0.6f / (knmln - knmfn + 1);
+                        int bknum = keynum[i] % 5;
+                        double offset = wdth / 2;
+                        if (bknum == 0 || bknum == 2)
+                        {
+                            offset *= 1.3;
+                        }
+                        else if (bknum == 1 || bknum == 4)
+                        {
+                            offset *= 0.7;
+                        }
+                        x1array[i] = (float)(keynum[_i] - knmfn) / (knmln - knmfn + 1) - offset;
+                        wdtharray[i] = wdth;
+                    }
                 }
             }
 

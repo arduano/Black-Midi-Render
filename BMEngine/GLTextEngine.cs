@@ -42,7 +42,7 @@ uniform sampler2D myTextureSampler;
 
 void main()
 {
-    float mask = texture( myTextureSampler, UV ).y;
+    float mask = texture2D( myTextureSampler, UV ).y;
     color = vec4(0.5, 0.5, 0.5, mask);
 }
 ";
