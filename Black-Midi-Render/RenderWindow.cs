@@ -19,9 +19,6 @@ using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
 using System.Drawing.Drawing2D;
 using System.Drawing.Text;
-using Poly2Tri;
-using Poly2Tri.Triangulation.Polygon;
-using Poly2Tri.Triangulation;
 
 namespace Black_Midi_Render
 {
@@ -67,33 +64,7 @@ void main()
     color = texture( myTextureSampler, UV );
 }
 ";
-        string textShaderVert = @"#version 330 compatibility
-
-layout(location = 0) in vec3 position;
-layout(location = 1) in vec4 glColor;
-
-out vec4 color;
-
-void main()
-{
-    gl_Position = vec4(position.x * 2 - 1, position.y * 2 - 1, 1.0f, 1.0f);
-    color = glColor;
-}
-";
-        string textShaderFrag = @"#version 330 compatibility
- 
-in vec4 color;
- 
-out vec4 outputF;
-layout(location = 0) out vec4 texOut;
-
-void main()
-{
-    outputF = color;
-	texOut = outputF;
-}
-";
-
+        
         int MakeShader(string vert, string frag)
         {
             int _vertexObj = GL.CreateShader(ShaderType.VertexShader);
@@ -138,7 +109,6 @@ void main()
         GLPostbuffer finalCompositeBuff;
 
         int postShader;
-        int textShader;
 
         byte[] pixels;
 
@@ -148,8 +118,10 @@ void main()
         }
 
         CurrentRendererPointer render;
+        GLTextEngine textEngine;
         public RenderWindow(CurrentRendererPointer renderer, MidiFile midi, RenderSettings settings) : base((int)(DisplayDevice.Default.Width / 1.5), (int)(DisplayDevice.Default.Height / 1.5), new GraphicsMode(new ColorFormat(8, 8, 8, 8)), "Render", GameWindowFlags.Default, DisplayDevice.Default)
         {
+            textEngine = new GLTextEngine();
             render = renderer;
             this.settings = settings;
             lastTempo = midi.zerothTempo;
@@ -225,7 +197,13 @@ void main()
             finalCompositeBuff = new GLPostbuffer(settings);
 
             postShader = MakeShader(postShaderVert, postShaderFrag);
-            textShader = MakeShader(textShaderVert, textShaderFrag);
+        }
+
+        void RenderAllText(long lastNC)
+        {
+            finalCompositeBuff.BindBuffer();
+            
+            textEngine.Render();
         }
 
         double lastTempo;
@@ -240,6 +218,7 @@ void main()
                 lastDeltaTimeOnScreen = render.renderer.NoteScreenTime;
             }
             int noNoteFrames = 0;
+            long lastNC = 0;
             while (settings.running && noNoteFrames > settings.fps * 5 || midi.unendedTracks != 0)
             {
                 if (!settings.paused || settings.forceReRender)
@@ -269,9 +248,11 @@ void main()
                             lastDeltaTimeOnScreen = render.renderer.NoteScreenTime;
                             SpinWait.SpinUntil(() => midi.currentSyncTime > midiTime + lastDeltaTimeOnScreen + tempoFrameStep || midi.unendedTracks == 0 || !settings.running);
                             if (!settings.running) break;
-
+                            
                             render.renderer.RenderFrame(globalDisplayNotes, midiTime, finalCompositeBuff.BufferID);
-                            if (render.renderer.LastNoteCount == 0 && midi.unendedTracks == 0) noNoteFrames++;
+                            lastNC = render.renderer.LastNoteCount;
+                            //RenderAllText(lastNC);
+                            if (lastNC == 0 && midi.unendedTracks == 0) noNoteFrames++;
                             else noNoteFrames = 0;
                         }
                         catch (Exception ex)
@@ -343,26 +324,6 @@ void main()
                         Marshal.FreeHGlobal(unmanagedPointer);
                     });
                 }
-
-                GL.UseProgram(textShader);
-
-                var polygons = GLTextEngine.GetTextPolygons();
-
-                P2T.Triangulate(polygons);
-
-                GL.Begin(PrimitiveType.Triangles);
-                GL.Color3(0f, 1f, 0f);
-                foreach (var p in polygons)
-                {
-                    foreach (var t in p.Triangles)
-                    {
-                        foreach (var pt in t.Points)
-                        {
-                            GL.Vertex2(pt.X / settings.width, 1 - pt.Y / settings.height);
-                        }
-                    }
-                }
-                GL.End();
 
                 GL.UseProgram(postShader);
                 GLPostbuffer.UnbindBuffers();

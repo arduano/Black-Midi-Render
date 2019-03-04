@@ -9,166 +9,292 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using OpenTK.Graphics.OpenGL;
+using OpenTK.Graphics;
+using OpenTK;
+using System.Drawing.Imaging;
 
 namespace BMEngine
 {
-    public static class GLTextEngine
+    public class GLTextEngine
     {
-        static bool CheckIfInside(
-IList<TriangulationPoint> polygonToTest,
-IList<TriangulationPoint> containingPolygon)
-        {
-            var t = 0;
-            for (var i = 0; i < polygonToTest.Count; ++i)
-            {
-                if (PointInPolygon(polygonToTest[i], containingPolygon)) t++;
-            }
+        #region Shaders
+        string textShaderVert = @"#version 330 compatibility
 
-            return ((float)t) >= (polygonToTest.Count * .6f) ? true : false;
+layout(location = 0) in vec2 position;
+layout(location = 1) in vec2 uv;
+
+out vec2 UV;
+
+void main()
+{
+    gl_Position = vec4(position.x * 2 - 1, position.y * 2 - 1, 0, 1.0f);
+    UV = uv;
+}
+";
+        string textShaderFrag = @"#version 330 compatibility
+
+in vec2 UV;
+
+out vec4 color;
+
+uniform sampler2D myTextureSampler;
+
+void main()
+{
+    float mask = texture( myTextureSampler, UV ).y;
+    color = vec4(0.5, 0.5, 0.5, mask);
+}
+";
+        #endregion
+
+        int charMapTex;
+        Size mapCharSize;
+        SizeF[] charSizes;
+
+        int textShader;
+
+        int vertexBufferID;
+        int uvBufferID;
+
+        int quadBufferLength = 2048 * 2;
+        double[] quadVertexbuff;
+        double[] quaduvbuff;
+        int quadBufferPos = 0;
+
+        int indexBufferId;
+        uint[] indexes = new uint[2048 * 4 * 6];
+
+        public void Dispose()
+        {
+            GL.DeleteBuffers(3, new int[] { vertexBufferID });
+            GL.DeleteProgram(textShader);
+            GL.DeleteTexture(charMapTex);
         }
 
-        static bool PointInPolygon(TriangulationPoint p, IList<TriangulationPoint> poly)
+        public GLTextEngine()
         {
-            PolygonPoint p1, p2;
-            var inside = false;
-            var oldPoint = new PolygonPoint(poly[poly.Count - 1].X, poly[poly.Count - 1].Y);
+            int _vertexObj = GL.CreateShader(ShaderType.VertexShader);
+            int _fragObj = GL.CreateShader(ShaderType.FragmentShader);
+            int statusCode;
+            string info;
 
-            for (var i = 0; i < poly.Count; i++)
+            GL.ShaderSource(_vertexObj, textShaderVert);
+            GL.CompileShader(_vertexObj);
+            info = GL.GetShaderInfoLog(_vertexObj);
+            GL.GetShader(_vertexObj, ShaderParameter.CompileStatus, out statusCode);
+            if (statusCode != 1) throw new ApplicationException(info);
+
+            GL.ShaderSource(_fragObj, textShaderFrag);
+            GL.CompileShader(_fragObj);
+            info = GL.GetShaderInfoLog(_fragObj);
+            GL.GetShader(_fragObj, ShaderParameter.CompileStatus, out statusCode);
+            if (statusCode != 1) throw new ApplicationException(info);
+
+            textShader = GL.CreateProgram();
+            GL.AttachShader(textShader, _fragObj);
+            GL.AttachShader(textShader, _vertexObj);
+            GL.LinkProgram(textShader);
+
+            quadVertexbuff = new double[quadBufferLength * 8];
+            quaduvbuff = new double[quadBufferLength * 8];
+
+            GL.GenBuffers(1, out vertexBufferID);
+            GL.GenBuffers(1, out uvBufferID);
+            for (uint i = 0; i < indexes.Length / 6; i++)
             {
-                var newPoint = new PolygonPoint(poly[i].X, poly[i].Y);
-                if (newPoint.X > oldPoint.X) { p1 = oldPoint; p2 = newPoint; }
-                else { p1 = newPoint; p2 = oldPoint; }
-                if ((newPoint.X < p.X) == (p.X <= oldPoint.X) && ((long)p.Y - (long)p1.Y) * (long)(p2.X - p1.X)
-                     < ((long)p2.Y - (long)p1.Y) * (long)(p.X - p1.X))
-                {
-                    inside = !inside;
-                }
-                oldPoint = newPoint;
+                indexes[i * 6 + 0] = i * 4 + 0;
+                indexes[i * 6 + 1] = i * 4 + 1;
+                indexes[i * 6 + 2] = i * 4 + 3;
+                indexes[i * 6 + 3] = i * 4 + 1;
+                indexes[i * 6 + 4] = i * 4 + 3;
+                indexes[i * 6 + 5] = i * 4 + 2;
             }
-            return inside;
+
+            GL.GenBuffers(1, out indexBufferId);
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, indexBufferId);
+            GL.BufferData(
+                BufferTarget.ElementArrayBuffer,
+                (IntPtr)(indexes.Length * 4),
+                indexes,
+                BufferUsageHint.StaticDraw);
+
+            int posloc = GL.GetAttribLocation(textShader, "position");
+            int uvloc = GL.GetAttribLocation(textShader, "uv");
+
+            var bitmap = GenerateCharacters(100, "Brush Script Std", out mapCharSize, out charSizes);
+            charMapTex = loadImage(bitmap);
+            bitmap.Dispose();
         }
 
-        class PolygonHierachy
+        int loadImage(Bitmap image)
         {
-            public Polygon Current;
-            public List<PolygonHierachy> Childs;
-            public PolygonHierachy Next;
+            int texID = GL.GenTexture();
 
-            public PolygonHierachy(Polygon current)
-            {
-                Current = current;
-                Childs = new List<PolygonHierachy>();
-                Next = null;
-            }
+            GL.BindTexture(TextureTarget.Texture2D, texID);
+            BitmapData data = image.LockBits(new System.Drawing.Rectangle(0, 0, image.Width, image.Height),
+                ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
+            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, data.Width, data.Height, 0,
+                OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, data.Scan0);
+
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge);
+
+            image.UnlockBits(data);
+
+            return texID;
         }
 
-        static void ProcessLevel(Polygon poly, ref PolygonHierachy localRoot)
+        public void Render()
         {
-            if (localRoot == null)
-            {
-                localRoot = new PolygonHierachy(poly);
-                return;
-            }
+            GL.Enable(EnableCap.Blend);
+            GL.EnableClientState(ArrayCap.VertexArray);
+            GL.EnableClientState(ArrayCap.ColorArray);
+            GL.EnableClientState(ArrayCap.TextureCoordArray);
+            GL.Enable(EnableCap.Texture2D);
 
-            if (CheckIfInside(localRoot.Current.Points, poly.Points))
+            GL.EnableVertexAttribArray(0);
+            GL.EnableVertexAttribArray(1);
+
+            GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+
+            GL.UseProgram(textShader);
+            GL.BindTexture(TextureTarget.Texture2D, charMapTex);
+
+            quadBufferPos = 0;
+            string text = "qwertQWERT:\n/';<1234.4567";
+            Vector2 curpos = new Vector2(0, 0);
+            foreach(char c in text)
             {
-                var nroot = new PolygonHierachy(poly);
-                var tmp = localRoot;
-                while (tmp != null)
+                if(c == '\n')
                 {
-                    var cur = tmp;
-                    tmp = tmp.Next;
-                    cur.Next = null;
-                    nroot.Childs.Add(cur);
+                    curpos.Y += mapCharSize.Height;
+                    curpos.X = 0;
                 }
+                if (!Characters.Contains(c)) continue;
+                var chari = Characters.IndexOf(c);
+                var sz = charSizes[chari];
+                sz.Width *= 1.0f;
+                double charwidth = 1.0 / Characters.Length;
+                double s = charwidth * chari;
+                double e = s + charSizes[chari].Width / mapCharSize.Width * charwidth;
+                float padding = mapCharSize.Width / 8f;
+                sz.Width -= padding * 2;
+                Vector2 endpos = curpos + new Vector2(sz.Width, sz.Height);
 
-                localRoot = nroot;
-                return;
+                int pos = quadBufferPos * 8;
+                quadVertexbuff[pos++] = (curpos.X - padding) / 1920;
+                quadVertexbuff[pos++] = curpos.Y / 1080;
+                quadVertexbuff[pos++] = (curpos.X - padding) / 1920;
+                quadVertexbuff[pos++] = endpos.Y / 1080;
+                quadVertexbuff[pos++] = (endpos.X + padding) / 1920;
+                quadVertexbuff[pos++] = endpos.Y / 1080;
+                quadVertexbuff[pos++] = (endpos.X + padding) / 1920;
+                quadVertexbuff[pos++] = curpos.Y / 1080;
+
+                curpos.X += sz.Width;
+
+                pos = quadBufferPos * 8;
+                quaduvbuff[pos++] = s;
+                quaduvbuff[pos++] = 0;
+                quaduvbuff[pos++] = s;
+                quaduvbuff[pos++] = 1;
+                quaduvbuff[pos++] = e;
+                quaduvbuff[pos++] = 1;
+                quaduvbuff[pos++] = e;
+                quaduvbuff[pos++] = 0;
+                quadBufferPos++;
+                FlushQuadBuffer();
             }
+            FlushQuadBuffer(false);
 
-            if (!CheckIfInside(poly.Points, localRoot.Current.Points))
-            {
-                ProcessLevel(poly, ref localRoot.Next);
-                return;
-            }
+            GL.Disable(EnableCap.Blend);
+            GL.Disable(EnableCap.Texture2D); 
+            GL.DisableClientState(ArrayCap.VertexArray);
+            GL.DisableClientState(ArrayCap.ColorArray);
+            GL.DisableClientState(ArrayCap.TextureCoordArray);
 
-            for (var i = 0; i < localRoot.Childs.Count; ++i)
-            {
-                if (!CheckIfInside(poly.Points, localRoot.Childs[i].Current.Points)) continue;
-
-                var childRoot = localRoot.Childs[i];
-                ProcessLevel(poly, ref childRoot);
-                localRoot.Childs[i] = childRoot;
-                return;
-            }
-
-            var newChildList = new List<PolygonHierachy>();
-            var newPoly = new PolygonHierachy(poly);
-            newChildList.Add(newPoly);
-            for (var i = 0; i < localRoot.Childs.Count; ++i)
-            {
-                if (CheckIfInside(localRoot.Childs[i].Current.Points, poly.Points))
-                {
-                    newPoly.Childs.Add(localRoot.Childs[i]);
-                }
-                else
-                {
-                    newChildList.Add(localRoot.Childs[i]);
-                }
-            }
-
-            localRoot.Childs = newChildList;
+            GL.DisableVertexAttribArray(0);
+            GL.DisableVertexAttribArray(1);
         }
 
-
-        public static List<Polygon> GetTextPolygons()
+        void FlushQuadBuffer(bool check = true)
         {
-            var path = new GraphicsPath();
-
-            path.AddString("TEXT!!!", new FontFamily(GenericFontFamilies.SansSerif), (int)System.Drawing.FontStyle.Regular, 100,
-                new PointF(0f, 0f), StringFormat.GenericDefault);
-
-            path.Flatten();
-
-            if (path.PointCount == 0) return new List<Polygon>();
-            var pts = path.PathPoints;
-            var ptsType = path.PathTypes;
-            path.Dispose();
-
-
-            var polygons = new List<Polygon>();
-            List<PolygonPoint> points = null;
-            Pen cPen = Pens.Yellow;
-            var start = -1;
-
-            for (var i = 0; i < pts.Length; i++)
+            if (quadBufferPos < quadBufferLength && check) return;
+            if (quadBufferPos == 0) return;
+            GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBufferID);
+            GL.BufferData(
+                BufferTarget.ArrayBuffer,
+                (IntPtr)(quadVertexbuff.Length * 8),
+                quadVertexbuff,
+                BufferUsageHint.StaticDraw);
+            GL.VertexAttribPointer(0, 2, VertexAttribPointerType.Double, false, 16, 0);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, uvBufferID);
+            GL.BufferData(
+                BufferTarget.ArrayBuffer,
+                (IntPtr)(quaduvbuff.Length * 8),
+                quaduvbuff,
+                BufferUsageHint.StaticDraw);
+            GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Double, false, 16, 0);
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, indexBufferId);
+            GL.IndexPointer(IndexPointerType.Int, 1, 0);
+            GL.DrawElements(PrimitiveType.Triangles, quadBufferPos * 6, DrawElementsType.UnsignedInt, IntPtr.Zero);
+            quadBufferPos = 0;
+        }
+        
+        private const string Characters = @"qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM0123456789µ§½!""#¤%&/()=?^*@£€${[]}\~¨'-_.:,;<>|°©®±¥";
+        public Bitmap GenerateCharacters(int fontSize, string fontName, out Size charSize, out SizeF[] charSizes)
+        {
+            charSizes = new SizeF[Characters.Length];
+            var characters = new List<Bitmap>();
+            using (var font = new Font(fontName, fontSize))
             {
-                var pointType = ptsType[i] & 0x07;
-                if (pointType == 0)
+                for (int i = 0; i < Characters.Length; i++)
                 {
-                    points = new List<PolygonPoint> { new PolygonPoint(pts[i].X, pts[i].Y) };
-                    start = i;
-                    continue;
+                    var charBmp = GenerateCharacter(font, Characters[i]);
+                    charSizes[i] = GetSize(font, Characters[i]);
+                    characters.Add(charBmp);
                 }
-                if (pointType != 1) throw new Exception("Unsupported point type");
-
-                if ((ptsType[i] & 0x80) != 0)
+                charSize = new Size(characters.Max(x => x.Width), characters.Max(x => x.Height));
+                var charMap = new Bitmap(charSize.Width * characters.Count, charSize.Height);
+                using (var gfx = Graphics.FromImage(charMap))
                 {
-                    //- Last point in the polygon
-                    if (pts[i] != pts[start])
+                    gfx.FillRectangle(Brushes.Black, 0, 0, charMap.Width, charMap.Height);
+                    for (int i = 0; i < characters.Count; i++)
                     {
-                        points.Add(new PolygonPoint(pts[i].X, pts[i].Y));
-                    }
-                    polygons.Add(new Polygon(points));
+                        var c = characters[i];
+                        gfx.DrawImageUnscaled(c, i * charSize.Width, 0);
 
-                    points = null;
+                        c.Dispose();
+                    }
                 }
-                else
+                return charMap;
+            }
+        }
+
+        private Bitmap GenerateCharacter(Font font, char c)
+        {
+            var size = GetSize(font, c);
+            var bmp = new Bitmap((int)size.Width, (int)size.Height);
+            using (var gfx = Graphics.FromImage(bmp))
+            {
+                gfx.FillRectangle(Brushes.Black, 0, 0, bmp.Width, bmp.Height);
+                gfx.DrawString(c.ToString(), font, Brushes.White, 0, 0);
+            }
+            return bmp;
+        }
+        private SizeF GetSize(Font font, char c)
+        {
+            using (var bmp = new Bitmap(512, 512))
+            {
+                using (var gfx = Graphics.FromImage(bmp))
                 {
-                    points.Add(new PolygonPoint(pts[i].X, pts[i].Y));
+                    return gfx.MeasureString(c.ToString(), font);
                 }
             }
-            return polygons;
         }
     }
 }
