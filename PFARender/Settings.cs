@@ -22,6 +22,7 @@ namespace PFARender
         public bool sameWidthNotes = false;
         public TopColor topColor = TopColor.Red;
         public bool middleC = false;
+        public bool blackNotesAbove = true;
 
         public bool tickBased = true;
     }

@@ -34,6 +34,7 @@ namespace PFARender
             sameWidth.IsChecked = settings.sameWidthNotes;
             topColorSelect.SelectedIndex = (int)settings.topColor;
             middleCSquare.IsChecked = settings.middleC;
+            blackNotesAbove.IsChecked = settings.blackNotesAbove;
             if (settings.tickBased) tickBase.SelectedIndex = 0;
             else tickBase.SelectedIndex = 1;
             screenTime.Content = (Math.Round(settings.deltaTimeOnScreen * 100) / 100).ToString();
@@ -160,6 +161,15 @@ namespace PFARender
             try
             {
                 settings.tickBased = tickBase.SelectedIndex == 0;
+            }
+            catch (NullReferenceException) { }
+        }
+
+        private void BlackNotesAbove_Checked(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                settings.blackNotesAbove = (bool)blackNotesAbove.IsChecked;
             }
             catch (NullReferenceException) { }
         }

@@ -34,7 +34,7 @@ namespace BMEngine
         public bool vsync = true;
 
         public bool paused = false;
-        public bool forceReRender = false;
+        public bool forceReRender = true;
         public double tempoMultiplier = 1;
 
         public bool includeAudio = false;
