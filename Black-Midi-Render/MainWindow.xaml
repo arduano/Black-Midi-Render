@@ -119,6 +119,18 @@
 
                 </Grid>
             </TabItem>
+            <TabItem Header="Note Counter" IsEnabled="{DynamicResource notRendering}">
+                <Grid Background="#FFE5E5E5">
+                    <Label Content="Font Size" HorizontalAlignment="Left" Margin="10,41,0,0" VerticalAlignment="Top"/>
+                    <xctk:DecimalUpDown x:Name="fontSizePicker" FormatString="F0" Value="1" Increment="1"  Maximum="500" Minimum="1" Margin="73,41,0,0" HorizontalAlignment="Left" Width="108" Height="26" VerticalAlignment="Top" ValueChanged="FontSizePicker_ValueChanged"  />
+                    <ComboBox x:Name="fontPicker" HorizontalAlignment="Left" Margin="49,72,0,0" VerticalAlignment="Top" Width="169" Height="26" SelectionChanged="FontPicker_SelectionChanged"/>
+                    <Label Content="Font" HorizontalAlignment="Left" Margin="10,72,0,0" VerticalAlignment="Top"/>
+                    <CheckBox x:Name="showNoteScreenCount" Content="Show on screen note count" HorizontalAlignment="Left" Margin="10,103,0,0" VerticalAlignment="Top" Checked="ShowNoteScreenCount_Checked"/>
+                    <CheckBox x:Name="showNoteCount" Content="Show total note count" HorizontalAlignment="Left" Margin="10,123,0,0" VerticalAlignment="Top" Checked="ShowNoteCount_Checked"/>
+                    <Label Content="You guys wanted a note counter, so here's a note counter" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
+
+                </Grid>
+            </TabItem>
             <TabItem Header="Preview" IsEnabled="{DynamicResource notRendering}">
                 <Grid Background="#FFE5E5E5" KeyDown="Grid_KeyDown">
                     <CheckBox x:Name="vsyncEnabled" Content="V-Sync Enabled" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Checked="VsyncEnabled_Checked" Unchecked="VsyncEnabled_Checked" Focusable="False"/>

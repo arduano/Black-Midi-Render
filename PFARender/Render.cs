@@ -311,6 +311,7 @@ void main()
                         {
                             keyColors[k * 2] = coll;
                             keyColors[k * 2 + 1] = colr;
+                            keyPressed[k] = true;
                         }
                         x1 = x1array[k];
                         wdth = wdtharray[k];
@@ -935,18 +936,23 @@ void main()
                 //Middle C
                 if (n == 60 && settings.middleC)
                 {
-                    double _x1 = x1 + wdth / 4;
-                    double _x2 = x2 - wdth / 4;
+                    r = coll.R;
+                    g = coll.G;
+                    b = coll.B;
+                    a = coll.A;
+                    double _wdth = x2 - x1;
+                    double _x1 = x1 + _wdth / 4;
+                    double _x2 = x2 - _wdth / 4;
                     double _y1, _y2;
                     if (keyPressed[n])
                     {
                         _y2 = wEndDownT + wdth / 4;
-                        _y1 = _y2 + wdth / 4 * 2 / renderSettings.height * renderSettings.width;
+                        _y1 = _y2 + _wdth / 4.0 * 2.0 / renderSettings.height * renderSettings.width;
                     }
                     else
                     {
-                        _y2 = wEndUpT + wdth / 4;
-                        _y1 = _y2 + wdth / 4 * 2 / renderSettings.height * renderSettings.width;
+                        _y2 = wEndUpT + _wdth / 4;
+                        _y1 = _y2 + wdth / 4.0 * 2.0 / renderSettings.height * renderSettings.width;
                     }
                     //Key End Notch 
                     pos = quadBufferPos * 8;
@@ -961,13 +967,13 @@ void main()
 
                     pos = quadBufferPos * 8;
                     quadAttribbuff[pos++] = 0;
-                    quadAttribbuff[pos++] = 0.6;
+                    quadAttribbuff[pos++] = 0.8;
                     quadAttribbuff[pos++] = 0;
-                    quadAttribbuff[pos++] = 0.6;
+                    quadAttribbuff[pos++] = 0.8;
                     quadAttribbuff[pos++] = 0;
-                    quadAttribbuff[pos++] = 0.6;
+                    quadAttribbuff[pos++] = 0.8;
                     quadAttribbuff[pos++] = 0;
-                    quadAttribbuff[pos++] = 0.6;
+                    quadAttribbuff[pos++] = 0.8;
 
                     pos = quadBufferPos * 16;
                     quadColorbuff[pos++] = r;

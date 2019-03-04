@@ -64,7 +64,7 @@ void main()
     color = texture2D( myTextureSampler, UV );
 }
 ";
-        
+
         int MakeShader(string vert, string frag)
         {
             int _vertexObj = GL.CreateShader(ShaderType.VertexShader);
@@ -201,9 +201,38 @@ void main()
 
         void RenderAllText(long lastNC)
         {
+            if (settings.showNoteCount || settings.showNotesRendered)
+                if (textEngine.Font != settings.font || textEngine.FontSize != settings.fontSize)
+                {
+                    textEngine.SetFont(settings.font, settings.fontSize);
+                }
             finalCompositeBuff.BindBuffer();
-            
-            textEngine.Render();
+
+            float offset = 0;
+            if (settings.showNotesRendered)
+            {
+                string text = "Rendering: " + lastNC;
+                var size = textEngine.GetBoundBox(text);
+                Matrix4 transform = Matrix4.Identity;
+                transform = Matrix4.Mult(transform, Matrix4.CreateTranslation(-settings.width / 2, -settings.height / 2 + offset, 0));
+                transform = Matrix4.Mult(transform, Matrix4.CreateRotationZ(0));
+                transform = Matrix4.Mult(transform, Matrix4.CreateScale(1.0f / 1920.0f * 2, -1.0f / 1080.0f * 2, 1.0f));
+
+                textEngine.Render(text, transform, Color4.White);
+
+                offset += size.Height;
+            }
+            if (settings.showNoteCount)
+            {
+                string text = "asdfsfdb\n34kh5bk234jhhjbgfvd";
+                var size = textEngine.GetBoundBox(text);
+                Matrix4 transform = Matrix4.Identity;
+                transform = Matrix4.Mult(transform, Matrix4.CreateTranslation(-settings.width / 2 , -settings.height / 2 + offset, 0));
+                transform = Matrix4.Mult(transform, Matrix4.CreateRotationZ(0));
+                transform = Matrix4.Mult(transform, Matrix4.CreateScale(1.0f / 1920.0f * 2, -1.0f / 1080.0f * 2, 1.0f));
+
+                textEngine.Render(text, transform, Color4.White);
+            }
         }
 
         double lastTempo;
@@ -248,10 +277,10 @@ void main()
                             lastDeltaTimeOnScreen = render.renderer.NoteScreenTime;
                             SpinWait.SpinUntil(() => midi.currentSyncTime > midiTime + lastDeltaTimeOnScreen + tempoFrameStep || midi.unendedTracks == 0 || !settings.running);
                             if (!settings.running) break;
-                            
+
                             render.renderer.RenderFrame(globalDisplayNotes, midiTime, finalCompositeBuff.BufferID);
                             lastNC = render.renderer.LastNoteCount;
-                            //RenderAllText(lastNC);
+                            RenderAllText(lastNC);
                             if (lastNC == 0 && midi.unendedTracks == 0) noNoteFrames++;
                             else noNoteFrames = 0;
                         }
@@ -368,7 +397,7 @@ void main()
             render.renderer.Dispose();
             this.Close();
         }
-        
+
         protected override void OnClosing(CancelEventArgs e)
         {
             base.OnClosing(e);

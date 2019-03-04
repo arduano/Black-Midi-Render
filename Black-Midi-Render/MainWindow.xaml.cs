@@ -53,6 +53,24 @@ namespace Black_Midi_Render
             viewFps.Value = settings.fps;
             vsyncEnabled.IsChecked = settings.vsync;
             tempoSlider.Value = Math.Log(settings.tempoMultiplier, 2);
+            fontSizePicker.Value = settings.fontSize;
+            showNoteCount.IsChecked = settings.showNoteCount;
+            showNoteScreenCount.IsChecked = settings.showNotesRendered;
+            var fonts = Fonts.GetFontFamilies("C:\\Windows\\Fonts");
+            fontPicker.Items.Clear();
+            foreach (var f in fonts)
+            {
+                try
+                {
+                    foreach (var k in f.FamilyNames.Keys.Where((a) => a.IetfLanguageTag.Contains("en")))
+                    {
+                        var item = new ComboBoxItem() { Content = f.FamilyNames[k] };
+                        fontPicker.Items.Add(item);
+                        if (settings.font == f.FamilyNames[k]) fontPicker.SelectedItem = item;
+                    }
+                }
+                catch { }
+            }
             ReloadPlugins();
         }
 
@@ -265,7 +283,7 @@ namespace Black_Midi_Render
 
         private void StartButton_Click(object sender, RoutedEventArgs e)
         {
-            if(renderer.renderer == null)
+            if (renderer.renderer == null)
             {
                 MessageBox.Show("No renderer is selected");
                 return;
@@ -405,6 +423,30 @@ namespace Black_Midi_Render
                 if (p.Initialized) renderer.disposeQueue.Enqueue(p);
             }
             SelectRenderer(pluginsList.SelectedIndex);
+        }
+
+        private void ShowNoteScreenCount_Checked(object sender, RoutedEventArgs e)
+        {
+            settings.showNotesRendered = (bool)showNoteScreenCount.IsChecked;
+        }
+
+        private void ShowNoteCount_Checked(object sender, RoutedEventArgs e)
+        {
+            settings.showNoteCount = (bool)showNoteCount.IsChecked;
+        }
+
+        private void FontSizePicker_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            try
+            {
+                settings.fontSize = (int)fontSizePicker.Value;
+            }
+            catch { }
+        }
+
+        private void FontPicker_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            settings.font = (string)((ComboBoxItem)fontPicker.SelectedItem).Content;
         }
     }
 

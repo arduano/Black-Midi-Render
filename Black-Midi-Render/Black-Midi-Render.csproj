@@ -143,7 +143,6 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="RenderWindow.cs" />
-    <Compile Include="TextManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">

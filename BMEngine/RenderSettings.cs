@@ -47,8 +47,10 @@ namespace BMEngine
         public int crf = 17;
         public string crfPreset = "medium";
 
-        public bool glowEnabled = false;
-        public int glowRadius = 200;
+        public bool showNoteCount = false;
+        public bool showNotesRendered = false;
+        public int fontSize = 50;
+        public string font = "Arial";
 
         public KeyboardRenderers kbrender = KeyboardRenderers.New;
         public NoteRenderers ntrender = NoteRenderers.Shaded;

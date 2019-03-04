@@ -24,17 +24,23 @@ namespace BMEngine
 layout(location = 0) in vec2 position;
 layout(location = 1) in vec2 uv;
 
+uniform mat4 viewmat;
+uniform vec4 Col;
+
 out vec2 UV;
+out vec4 Color;
 
 void main()
 {
-    gl_Position = vec4(position.x * 2 - 1, position.y * 2 - 1, 0, 1.0f);
+    gl_Position = viewmat * vec4(position.x, position.y, 0, 1.0f);
     UV = uv;
+    Color = Col;
 }
 ";
         string textShaderFrag = @"#version 330 compatibility
 
 in vec2 UV;
+in vec4 Color;
 
 out vec4 color;
 
@@ -43,7 +49,7 @@ uniform sampler2D myTextureSampler;
 void main()
 {
     float mask = texture2D( myTextureSampler, UV ).y;
-    color = vec4(0.5, 0.5, 0.5, mask);
+    color = vec4(1, 1, 1, mask) * Color;
 }
 ";
         #endregion
@@ -53,6 +59,9 @@ void main()
         SizeF[] charSizes;
 
         int textShader;
+
+        int uniformMatrix;
+        int uniformColor;
 
         int vertexBufferID;
         int uvBufferID;
@@ -71,6 +80,9 @@ void main()
             GL.DeleteProgram(textShader);
             GL.DeleteTexture(charMapTex);
         }
+
+        public string Font { get; private set; } = "";
+        public int FontSize { get; private set; } = -1;
 
         public GLTextEngine()
         {
@@ -119,18 +131,23 @@ void main()
                 indexes,
                 BufferUsageHint.StaticDraw);
 
-            int posloc = GL.GetAttribLocation(textShader, "position");
-            int uvloc = GL.GetAttribLocation(textShader, "uv");
+            uniformMatrix = GL.GetUniformLocation(textShader, "viewmat");
+            uniformColor = GL.GetUniformLocation(textShader, "Col");
 
-            var bitmap = GenerateCharacters(100, "Brush Script Std", out mapCharSize, out charSizes);
-            charMapTex = loadImage(bitmap);
-            bitmap.Dispose();
+            charMapTex = GL.GenTexture();
         }
 
-        int loadImage(Bitmap image)
+        public void SetFont(string font, int size)
         {
-            int texID = GL.GenTexture();
+            var bitmap = GenerateCharacters(size, font, out mapCharSize, out charSizes);
+            loadImage(bitmap, charMapTex);
+            bitmap.Dispose();
+            Font = font;
+            FontSize = size;
+        }
 
+        void loadImage(Bitmap image, int texID)
+        {
             GL.BindTexture(TextureTarget.Texture2D, texID);
             BitmapData data = image.LockBits(new System.Drawing.Rectangle(0, 0, image.Width, image.Height),
                 ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
@@ -144,11 +161,9 @@ void main()
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge);
 
             image.UnlockBits(data);
-
-            return texID;
         }
 
-        public void Render()
+        public void Render(string text, Matrix4 transform, Color4 color)
         {
             GL.Enable(EnableCap.Blend);
             GL.EnableClientState(ArrayCap.VertexArray);
@@ -164,15 +179,21 @@ void main()
             GL.UseProgram(textShader);
             GL.BindTexture(TextureTarget.Texture2D, charMapTex);
 
+            GL.Uniform4(uniformColor, color);
+            GL.UniformMatrix4(uniformMatrix, false, ref transform);
+
             quadBufferPos = 0;
-            string text = "qwertQWERT:\n/';<1234.4567";
             Vector2 curpos = new Vector2(0, 0);
-            foreach(char c in text)
+            foreach (char c in text)
             {
-                if(c == '\n')
+                if (c == '\n')
                 {
                     curpos.Y += mapCharSize.Height;
                     curpos.X = 0;
+                }
+                if(c == ' ')
+                {
+                    curpos.X += mapCharSize.Width / 4.0f;
                 }
                 if (!Characters.Contains(c)) continue;
                 var chari = Characters.IndexOf(c);
@@ -186,14 +207,14 @@ void main()
                 Vector2 endpos = curpos + new Vector2(sz.Width, sz.Height);
 
                 int pos = quadBufferPos * 8;
-                quadVertexbuff[pos++] = (curpos.X - padding) / 1920;
-                quadVertexbuff[pos++] = curpos.Y / 1080;
-                quadVertexbuff[pos++] = (curpos.X - padding) / 1920;
-                quadVertexbuff[pos++] = endpos.Y / 1080;
-                quadVertexbuff[pos++] = (endpos.X + padding) / 1920;
-                quadVertexbuff[pos++] = endpos.Y / 1080;
-                quadVertexbuff[pos++] = (endpos.X + padding) / 1920;
-                quadVertexbuff[pos++] = curpos.Y / 1080;
+                quadVertexbuff[pos++] = (curpos.X - padding);
+                quadVertexbuff[pos++] = curpos.Y;
+                quadVertexbuff[pos++] = (curpos.X - padding);
+                quadVertexbuff[pos++] = endpos.Y;
+                quadVertexbuff[pos++] = (endpos.X + padding);
+                quadVertexbuff[pos++] = endpos.Y;
+                quadVertexbuff[pos++] = (endpos.X + padding);
+                quadVertexbuff[pos++] = curpos.Y;
 
                 curpos.X += sz.Width;
 
@@ -212,13 +233,41 @@ void main()
             FlushQuadBuffer(false);
 
             GL.Disable(EnableCap.Blend);
-            GL.Disable(EnableCap.Texture2D); 
+            GL.Disable(EnableCap.Texture2D);
             GL.DisableClientState(ArrayCap.VertexArray);
             GL.DisableClientState(ArrayCap.ColorArray);
             GL.DisableClientState(ArrayCap.TextureCoordArray);
 
             GL.DisableVertexAttribArray(0);
             GL.DisableVertexAttribArray(1);
+        }
+
+        public SizeF GetBoundBox(string text)
+        {
+            Vector2 curpos = new Vector2(0, 0);
+            int rows = 1;
+            float maxWidth = 0;
+            foreach (char c in text)
+            {
+                if (c == '\n')
+                {
+                    curpos.X = 0;
+                    rows ++;
+                }
+                if (!Characters.Contains(c)) continue;
+                var chari = Characters.IndexOf(c);
+                var sz = charSizes[chari];
+                sz.Width *= 1.0f;
+                double charwidth = 1.0 / Characters.Length;
+                double s = charwidth * chari;
+                double e = s + charSizes[chari].Width / mapCharSize.Width * charwidth;
+                float padding = mapCharSize.Width / 8f;
+                sz.Width -= padding * 2;
+                Vector2 endpos = curpos + new Vector2(sz.Width, sz.Height);
+                curpos.X += sz.Width;
+                if (curpos.X > maxWidth) maxWidth = curpos.X;
+            }
+            return new SizeF(maxWidth, mapCharSize.Height * rows);
         }
 
         void FlushQuadBuffer(bool check = true)
@@ -245,7 +294,7 @@ void main()
             quadBufferPos = 0;
         }
         
-        private const string Characters = @"qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM0123456789µ§½!""#¤%&/()=?^*@£€${[]}\~¨'-_.:,;<>|°©®±¥";
+        private const string Characters = @" qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM0123456789µ§½!""#¤%&/()=?^*@£€${[]}\~¨'-_.:,;<>|°©®±¥";
         public Bitmap GenerateCharacters(int fontSize, string fontName, out Size charSize, out SizeF[] charSizes)
         {
             charSizes = new SizeF[Characters.Length];
