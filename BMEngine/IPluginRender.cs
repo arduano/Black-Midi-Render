@@ -25,6 +25,5 @@ namespace BMEngine
         void Init();
         void RenderFrame(FastList<Note> notes, double midiTime, int finalCompositeBuff);
         void SetTrackColors(Color4[][] trakcs);
-        
     }
 }

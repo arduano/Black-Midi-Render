@@ -32,6 +32,8 @@ namespace BMEngine
         public bool imgRender = false;
         public string imgPath = "imgs";
         public bool vsync = true;
+        public bool renderStartBlankScreen = false;
+        public double renderSecondsDelay = 0;
 
         public bool paused = false;
         public bool forceReRender = true;
@@ -51,6 +53,7 @@ namespace BMEngine
         public bool showNotesRendered = false;
         public int fontSize = 50;
         public string font = "Arial";
+
 
         public KeyboardRenderers kbrender = KeyboardRenderers.New;
         public NoteRenderers ntrender = NoteRenderers.Shaded;

@@ -301,6 +301,7 @@ void main()
             {
                 double renderCutoff = midiTime + deltaTimeOnScreen;
                 if (n.end >= midiTime || !n.hasEnded)
+                { 
                     if (n.start < renderCutoff)
                     {
                         int k = n.note;
@@ -424,6 +425,11 @@ void main()
                         }
                     }
                     else break;
+                }
+                else
+                {
+                    n.delete = true;
+                }
             }
             if (blackNotesAbove)
             {
@@ -1504,13 +1510,13 @@ void main()
 
                     pos = quadBufferPos * 8;
                     quadAttribbuff[pos++] = 0;
-                    quadAttribbuff[pos++] = 0.9f;
+                    quadAttribbuff[pos++] = 0.85f;
                     quadAttribbuff[pos++] = 0;
-                    quadAttribbuff[pos++] = 0.9f;
+                    quadAttribbuff[pos++] = 0.85f;
                     quadAttribbuff[pos++] = 0;
-                    quadAttribbuff[pos++] = 0.9f;
+                    quadAttribbuff[pos++] = 0.85f;
                     quadAttribbuff[pos++] = 0;
-                    quadAttribbuff[pos++] = 0.9f;
+                    quadAttribbuff[pos++] = 0.85f;
 
                     pos = quadBufferPos * 16;
                     quadColorbuff[pos++] = r3;
@@ -1549,9 +1555,9 @@ void main()
                     quadAttribbuff[pos++] = 0;
                     quadAttribbuff[pos++] = 0.7f;
                     quadAttribbuff[pos++] = 0;
-                    quadAttribbuff[pos++] = 0.9f;
+                    quadAttribbuff[pos++] = 0.85f;
                     quadAttribbuff[pos++] = 0;
-                    quadAttribbuff[pos++] = 0.9f;
+                    quadAttribbuff[pos++] = 0.85f;
 
                     pos = quadBufferPos * 16;
                     quadColorbuff[pos++] = r3;

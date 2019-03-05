@@ -109,7 +109,7 @@ namespace Black_Midi_Render
                         cutoffTime = win.midiTime;
                         while (i.MoveNext(out n))
                         {
-                            if (n.hasEnded && n.end < cutoffTime)
+                            if (n.delete)
                                 i.Remove();
                             else nc++;
                         }
@@ -294,6 +294,7 @@ namespace Black_Midi_Render
             settings.height = (int)viewHeight.Value;
             settings.fps = (int)viewFps.Value;
             settings.ffRender = false;
+            settings.renderSecondsDelay = 0;
             renderThread = Task.Factory.StartNew(RunRenderWindow);
             Resources["notPreviewing"] = false;
         }
@@ -323,6 +324,7 @@ namespace Black_Midi_Render
             settings.fps = (int)viewFps.Value;
             settings.ffRender = true;
             settings.ffPath = videoPath.Text;
+            settings.renderSecondsDelay = (double)secondsDelay.Value;
 
             settings.paused = false;
             previewPaused.IsChecked = false;

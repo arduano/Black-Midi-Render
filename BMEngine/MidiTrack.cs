@@ -16,6 +16,8 @@ namespace BMEngine
         public byte channel;
         public byte note;
         public byte vel;
+        public bool delete = false;
+        public object meta = null;
         public MidiTrack track;
     }
 

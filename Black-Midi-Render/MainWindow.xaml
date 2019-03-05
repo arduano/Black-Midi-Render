@@ -159,7 +159,7 @@
                         </Button.IsEnabled>
                     </Button>
                     <TextBox x:Name="audioPath" Height="18" Margin="190,39,8,0" IsEnabled="False" TextWrapping="Wrap" Text="" VerticalAlignment="Top"/>
-                    <Button x:Name="startRenderButton" Content="Start Render" HorizontalAlignment="Left" Margin="10,126,0,0" VerticalAlignment="Top" Width="94" Click="StartRenderButton_Click"  IsEnabled="{Binding IsEnabled, ElementName=previewStartEnabled}"/>
+                    <Button x:Name="startRenderButton" Content="Start Render" HorizontalAlignment="Left" Margin="10,181,0,0" VerticalAlignment="Top" Width="94" Click="StartRenderButton_Click"  IsEnabled="{Binding IsEnabled, ElementName=previewStartEnabled}"/>
                     <RadioButton x:Name="bitrateOption" Content="Bitrate" HorizontalAlignment="Left" Margin="10,69,0,0" VerticalAlignment="Top" IsChecked="True"/>
                     <RadioButton x:Name="crfOption" Content="crf" HorizontalAlignment="Left" Margin="10,101,0,0" VerticalAlignment="Top"/>
                     <xctk:DecimalUpDown x:Name="bitrate" FormatString="F0" Value="20000" Increment="1"  Maximum="1000000" Minimum="1" Margin="70,63,0,0" HorizontalAlignment="Left" Width="118" Height="26" VerticalAlignment="Top" >
@@ -197,7 +197,9 @@
                     </ComboBox>
                     <Label Content="FFMPEG crf: 0 = lossless, 51 = worst quality possible" HorizontalAlignment="Left" Margin="244,95,0,0" VerticalAlignment="Top"/>
                     <Label Content="kbps" HorizontalAlignment="Left" Margin="192,63,0,0" VerticalAlignment="Top"/>
-                    <Button Content="Stop" HorizontalAlignment="Left" Margin="109,126,0,0" Width="75" IsEnabled="{Binding IsEnabled, ElementName=stopEnabled}" Click="StopButton_Click" Height="20" VerticalAlignment="Top" />
+                    <Button Content="Stop" HorizontalAlignment="Left" Margin="109,181,0,0" Width="75" IsEnabled="{Binding IsEnabled, ElementName=stopEnabled}" Click="StopButton_Click" Height="20" VerticalAlignment="Top" />
+                    <xctk:DecimalUpDown x:Name="secondsDelay" FormatString="F1" Value="0" Increment="0.5"  Maximum="10" Minimum="0" Margin="135,126,0,0" HorizontalAlignment="Left" Width="82" Height="26" VerticalAlignment="Top" />
+                    <Label Content="Delay start (seconds)" HorizontalAlignment="Left" Margin="10,126,0,0" VerticalAlignment="Top"/>
                 </Grid>
             </TabItem>
         </TabControl>

@@ -276,6 +276,7 @@ void main()
             {
                 double renderCutoff = midiTime + deltaTimeOnScreen;
                 if (n.end >= midiTime || !n.hasEnded)
+                { 
                     if (n.start < renderCutoff)
                     {
                         if (n.note >= firstNote && n.note < lastNote)
@@ -339,7 +340,11 @@ void main()
                         }
                     }
                     else break;
-
+                }
+                else
+                {
+                    n.delete = true;
+                }
             }
             FlushQuadBuffer(false);
             quadBufferPos = 0;

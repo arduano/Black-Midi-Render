@@ -134,6 +134,8 @@ void main()
             {
                 render.renderer.LastMidiTimePerTick = (double)midi.zerothTempo / midi.division;
                 midiTime = -render.renderer.NoteScreenTime;
+                tempoFrameStep = ((double)midi.division / lastTempo) * (1000000 / settings.fps);
+                midiTime -= tempoFrameStep * settings.renderSecondsDelay  *settings.fps;
             }
             pixels = new byte[settings.width * settings.height * 3];
 
@@ -294,6 +296,13 @@ void main()
                                 List<Color4[]> trkcolors = new List<Color4[]>();
                                 foreach (var t in midi.tracks) trkcolors.Add(t.trkColor);
                                 render.renderer.SetTrackColors(trkcolors.ToArray());
+                                lock (globalDisplayNotes)
+                                {
+                                    foreach (Note n in globalDisplayNotes)
+                                    {
+                                        n.meta = null;
+                                    }
+                                }
                             }
                             render.renderer.LastMidiTimePerTick = lastTempo / midi.division;
                             lastDeltaTimeOnScreen = render.renderer.NoteScreenTime;
@@ -433,12 +442,21 @@ void main()
 
         void DrawScreenQuad()
         {
+            GL.Enable(EnableCap.Blend);
+            GL.EnableClientState(ArrayCap.VertexArray);
+            GL.Enable(EnableCap.Texture2D);
+            GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+
             GL.BindBuffer(BufferTarget.ArrayBuffer, screenQuadBuffer);
             GL.VertexPointer(2, VertexPointerType.Double, 16, 0);
 
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, screenQuadIndexBuffer);
             GL.IndexPointer(IndexPointerType.Int, 1, 0);
             GL.DrawElements(PrimitiveType.Quads, 4, DrawElementsType.UnsignedInt, IntPtr.Zero);
+
+            GL.Disable(EnableCap.Blend);
+            GL.DisableClientState(ArrayCap.VertexArray);
+            GL.Disable(EnableCap.Texture2D);
         }
     }
 }
