@@ -10,7 +10,7 @@ import { HttpClient } from "@angular/common/http";
 export class StartPageComponent implements OnInit {
   constructor(public router: Router, private http: HttpClient) {}
 
-  url32: string = '';
+  url86: string = '';
   url64: string = '';
 
   gitURL: string =
@@ -22,9 +22,9 @@ export class StartPageComponent implements OnInit {
     for (let i = 0; i < data.assets.length; i++) {
       let asset = data.assets[i];
       let name: string = asset.name;
-      if (name.includes('32')) {
-        this.url32 = asset.browser_download_url;
-        console.log(this.url32);
+      if (name.includes('86')) {
+        this.url86 = asset.browser_download_url;
+        console.log(this.url86);
       }
       if (name.includes('64')) {
         this.url64 = asset.browser_download_url;
