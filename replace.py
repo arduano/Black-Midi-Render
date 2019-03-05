@@ -4,11 +4,11 @@ os.system("copy dist\\bmr\\index.html 404.html")
 os.remove('dist/bmr/index.html')
 
 s = open('404.html').read()
-s = s.replace('"styles.', '"Black-Midi-Render/dist/bmr/styles.')
-s = s.replace('"runtime', '"Black-Midi-Render/dist/bmr/runtime')
-s = s.replace('"main', '"Black-Midi-Render/dist/bmr/main')
-s = s.replace('"polyfills', '"Black-Midi-Render/dist/bmr/polyfills')
-s = s.replace('assets/css-element-queries', 'Black-Midi-Render/dist/bmr/assets/css-element-queries')
+s = s.replace('"styles.', '"Zenith-MIDI/dist/bmr/styles.')
+s = s.replace('"runtime', '"Zenith-MIDI/dist/bmr/runtime')
+s = s.replace('"main', '"Zenith-MIDI/dist/bmr/main')
+s = s.replace('"polyfills', '"Zenith-MIDI/dist/bmr/polyfills')
+s = s.replace('assets/css-element-queries', 'Zenith-MIDI/dist/bmr/assets/css-element-queries')
 
 
 def replaceAssetPaths(f, r):
@@ -19,8 +19,8 @@ def replaceAssetPaths(f, r):
         for _f in files:
             d = root.replace('\\', '/')[4:] + '/' + _f
             if d in txt:
-                print('replaced', d, 'with', 'Black-Midi-Render/dist/bmr/' + d)
-                txt = txt.replace(d, 'Black-Midi-Render/dist/bmr/' + d)
+                print('replaced', d, 'with', 'Zenith-MIDI/dist/bmr/' + d)
+                txt = txt.replace(d, 'Zenith-MIDI/dist/bmr/' + d)
     s = s.replace(f, r)
     open('dist/bmr/' + r, 'w').write(txt)
     os.remove('dist/bmr/' + f)
