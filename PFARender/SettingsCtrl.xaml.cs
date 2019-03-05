@@ -38,6 +38,10 @@ namespace PFARender
             if (settings.tickBased) tickBase.SelectedIndex = 0;
             else tickBase.SelectedIndex = 1;
             screenTime.Content = (Math.Round(settings.deltaTimeOnScreen * 100) / 100).ToString();
+#if !ALL_COLORS
+            topColorSelect.SelectedIndex = 1;
+            topColorSelect.IsEnabled = false;
+#endif
         }
 
         public SettingsCtrl(Settings settings) : base()

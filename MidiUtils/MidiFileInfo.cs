@@ -15,8 +15,8 @@ namespace MidiUtils
             public uint Length { get; set; }
         }
 
-        public short Format { get; private set; }
-        public short Division { get; private set; }
+        public ushort Format { get; private set; }
+        public ushort Division { get; private set; }
         public int TrackCount { get; private set; }
 
         public MidiChunkPointer[] Tracks { get; private set; }
@@ -48,19 +48,19 @@ namespace MidiUtils
             }
         }
 
-        static int ReadInt32(Stream reader)
+        static uint ReadInt32(Stream reader)
         {
-            int length = 0;
+            uint length = 0;
             for (int i = 0; i != 4; i++)
-                length = (int)((length << 8) | (byte)reader.ReadByte());
+                length = (uint)((length << 8) | (byte)reader.ReadByte());
             return length;
         }
 
-        static short ReadInt16(Stream reader)
+        static ushort ReadInt16(Stream reader)
         {
-            short length = 0;
+            ushort length = 0;
             for (int i = 0; i != 2; i++)
-                length = (short)((length << 8) | (byte)reader.ReadByte());
+                length = (ushort)((length << 8) | (byte)reader.ReadByte());
             return length;
         }
 

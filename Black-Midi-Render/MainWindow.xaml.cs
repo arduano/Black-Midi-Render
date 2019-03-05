@@ -254,8 +254,10 @@ namespace Black_Midi_Render
                 MessageBox.Show("Midi file doesn't exist");
                 return;
             }
-            //try
+#if !DEBUG_LOAD
+            try
             {
+#endif
                 settings.maxTrackBufferSize = (int)maxBufferSize.Value;
 
                 if (midifile != null) midifile.Dispose();
@@ -264,12 +266,14 @@ namespace Black_Midi_Render
                 GC.WaitForFullGCComplete();
                 midifile = new MidiFile(midipath, settings);
                 Resources["midiLoaded"] = true;
+#if !DEBUG_LOAD
             }
-            //catch (Exception ex)
-            //{
-            //    Console.WriteLine(ex.Message + "\n" + ex.StackTrace);
-            //    MessageBox.Show(ex.Message + "\n" + ex.StackTrace);
-            //}
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message + "\n" + ex.StackTrace);
+                MessageBox.Show(ex.Message + "\n" + ex.StackTrace);
+            }
+#endif
         }
 
         private void UnloadButton_Click(object sender, RoutedEventArgs e)

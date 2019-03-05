@@ -28,7 +28,7 @@ namespace Colour_Event_Inject
 
             MidiFileInfo info = MidiFileInfo.Parse(midiin.BaseStream);
             writer.WriteDivision(info.Division);
-            writer.WriteNtrks((short)Math.Min(info.TrackCount, 65535));
+            writer.WriteNtrks((ushort)Math.Min(info.TrackCount, 65535));
             writer.WriteFormat(info.Format);
 
             for (int i = 0; i < info.TrackCount; i++)

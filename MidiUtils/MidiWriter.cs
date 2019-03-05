@@ -28,12 +28,12 @@ namespace MidiUtils
             writer.Write(data, 0, data.Length);
         }
 
-        public void Write(short v)
+        public void Write(ushort v)
         {
             for (int i = 1; i >= 0; i--) writer.WriteByte((byte)((v >> (i * 8)) & 0xFF));
         }
 
-        public void Write(int v)
+        public void Write(uint v)
         {
             for (int i = 3; i >= 0; i--) writer.WriteByte((byte)((v >> (i * 8)) & 0xFF));
         }
@@ -43,27 +43,27 @@ namespace MidiUtils
             writer.WriteByte(v);
         }
 
-        public void WriteFormat(short s)
+        public void WriteFormat(ushort s)
         {
             long pos = writer.Position;
             writer.Position = 8;
-            Write((short)s);
+            Write((ushort)s);
             writer.Position = pos;
         }
 
-        public void WriteNtrks(short s)
+        public void WriteNtrks(ushort s)
         {
             long pos = writer.Position;
             writer.Position = 10;
-            Write((short)s);
+            Write((ushort)s);
             writer.Position = pos;
         }
 
-        public void WriteDivision(short s)
+        public void WriteDivision(ushort s)
         {
             long pos = writer.Position;
             writer.Position = 12;
-            Write((short)s);
+            Write((ushort)s);
             writer.Position = pos;
         }
 
@@ -87,7 +87,7 @@ namespace MidiUtils
 
         public void EndTrack()
         {
-            int len = (int)(writer.Position - chunkStart) - 8;
+            uint len = (uint)(writer.Position - chunkStart) - 8;
             writer.Position = chunkStart + 4;
             Write(len);
             writer.Position = writer.Length;
