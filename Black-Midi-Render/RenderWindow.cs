@@ -38,16 +38,16 @@ namespace Black_Midi_Render
         string postShaderVert = @"#version 330 compatibility
 
 in vec3 position;
-in vec4 glColor;
-in vec2 texCoordV;
+//in vec4 glColor;
+//in vec2 texCoordV;
 out vec2 UV;
 
-out vec4 color;
+//out vec4 color;
 
 void main()
 {
     gl_Position = vec4(position.x * 2 - 1, position.y * 2 - 1, position.z * 2 - 1, 1.0f);
-	color = glColor;
+	//color = glColor;
     UV = vec2(position.x, position.y);
 }
 ";
@@ -109,6 +109,11 @@ void main()
         GLPostbuffer finalCompositeBuff;
 
         int postShader;
+
+        int screenQuadBuffer;
+        int screenQuadIndexBuffer;
+        double[] screenQuadArray = new double[] { 0, 0, 0, 1, 1, 1, 1, 0 };
+        int[] screenQuadArrayIndex = new int[] { 0, 1, 2, 3 };
 
         byte[] pixels;
 
@@ -196,6 +201,23 @@ void main()
 
             finalCompositeBuff = new GLPostbuffer(settings);
 
+            GL.GenBuffers(1, out screenQuadBuffer);
+            GL.GenBuffers(1, out screenQuadIndexBuffer);
+
+            GL.BindBuffer(BufferTarget.ArrayBuffer, screenQuadBuffer);
+            GL.BufferData(
+                BufferTarget.ArrayBuffer,
+                (IntPtr)(screenQuadArray.Length * 8),
+                screenQuadArray,
+                BufferUsageHint.StaticDraw);
+            
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, screenQuadIndexBuffer);
+            GL.BufferData(
+                BufferTarget.ElementArrayBuffer,
+                (IntPtr)(screenQuadArrayIndex.Length * 4),
+                screenQuadArrayIndex,
+                BufferUsageHint.StaticDraw);
+
             postShader = MakeShader(postShaderVert, postShaderFrag);
         }
 
@@ -227,7 +249,7 @@ void main()
                 string text = "asdfsfdb\n34kh5bk234jhhjbgfvd";
                 var size = textEngine.GetBoundBox(text);
                 Matrix4 transform = Matrix4.Identity;
-                transform = Matrix4.Mult(transform, Matrix4.CreateTranslation(-settings.width / 2 , -settings.height / 2 + offset, 0));
+                transform = Matrix4.Mult(transform, Matrix4.CreateTranslation(-settings.width / 2, -settings.height / 2 + offset, 0));
                 transform = Matrix4.Mult(transform, Matrix4.CreateRotationZ(0));
                 transform = Matrix4.Mult(transform, Matrix4.CreateScale(1.0f / 1920.0f * 2, -1.0f / 1080.0f * 2, 1.0f));
 
@@ -411,12 +433,12 @@ void main()
 
         void DrawScreenQuad()
         {
-            GL.Begin(PrimitiveType.Quads);
-            GL.Vertex2(0, 0);
-            GL.Vertex2(1, 0);
-            GL.Vertex2(1, 1);
-            GL.Vertex2(0, 1);
-            GL.End();
+            GL.BindBuffer(BufferTarget.ArrayBuffer, screenQuadBuffer);
+            GL.VertexPointer(2, VertexPointerType.Double, 16, 0);
+
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, screenQuadIndexBuffer);
+            GL.IndexPointer(IndexPointerType.Int, 1, 0);
+            GL.DrawElements(PrimitiveType.Quads, 4, DrawElementsType.UnsignedInt, IntPtr.Zero);
         }
     }
 }
