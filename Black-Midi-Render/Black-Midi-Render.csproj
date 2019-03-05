@@ -7,7 +7,7 @@
     <ProjectGuid>{273DA7BD-C89A-4574-97DE-AF425529FAAE}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>Black_Midi_Render</RootNamespace>
-    <AssemblyName>Black-Midi-Render</AssemblyName>
+    <AssemblyName>Zenith</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -229,7 +229,7 @@
   </Target>
   <PropertyGroup>
     <PostBuildEvent>del Plugins\OpenTK.dll
-del Plugins\BMEngine.dll
+del Plugins\ZenithEngine.dll
 del Plugins\MidiUtils.dll
 del Plugins\Newtonsoft.Json.dll
 del Plugins\Xceed.Wpf.Toolkit.dll

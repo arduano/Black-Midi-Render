@@ -32,7 +32,7 @@ namespace FlatRender
             noteBrightness.Value = (decimal)settings.noteBrightness;
             noteDeltaScreenTime.Value = Math.Log(settings.deltaTimeOnScreen, 2);
             screenTime.Content = settings.deltaTimeOnScreen;
-            sameWidth.IsChecked = settings.sameWidthNotes; 
+            sameWidth.IsChecked = settings.sameWidthNotes;
             if (settings.tickBased) tickBase.SelectedIndex = 0;
             else tickBase.SelectedIndex = 1;
             screenTime.Content = (Math.Round(settings.deltaTimeOnScreen * 100) / 100).ToString();
@@ -42,7 +42,7 @@ namespace FlatRender
         {
             InitializeComponent();
             this.settings = settings;
-            LoadSettings();
+            LoadSettings(true);
             SetValues();
         }
 
@@ -87,7 +87,7 @@ namespace FlatRender
             }
         }
 
-        void LoadSettings()
+        void LoadSettings(bool startup = false)
         {
             try
             {
@@ -98,7 +98,8 @@ namespace FlatRender
             }
             catch
             {
-                Console.WriteLine("Could not load saved plugin settings");
+                if (!startup)
+                    Console.WriteLine("Could not load saved plugin settings");
             }
         }
 

@@ -42,7 +42,7 @@ namespace ClassicRender
         {
             InitializeComponent();
             this.settings = settings;
-            LoadSettings();
+            LoadSettings(true);
             SetValues();
         }
 
@@ -87,7 +87,7 @@ namespace ClassicRender
             }
         }
 
-        void LoadSettings()
+        void LoadSettings(bool startup = false)
         {
 
             try
@@ -99,7 +99,8 @@ namespace ClassicRender
             }
             catch
             {
-                Console.WriteLine("Could not load saved plugin settings");
+                if (!startup)
+                    Console.WriteLine("Could not load saved plugin settings");
             }
         }
 
