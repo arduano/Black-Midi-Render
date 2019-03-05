@@ -27,7 +27,8 @@ export class MainComponent implements OnInit {
 
   public links:any[] = [
     {name:'Start', url:'start'},
-    {name:'Benchmarks', url:'benchmarks'}
+    {name:'Benchmarks', url:'benchmarks'},
+    {name:'Plugins', url:'plugins'}
   ]
 
   toggleMenu(){
@@ -71,6 +72,6 @@ export class MainComponent implements OnInit {
   }
 
   routeTo(url) {
-    this.router.navigate(['Black-Midi-Render/' + url])
+    this.router.navigate(['Zenith-MIDI/' + url])
   }
 }

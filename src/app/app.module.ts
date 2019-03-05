@@ -15,6 +15,8 @@ import { HttpClient } from 'selenium-webdriver/http';
 import { HttpClientModule } from '@angular/common/http';
 import { BenchmarksPageComponent } from './pages/benchmarks-page/benchmarks-page.component';
 import { BenchmarkComponent } from './misc/benchmark/benchmark.component';
+import { PluginsPageComponent } from './pages/plugins-page/plugins-page.component';
+import { PluginComponent } from './misc/plugin/plugin.component';
 
 
 @NgModule({
@@ -26,6 +28,8 @@ import { BenchmarkComponent } from './misc/benchmark/benchmark.component';
     SocialMediaComponent,
     BenchmarksPageComponent,
     BenchmarkComponent,
+    PluginsPageComponent,
+    PluginComponent,
   ],
   imports: [
     BrowserModule,
