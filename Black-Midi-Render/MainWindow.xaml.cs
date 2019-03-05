@@ -131,18 +131,20 @@ namespace Black_Midi_Render
                     ramSample++;
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                MessageBox.Show("An error occurred while opeining render window. Please try again.");
+                MessageBox.Show("An error occurred while opeining render window. Please try again.\n\n" + ex.Message + "\n" + ex.StackTrace);
                 settings.running = false;
             }
             winthread.GetAwaiter().GetResult();
             settings.running = false;
             midifile.Reset();
+            Console.ForegroundColor = ConsoleColor.Blue;
             Console.WriteLine(
                     "Finished render\nRAM usage (Private bytes)\nPeak: " + Math.Round((double)maxRam / 1000 / 1000 / 1000 * 100) / 100 +
                     "GB\nAvg: " + Math.Round((double)avgRam / 1000 / 1000 / 1000 * 100) / 100 +
                     "GB\nMinutes to render: " + Math.Round((double)timewatch.ElapsedMilliseconds / 1000 / 60 * 100) / 100);
+            Console.ResetColor();
             Dispatcher.Invoke(() =>
             {
                 Resources["notRendering"] = true;

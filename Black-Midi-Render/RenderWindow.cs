@@ -19,6 +19,7 @@ using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
 using System.Drawing.Drawing2D;
 using System.Drawing.Text;
+using System.Text.RegularExpressions;
 
 namespace Black_Midi_Render
 {
@@ -124,8 +125,11 @@ void main()
 
         CurrentRendererPointer render;
         GLTextEngine textEngine;
-        public RenderWindow(CurrentRendererPointer renderer, MidiFile midi, RenderSettings settings) : base((int)(DisplayDevice.Default.Width / 1.5), (int)(DisplayDevice.Default.Height / 1.5), new GraphicsMode(new ColorFormat(8, 8, 8, 8)), "Render", GameWindowFlags.Default, DisplayDevice.Default)
+        public RenderWindow(CurrentRendererPointer renderer, MidiFile midi, RenderSettings settings) : base(16, 9, new GraphicsMode(new ColorFormat(8, 8, 8, 8)), "Render", GameWindowFlags.Default, DisplayDevice.Default)
         {
+            Width = (int)(DisplayDevice.Default.Width / 1.5);
+            Height = (int)((double)Width / settings.width * settings.height);
+            Location = new Point((DisplayDevice.Default.Width - Width) / 2, (DisplayDevice.Default.Height - Height) / 2);
             textEngine = new GLTextEngine();
             render = renderer;
             this.settings = settings;
@@ -146,7 +150,7 @@ void main()
             this.midi = midi;
             if (settings.ffRender)
             {
-                string args = "";
+                string args = "-hide_banner";
                 if (settings.includeAudio)
                 {
                     double fstep = ((double)midi.division / lastTempo) * (1000000 / settings.fps);
@@ -179,9 +183,33 @@ void main()
                 ffmpeg.StartInfo = new ProcessStartInfo("ffmpeg", args);
                 ffmpeg.StartInfo.RedirectStandardInput = true;
                 ffmpeg.StartInfo.UseShellExecute = false;
+                ffmpeg.StartInfo.RedirectStandardError = true;
                 try
                 {
                     ffmpeg.Start();
+                    Console.OpenStandardOutput();
+                    Regex messageMatch = new Regex("\\[.*@.*\\]");
+                    ffmpeg.ErrorDataReceived += (s, e) =>
+                    {
+                        if (e.Data == null) return;
+                        if (e.Data.Contains("frame="))
+                        {
+                            Console.Write(e.Data);
+                            Console.SetCursorPosition(0, Console.CursorTop);
+                        }
+                        if(e.Data.Contains("Conversion failed!"))
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine("An error occured in FFMPEG, closing!");
+                            Console.ResetColor();
+                            settings.running = false;
+                        }
+                        if (messageMatch.IsMatch(e.Data))
+                        {
+                            Console.WriteLine(e.Data);
+                        }
+                    };
+                    ffmpeg.BeginErrorReadLine();
                 }
                 catch (Exception ex)
                 {
@@ -272,7 +300,7 @@ void main()
             }
             int noNoteFrames = 0;
             long lastNC = 0;
-            while (settings.running && noNoteFrames > settings.fps * 5 || midi.unendedTracks != 0)
+            while (settings.running && noNoteFrames < settings.fps * 5 || midi.unendedTracks != 0)
             {
                 if (!settings.paused || settings.forceReRender)
                 {
